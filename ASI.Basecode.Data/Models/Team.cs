@@ -1,26 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace ASI.Basecode.Data.Models
 {
-    public partial class User
+    public class Team
     {
         [Key]
-        public string UserId { get; set; }
-        public string Name { get; set; }
-        public string Password { get; set; }
-        public int TeamId { get; set; }
-        public int RoleId { get; set; }
+        public int TeamId { get; set; } 
+        public string TeamName { get; set; }
+        public string TeamLeaderId { get; set; }
+        public string TeamSpecialization { get; set; }
         public string CreatedBy { get; set; }
         public DateTime CreatedTime { get; set; }
         public string? UpdatedBy { get; set; }
         public DateTime? UpdatedTime { get; set; }
 
         // Navigation properties
+        public User TeamLeader { get; set; }
+        public ICollection<User> Users { get; set; }
         public ICollection<Ticket> Tickets { get; set; }
-        public ICollection<Team> TeamsLed { get; set; } 
-        public ICollection<Team> Teams { get; set; }
-        public Role Role { get; set; }
     }
 }
