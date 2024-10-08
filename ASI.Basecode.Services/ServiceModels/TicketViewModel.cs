@@ -33,5 +33,9 @@ namespace ASI.Basecode.Services.ServiceModels
                       NeitherMessage = "Please provide either an Assignee ID or a Team Assigned ID.",
                       BothMessage = "You cannot assign both an Assignee ID and a Team Assigned ID.")]
         public int? TeamAssignedId { get; set; }
+        public string CreatedBy { get; set; }
+        public string StatusName { get; set; }
+        public string CategoryName { get; set; }
+        public string PriorityName { get; set; }
     }
 }

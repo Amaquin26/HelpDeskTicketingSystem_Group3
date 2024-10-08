@@ -1,4 +1,5 @@
-﻿using ASI.Basecode.WebApp.Mvc;
+﻿using ASI.Basecode.Services.Interfaces;
+using ASI.Basecode.WebApp.Mvc;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,14 +10,28 @@ namespace ASI.Basecode.WebApp.Controllers
 {
     public class TicketController : ControllerBase<TicketController>
     {
-        public TicketController(IHttpContextAccessor httpContextAccessor, ILoggerFactory loggerFactory, IConfiguration configuration, IMapper mapper = null) : base(httpContextAccessor, loggerFactory, configuration, mapper)
-        {
+        private readonly ITicketService _ticketService;
 
+        public TicketController(
+            IHttpContextAccessor httpContextAccessor, 
+            ILoggerFactory loggerFactory, 
+            IConfiguration configuration,
+            ITicketService ticketService,
+            IMapper mapper = null) : base(httpContextAccessor, loggerFactory, configuration, mapper)
+        {
+            _ticketService = ticketService;
         }
 
         public IActionResult Index()
         {
             return View();
+        }
+
+        [HttpGet]
+        public JsonResult GetTickets()
+        {
+            var tickets = _ticketService.GetListOfTickets();
+            return Json(tickets); 
         }
     }
 }

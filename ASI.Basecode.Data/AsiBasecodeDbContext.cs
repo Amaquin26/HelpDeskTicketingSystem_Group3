@@ -25,6 +25,7 @@ namespace ASI.Basecode.Data
         public virtual DbSet<Ticket> Tickets { get; set; }
         public virtual DbSet<TicketCategory> TicketCategories { get; set; }
         public virtual DbSet<TicketStatus> TicketStatuses { get; set; }
+        public virtual DbSet<TicketPriority> TicketPriorities { get; set; }
         public virtual DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -115,9 +116,23 @@ namespace ASI.Basecode.Data
             // TicketStatus and Ticket Relationship
             modelBuilder.Entity<TicketStatus>()
                 .HasMany(s => s.Tickets)                        
-                .WithOne()                                      
+                .WithOne(t => t.Status)                                      
                 .HasForeignKey(t => t.StatusId)                 
-                .OnDelete(DeleteBehavior.Cascade);               
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // TicketCategory and Ticket Relationship
+            modelBuilder.Entity<TicketCategory>()
+                .HasMany(s => s.Tickets)
+                .WithOne(t => t.Category)
+                .HasForeignKey(t => t.CategoryId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // TicketPriority and Ticket Relationship
+            modelBuilder.Entity<TicketPriority>()
+                .HasMany(s => s.Tickets)
+                .WithOne(t => t.Priority)
+                .HasForeignKey(t => t.PriorityId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Announcement and User Relationship
             modelBuilder.Entity<Announcement>()
