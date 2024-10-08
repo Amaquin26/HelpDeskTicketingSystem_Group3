@@ -1,4 +1,4 @@
-﻿.footer {
+﻿/*.footer {
     -moz-transition: all 0.3s ease-in-out;
     -o-transition: all 0.3s ease-in-out;
     -webkit-transition: all 0.3s ease-in-out;
@@ -9,8 +9,8 @@
     height: 64px;
     line-height: 64px;
     vertical-align: middle;
-    bottom: 0;
+    bottom: 0;*/
     /* padding: 10px; */
-    font-size: 0.9em;
+    /*font-size: 0.9em;
     text-align: center;
-}
+}*/
