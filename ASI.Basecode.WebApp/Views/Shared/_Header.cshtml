@@ -3,6 +3,7 @@
 
 <div class="modal-backdrop fade" id="backdrop"></div>
 
+<!-- Sidebar -->
 <div id="sidebar" class="@((ViewBag.LoginView == true) ? "hide-navbar" : "sidebar")">
     <div id="toggleSidebar" class="logo">
         <img src="~/img/icon-white.png" alt="Logo">
@@ -32,6 +33,22 @@
         </li>
     </ul>
 </div>
+
+<!-- Topbar for Mobile -->
+    <div id="topbar" class="topbar">
+        <div class="logo">
+            <img src="~/img/icon-white.png" alt="Logo">
+        </div>
+        <button id="toggleDropdown" class="toggle-button"><i class="fas fa-bars"></i></button>
+        <div class="dropdown-menu">
+            <a asp-action="Profile" asp-controller="Account"><i class="fas fa-ticket-alt"></i> Profile</a>
+            <a asp-action="Index" asp-controller="Ticket"><i class="fas fa-ticket-alt"></i> Tickets</a>
+            <a asp-action="Index" asp-controller="User"><i class="fas fa-users"></i> Users</a>
+            <a asp-action="Index" asp-controller="Notification"><i class="fas fa-bell"></i><span>Notifications</span></a>
+            <a asp-action="Settings" asp-controller="Account"><i class="fas fa-cog"></i> Settings</a>
+            <a asp-action="Logout" asp-controller="Account"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+        </div>
+    </div>
 
 @functions {
     public bool IsActive(string action, string controller)

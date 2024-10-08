@@ -16,10 +16,8 @@
 </head>
 <body>
     @Html.Partial("_Header")
-    <div class="container">
-        <main role="main">
-            @RenderBody()
-        </main>
+    <div style="@((ViewBag.LoginView == true) ? "" : "margin-left: 200px;")" class="@((ViewBag.LoginView == true) ? "" : "content p-4")">
+        @RenderBody()
     </div>
     @* <footer class="border-top footer text-muted">
         <div class="container">
