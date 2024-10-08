@@ -15,10 +15,10 @@ namespace ASI.Basecode.Data.Models
         public string? AssigneeId { get; set; }
         public int? TeamAssignedId { get; set; }
         public string Title { get; set; }
+        public int StatusId { get; set; }
         public string Description { get; set; }
         public string CreatedBy { get; set; }
         public int CategoryId { get; set; }
-        public int StatusId { get; set; }
         public DateTime CreatedTime { get; set; }
         public string? UpdatedBy { get; set; }
         public DateTime? UpdatedTime { get; set; }

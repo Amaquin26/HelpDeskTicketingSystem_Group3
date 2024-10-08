@@ -10,7 +10,7 @@ namespace ASI.Basecode.Data.Models
         public string UserId { get; set; }
         public string Name { get; set; }
         public string Password { get; set; }
-        public int TeamId { get; set; }
+        public int? TeamId { get; set; }
         public int RoleId { get; set; }
         public string CreatedBy { get; set; }
         public DateTime CreatedTime { get; set; }
