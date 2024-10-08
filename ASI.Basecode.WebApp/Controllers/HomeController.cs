@@ -29,9 +29,9 @@ namespace ASI.Basecode.WebApp.Controllers
         }
 
         /// <summary>
-        /// Returns Home View.
+        /// Returns Ticket View.
         /// </summary>
-        /// <returns> Home View </returns>
+        /// <returns> Ticket View </returns>
         public IActionResult Index()
         {
             return View();
