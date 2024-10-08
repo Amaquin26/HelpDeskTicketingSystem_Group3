@@ -44,6 +44,11 @@ namespace ASI.Basecode.Services.Services
                 user.CreatedBy = System.Environment.UserName;
                 user.UpdatedBy = System.Environment.UserName;
 
+                Guid userId = Guid.NewGuid();
+                user.UserId = userId.ToString();
+                user.RoleId = 1;
+                user.Name = model.Name;
+                user.Email = "Jermain@buang.com";
                 _repository.AddUser(user);
             }
             else
