@@ -1,6 +1,7 @@
 ﻿using ASI.Basecode.Data.Interfaces;
 using ASI.Basecode.Data.Models;
 using Basecode.Data.Repositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace ASI.Basecode.Data.Repositories
 
         public IQueryable<Ticket> GetTickets()
         {
-            return this.GetDbSet<Ticket>();
+            return this.GetDbSet<Ticket>().Include(t => t.Status).Include(t => t.Category).Include(t => t.Priority);
         }
 
         public bool TicketExists(int ticketId)

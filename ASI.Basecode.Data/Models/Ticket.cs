@@ -16,6 +16,7 @@ namespace ASI.Basecode.Data.Models
         public int? TeamAssignedId { get; set; }
         public string Title { get; set; }
         public int StatusId { get; set; }
+        public int PriorityId { get; set; }
         public string Description { get; set; }
         public string CreatedBy { get; set; }
         public int CategoryId { get; set; }
@@ -29,6 +30,7 @@ namespace ASI.Basecode.Data.Models
         public Team Team { get; set; }
         public TicketCategory Category { get; set; }
         public TicketStatus Status { get; set; }
+        public TicketPriority Priority { get; set; }
         public ICollection<Attachment> Attachments { get; set; }
     }
 }

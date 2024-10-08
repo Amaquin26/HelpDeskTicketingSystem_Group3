@@ -17,7 +17,7 @@ namespace ASI.Basecode.Services.Interfaces
         /// A list of <see cref="Ticket"/> objects. 
         /// If no tickets exist, an empty list will be returned.
         /// </returns>
-        List<Ticket> GetTickets();
+        List<TicketViewModel> GetListOfTickets();
 
         /// <summary>
         /// Adds a new ticket based on the provided <see cref="TicketViewModel"/>.

@@ -1,5 +1,6 @@
 ﻿using ASI.Basecode.Data.Interfaces;
 using ASI.Basecode.Data.Models;
+using ASI.Basecode.Data.Repositories;
 using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
 using Microsoft.AspNetCore.Http;
@@ -12,18 +13,39 @@ namespace ASI.Basecode.Services.Services
 {
     public class TicketService:ITicketService
     {
-        private readonly ITicketRepository _repository;
+        private readonly ITicketRepository _ticketRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public TicketService(ITicketRepository repository, IHttpContextAccessor httpContextAccessor)
+        public TicketService(ITicketRepository ticketRepository, IUserRepository userRepository, IHttpContextAccessor httpContextAccessor)
         {
-            _repository = repository;
+            _ticketRepository = ticketRepository;
+            _userRepository = userRepository;
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public List<Ticket> GetTickets()
+        public List<TicketViewModel> GetListOfTickets()
         {
-            return _repository.GetTickets().ToList();
+            var tickets = _ticketRepository.GetTickets().Join(_userRepository.GetUsers(),
+                  ticket => ticket.CreatedBy, 
+                  user => user.UserId,    
+                  (ticket, user) => new TicketViewModel
+                  {
+                      TicketId = ticket.TicketId,
+                      Title = ticket.Title,
+                      Description = ticket.Description,
+                      TeamAssignedId = ticket.TeamAssignedId,
+                      AssigneeId = ticket.AssigneeId,
+                      CategoryId = ticket.CategoryId,
+                      StatusId = ticket.StatusId,
+                      CreatedBy = user.Name,
+                      StatusName = ticket.Status.StatusName,
+                      CategoryName = ticket.Category.CategoryName,
+                      PriorityName = ticket.Priority.PriorityName
+                  })
+            .ToList();
+
+            return tickets;
         }
 
         public void AddTicket(TicketViewModel model)
@@ -42,13 +64,13 @@ namespace ASI.Basecode.Services.Services
 
             ticket.CreatedBy = userId;
 
-            _repository.AddTicket(ticket);
+            _ticketRepository.AddTicket(ticket);
         }
 
         public void EditTicket(TicketViewModel model)
         {
 
-            var ticket = _repository.GetTicketById(model.TicketId);
+            var ticket = _ticketRepository.GetTicketById(model.TicketId);
 
             if(ticket == null)
             {
@@ -67,19 +89,19 @@ namespace ASI.Basecode.Services.Services
 
             ticket.UpdatedBy = userId;
 
-            _repository.SaveTicket();
+            _ticketRepository.SaveTicket();
         }
 
         public void DeleteTicket(int ticketId) 
         {
-            var ticket = _repository.GetTicketById(ticketId);
+            var ticket = _ticketRepository.GetTicketById(ticketId);
 
             if (ticket == null)
             {
                 throw new KeyNotFoundException($"Ticket with ID {ticketId} does not exist.");
             }
 
-            _repository.DeleteTicket(ticket);
+            _ticketRepository.DeleteTicket(ticket);
         }
     }
 }

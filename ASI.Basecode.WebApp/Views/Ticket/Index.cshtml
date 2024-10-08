@@ -2,7 +2,472 @@
     ViewData["Title"] = "Ticket Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- Main Content -->
+<div class="content p-4" style="margin-left: 200px;">
+    <h3 class="mb-4"><strong>Ticket Summary</strong></h3>
+    <div class="row">
+        <!-- Tickets by Category -->
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Tickets by Category</h5>
+                    <div class="chart-container">
+                        <canvas id="ticketsByCategoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tickets by Status -->
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Tickets by Status</h5>
+                    <div class="chart-container">
+                        <canvas id="ticketsByStatusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tickets by Priority -->
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Tickets by Priority</h5>
+                    <div class="chart-container">
+                        <canvas id="ticketsByPriorityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="mb-4"><strong>Ticket Management</strong></h3>
+
+    <!-- Responsive Tickets List Table -->
+    <div class="table-responsive">
+        <table id="ticketTable" class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Issue</th>
+                    <th scope="col">Created By</th>
+                    <th scope="col">Category</th>
+                    <th scope="col">Priority</th>
+                    <th scope="col">Status</th>
+                    <th scope="col" class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="ticketList">
+            </tbody>
+        </table>
+    </div>
 </div>
+
+<!-- Floating Add User Button -->
+<button class="btn btn-danger floating-btn" id="createTicketBtn" style="border-radius:999999px !important;">
+    <i class="fas fa-plus"></i>
+</button>
+
+<!-- Side Modal for Create Ticket -->
+<div class="modal-side p-3" id="createTicketModal">
+    <div class="modal-header">
+        <h5 class="modal-title">Create Ticket</h5>
+        <button type="button" class="btn-close" id="closeModalBtn"></button>
+    </div>
+    <div class="modal-body">
+        <form>
+            <div class="mb-3">
+                <label for="title" class="form-label">Title</label>
+                <input type="text" class="form-control" id="title" placeholder="Enter ticket title" required>
+            </div>
+            <div class="mb-3">
+                <label for="ticketDescription" class="form-label">Issue Description</label>
+                <textarea class="form-control" id="ticketDescription" rows="3" placeholder="Describe the issue" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="ticketCategory" class="form-label">Category</label>
+                <select class="form-select" id="ticketCategory" required>
+                    <option selected disabled>Select category</option>
+                    <option value="technical">Technical</option>
+                    <option value="billing">Billing</option>
+                    <option value="general">General Inquiry</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="ticketPriority" class="form-label">Priority</label>
+                <select class="form-select" id="ticketPriority" required>
+                    <option selected disabled>Select priority</option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="ticketAssign" class="form-label">Assign to Agent/Team</label>
+                <select class="form-select" id="ticketAssign" required>
+                    <option selected disabled>Select agent/team</option>
+                    <option value="agent1">Agent 1</option>
+                    <option value="agent2">Agent 2</option>
+                    <option value="team1">Team 1</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="ticketAttachment" class="form-label">Attachments</label>
+                <input type="file" class="form-control"  multiple id="ticketAttachment">
+            </div>
+            <button type="submit" class="btn btn-danger w-100">Create Ticket</button>
+        </form>
+    </div>
+</div>
+
+<!-- Side Modal for Edit Ticket -->
+<div class="modal-side p-3" id="editTicketModal">
+    <div class="modal-header mb-3">
+        <h5 class="modal-title">Edit Ticket #00001</h5>
+        <button type="button" class="btn-close" id="closeEditModalBtn"></button>
+    </div>
+    <div class="modal-body">
+        <form>
+            <div class="mb-3">
+                <label for="title" class="form-label">Title</label>
+                <input type="text" class="form-control" id="title" placeholder="Enter ticket title" value="Cannot login to account" required>
+            </div>
+            <div class="mb-3">
+                <label for="editTicketDescription" class="form-label">Issue Description</label>
+                <textarea class="form-control" id="editTicketDescription" rows="3" placeholder="Update the issue description" required>The user is experiencing issues logging into their account. Every time they try to log in, they receive an error message stating that their credentials are incorrect. The user has already attempted resetting their password, but the issue persists.</textarea>
+            </div>
+            <div class="mb-3">
+                <label for="editTicketCategory" class="form-label">Category</label>
+                <select class="form-select" id="editTicketCategory" required>
+                    <option disabled>Select category</option>
+                    <option selected value="technical">Technical</option>
+                    <option value="billing">Billing</option>
+                    <option value="general">General Inquiry</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="editTicketStatus" class="form-label">Status</label>
+                <select class="form-select" id="editTicketStatus" required>
+                    <option disabled>Select priority</option>
+                    <option selected value="open">Open</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="resolve">Resolve</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="editTicketPriority" class="form-label">Priority</label>
+                <select class="form-select" id="editTicketPriority" required>
+                    <option selected disabled>Select priority</option>
+                    <option value="low">Low</option>
+                    <option selected value="medium">Medium</option>
+                    <option value="high">High</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="editTicketAssign" class="form-label">Reassign to Agent/Team</label>
+                <select class="form-select" id="editTicketAssign" required>
+                    <option disabled>Select agent/team</option>
+                    <option selected value="agent1">Agent 1</option>
+                    <option value="agent2">Agent 2</option>
+                    <option value="team1">Team 1</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-outline-danger w-100">Update Ticket</button>
+        </form>
+    </div>
+</div>
+
+<!-- Delete Ticket Modal -->
+<div class="modal fade" id="deleteTicketModal" tabindex="-1" aria-labelledby="deleteTicketModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteTicketModalLabel">Delete Ticket</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this ticket?</p>
+                <p><strong>Ticket ID# </strong><span id="ticketId"></span></p>
+                <p><strong>Status: </strong><span class="status"></span></p>
+                <p><strong>Priority: </strong><span class="priority"></span></p>
+                <p><strong>Category: </strong><span class="category"></span></p>
+                <button type="button" class="btn btn-danger w-100">Delete Ticket</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Include jQuery before DataTables -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+<!-- Include Bootstrap and Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Chart Data and Configuration
+
+    // Tickets by Category
+    const ticketsByCategoryCtx = document.getElementById('ticketsByCategoryChart').getContext('2d');
+    new Chart(ticketsByCategoryCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Technical', 'Billing', 'General Inquiry'],
+            datasets: [{
+                data: [50, 30, 20],
+                backgroundColor: ['#ffcfd4', '#fd838e', '#dc3545']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom', // Position legend at the bottom
+                    align: 'center', // Align legend in the center
+                    labels: {
+                        boxWidth: 20, // Adjust the width of the legend color box
+                        padding: 20,  // Adjust the spacing between legend items
+                    }
+                }
+            }
+        }
+    });
+
+    // Tickets by Status
+    const ticketsByStatusCtx = document.getElementById('ticketsByStatusChart').getContext('2d');
+    new Chart(ticketsByStatusCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Open', 'In Progress', 'Closed'],
+            datasets: [{
+                data: [40, 30, 30],
+                backgroundColor: ['#dc3545', '#fd838e', '#d9cbcc']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom', // Position legend at the bottom
+                    align: 'center', // Align legend in the center
+                    labels: {
+                        boxWidth: 20, // Adjust the width of the legend color box
+                        padding: 20,  // Adjust the spacing between legend items
+                    }
+                }
+            }
+        }
+    });
+
+
+
+    // Tickets by Priority
+    const ticketsByPriorityCtx = document.getElementById('ticketsByPriorityChart').getContext('2d');
+    new Chart(ticketsByPriorityCtx, {
+        type: 'bar',
+        data: {
+            labels: ['High', 'Medium', 'Low'],
+            datasets: [{
+                label: '# of Tickets',
+                data: [25, 45, 30],
+                backgroundColor: ['#e04d5b', '#f6ce54', '#308e62']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false // Hide the legend for the bar chart
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        $('#ticketTable').DataTable();
+    });
+
+    const sidebar = document.getElementById('sidebar');
+    const toggleSidebar = document.getElementById('toggleSidebar');
+    const toggleIcon = toggleSidebar.querySelector('i');
+    const toggleLabel = toggleSidebar.querySelector('span');
+
+    toggleSidebar.addEventListener('click', function () {
+        sidebar.classList.toggle('collapsed');
+        toggleIcon.classList.toggle('fa-arrow-left');
+        toggleIcon.classList.toggle('fa-arrow-right');
+        toggleLabel.textContent = sidebar.classList.contains('collapsed') ? 'Show Sidebar' : 'Hide Sidebar';
+    });
+
+    const createTicketModal = document.getElementById('createTicketModal');
+    const editTicketModal = document.getElementById('editTicketModal');
+
+    document.getElementById('createTicketBtn').addEventListener('click', function () {
+        createTicketModal.style.display = 'block';
+        editTicketModal.style.display = 'none'; // Ensure the edit modal is hidden
+    });
+
+    document.getElementById('closeModalBtn').addEventListener('click', function () {
+        createTicketModal.style.display = 'none';
+    });
+
+    document.getElementById('closeEditModalBtn').addEventListener('click', function () {
+        editTicketModal.style.display = 'none';
+    });
+
+    function openDeleteModal(ticketId, status, priority, category) {
+        document.getElementById('deleteTicketModalLabel').textContent = `Delete Ticket #${ticketId}`;
+        document.querySelector('#deleteTicketModal .modal-body strong').textContent = `${ticketId}`;
+        document.querySelector('#deleteTicketModal .modal-body .status').textContent = `${status}`;
+        document.querySelector('#deleteTicketModal .modal-body .priority').textContent = `${priority}`;
+        document.querySelector('#deleteTicketModal .modal-body .category').textContent = `${category}`;
+        $('#deleteTicketModal').modal('show');
+    }
+
+    // toggleSidebar.addEventListener('click', () => {
+    //     sidebar.classList.toggle('shrink');
+    //     if (sidebar.classList.contains('shrink')) {
+    //         toggleIcon.className = 'fas fa-chevron-right';
+    //         toggleLabel.textContent = 'Show';
+    //         content.style.marginLeft = '60px';
+    //     } else {
+    //         toggleIcon.className = 'fas fa-chevron-left';
+    //         toggleLabel.textContent = 'Hide';
+    //         content.style.marginLeft = '200px';
+    //     }
+    //     const marginLeft = sidebar.classList.contains('shrink') ? '60px' : '200px';
+    //     document.querySelector('.content').style.marginLeft = marginLeft;
+    // });
+
+    // toggleDropdown.addEventListener('click', () => {
+    //     dropdownMenu.classList.toggle('show');
+    // });
+
+    // document.getElementById('createTicketBtn').addEventListener('click', function() {
+    //     document.getElementById('createTicketModal').classList.add('show');
+    //     backdrop.classList.add('show');
+    // });
+
+    // document.getElementById('closeModalBtn').addEventListener('click', function() {
+    //     document.getElementById('createTicketModal').classList.remove('show');
+    //     backdrop.classList.remove('show');
+    // });
+
+    // document.querySelectorAll('.edit').forEach(button => {
+    //     button.addEventListener('click', function() {
+    //         document.getElementById('editTicketModal').classList.add('show');
+    //         backdrop.classList.add('show');
+    //     });
+    // });
+
+    // document.getElementById('closeEditModalBtn').addEventListener('click', function() {
+    //     document.getElementById('editTicketModal').classList.remove('show');
+    //     backdrop.classList.remove('show');
+    // });
+</script>
+
+<script>
+    function ajaxRequest(url, method, data, successCallback, errorCallback) {
+        $.ajax({
+            url: url,
+            method: method,
+            data: data,
+            contentType: "application/json; charset=utf-8",
+            success: function (response) {
+                if (typeof successCallback === 'function') {
+                    successCallback(response);
+                }
+            },
+            error: function (err) {
+                if (typeof errorCallback === 'function') {
+                    errorCallback(err);
+                }
+            }
+        });
+    }
+
+    function loadTickets() {
+        ajaxRequest('@Url.Action("GetTickets", "Ticket")', 'GET', null, function (data) {
+            const ticketList = $('#ticketList');
+            ticketList.empty();  // Clear the list before adding new items
+
+            $.each(data, function (i, ticket) {
+                ticketList.append('<tr>');
+                ticketList.append('<th scope="row">' + ticket.ticketId + '</th>');
+                ticketList.append('<td>' + ticket.description + '</td>');
+                ticketList.append('<td>' + ticket.createdBy + '</td>');
+                ticketList.append('<td>' + ticket.categoryName + '</td>');
+                ticketList.append('<td>' + ticket.priorityName + '</td>');
+                ticketList.append('<td>' + ticket.statusName + '</td>');
+                ticketList.append(
+                    '<td class="text-center">' +
+                    '<a href="" class="edit btn btn-outline-primary btn-sm">' +
+                    '<i class="fas fa-eye"></i>' +
+                    '</a>' +
+                    '<button class="edit btn btn-outline-danger btn-sm">' +
+                    '<i class="fas fa-edit"></i>' +
+                    '</button>' +
+                    // Delete button with event handler for opening the delete modal
+                    '<button class="edit btn btn-outline-danger btn-sm delete-btn" data-ticket-id="' + ticket.ticketId + '" data-status="' + ticket.statusName + '" data-priority="' + ticket.priorityName + '" data-category="' + ticket.categoryName + '">' +
+                    '<i class="fas fa-trash-alt"></i>' +
+                    '</button>' +
+                    '</td>'
+                );
+                ticketList.append('</tr>');
+            });
+
+            // Attach event listener to dynamically created delete buttons
+            $('.delete-btn').on('click', function () {
+                const ticketId = $(this).data('ticket-id');
+                const status = $(this).data('status');
+                const priority = $(this).data('priority');
+                const category = $(this).data('category');
+                openDeleteModal(ticketId, status, priority, category);
+            });
+        }, function (error) {
+            console.error('Error loading tickets:', error);
+        });
+    }
+
+    // function addTicket(ticketData) {
+    //     ajaxRequest('@Url.Page("/Tickets", "AddTicket")', 'POST', JSON.stringify(ticketData), function (response) {
+    //         alert('Ticket added successfully!');
+    //         loadTickets();  // Reload the tickets after adding
+    //     }, function (error) {
+    //         console.error('Error adding ticket:', error);
+    //     });
+    // }
+
+    // function deleteTicket(ticketId) {
+    //     ajaxRequest('@Url.Page("/Tickets", "DeleteTicket")', 'DELETE', JSON.stringify({ ticketId: ticketId }), function (response) {
+    //         alert('Ticket deleted successfully!');
+    //         loadTickets();  // Reload the tickets after deleting
+    //     }, function (error) {
+    //         console.error('Error deleting ticket:', error);
+    //     });
+    // }
+
+    $(document).ready(function () {
+        loadTickets();
+
+        $('#createTicketBtn').click(function () {
+            document.getElementById('createTicketModal').classList.add('show');
+            backdrop.classList.add('show');
+        });
+
+        $('#closeModalBtn').click(function () {
+            document.getElementById('createTicketModal').classList.remove('show');
+            backdrop.classList.remove('show');
+        });
+    });
+</script>
