@@ -1,6 +1,7 @@
 ﻿@{
     ViewData["Title"] = "Ticket Page";
 }
+@model ASI.Basecode.Services.ServiceModels.TicketViewModel
 
 <!-- Main Content -->
 <div class="content p-4" style="margin-left: 200px;">
@@ -77,32 +78,30 @@
         <button type="button" class="btn-close" id="closeModalBtn"></button>
     </div>
     <div class="modal-body">
-        <form>
+        <form method="post" asp-action="AddTicket" asp-controller="Ticket">
             <div class="mb-3">
-                <label for="title" class="form-label">Title</label>
-                <input type="text" class="form-control" id="title" placeholder="Enter ticket title" required>
+                <label asp-for="Ticket.Title" class="form-label">Title</label>
+                <input asp-for="Ticket.Title" class="form-control" id="title" placeholder="Enter ticket title" required>
+                <span asp-validation-for="Ticket.Title" class="text-danger"></span>
             </div>
             <div class="mb-3">
-                <label for="ticketDescription" class="form-label">Issue Description</label>
-                <textarea class="form-control" id="ticketDescription" rows="3" placeholder="Describe the issue" required></textarea>
+                <label asp-for="Ticket.Description" class="form-label">Issue Description</label>
+                <textarea asp-for="Ticket.Description" class="form-control" id="ticketDescription" rows="3" placeholder="Describe the issue" required></textarea>
+                <span asp-validation-for="Ticket.Description" class="text-danger"></span>
             </div>
             <div class="mb-3">
-                <label for="ticketCategory" class="form-label">Category</label>
-                <select class="form-select" id="ticketCategory" required>
-                    <option selected disabled>Select category</option>
-                    <option value="technical">Technical</option>
-                    <option value="billing">Billing</option>
-                    <option value="general">General Inquiry</option>
+                <label asp-for="Ticket.CategoryId" class="form-label">Category</label>
+                <select asp-for="Ticket.CategoryId" class="form-select" id="category" asp-items="@(new SelectList(Model.TicketCategories, "CategoryId", "CategoryName"))">
+                    <option value="">-- Select Category --</option> <!-- Optional default option -->
                 </select>
+                <span asp-validation-for="Ticket.CategoryId" class="text-danger"></span>
             </div>
             <div class="mb-3">
-                <label for="ticketPriority" class="form-label">Priority</label>
-                <select class="form-select" id="ticketPriority" required>
-                    <option selected disabled>Select priority</option>
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
+                <label asp-for="Ticket.PriorityId" class="form-label">Priority</label>
+                <select asp-for="Ticket.PriorityId" class="form-select" id="category" asp-items="@(new SelectList(Model.ticketPriorities, "PriorityId", "PriorityName"))">
+                    <option value="">-- Select Priority --</option> <!-- Optional default option -->
                 </select>
+                <span asp-validation-for="Ticket.PriorityId" class="text-danger"></span>
             </div>
             <div class="mb-3">
                 <label for="ticketAssign" class="form-label">Assign to Agent/Team</label>

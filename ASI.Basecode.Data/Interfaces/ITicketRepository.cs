@@ -19,6 +19,30 @@ namespace ASI.Basecode.Data.Interfaces
         IQueryable<Ticket> GetTickets();
 
         /// <summary>
+        /// Retrieves all ticket categories from the database.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="IQueryable{TicketCategory}"/> representing the collection of tickets categories.
+        /// </returns>
+        IQueryable<TicketCategory> GetTicketCategories();
+
+        /// <summary>
+        /// Retrieves all ticket statuses from the database.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="IQueryable{TicketStatus}"/> representing the collection of ticket statuses.
+        /// </returns>
+        IQueryable<TicketStatus> GetTicketStatuses();
+
+        /// <summary>
+        /// Retrieves all ticket priorities from the database.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="IQueryable{TicketPriority}"/> representing the collection of ticket priorities.
+        /// </returns>
+        IQueryable<TicketPriority> GetTicketPriorities();
+
+        /// <summary>
         /// Checks if a ticket exists in the database by its <paramref name="ticketId"/>.
         /// </summary>
         /// <param name="ticketId">The ID of the ticket to check.</param>
