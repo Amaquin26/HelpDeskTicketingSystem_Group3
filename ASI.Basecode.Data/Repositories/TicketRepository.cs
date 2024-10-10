@@ -22,6 +22,21 @@ namespace ASI.Basecode.Data.Repositories
             return this.GetDbSet<Ticket>().Include(t => t.Status).Include(t => t.Category).Include(t => t.Priority);
         }
 
+        public IQueryable<TicketCategory> GetTicketCategories()
+        {
+            return this.GetDbSet<TicketCategory>();
+        }
+
+        public IQueryable<TicketStatus> GetTicketStatuses()
+        {
+            return this.GetDbSet<TicketStatus>();
+        }
+
+        public IQueryable<TicketPriority> GetTicketPriorities()
+        {
+            return this.GetDbSet<TicketPriority>();
+        }
+
         public bool TicketExists(int ticketId)
         {
             return this.GetDbSet<Ticket>().Any(t => t.TicketId == ticketId);

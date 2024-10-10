@@ -1,6 +1,7 @@
 ﻿using ASI.Basecode.Data.Interfaces;
 using ASI.Basecode.Data.Models;
 using Basecode.Data.Repositories;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 namespace ASI.Basecode.Data.Repositories
@@ -14,12 +15,17 @@ namespace ASI.Basecode.Data.Repositories
         public IQueryable<User> GetUsers()
         {
             // Return only active users
-            return this.GetDbSet<User>().Where(u => u.IsActive);
+            return this.GetDbSet<User>().Include(u => u.Role).Where(u => u.IsActive);
         }
 
         public bool UserExists(string userId)
         {
             return this.GetDbSet<User>().Any(x => x.UserId == userId);
+        }
+
+        public bool EmailExists(string email)
+        {
+            return this.GetDbSet<User>().Any(x => x.Email == email);
         }
 
         public IQueryable<User> GetAgents()

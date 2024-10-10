@@ -1,6 +1,7 @@
 ﻿using ASI.Basecode.Data.Interfaces;
 using ASI.Basecode.Data.Models;
 using ASI.Basecode.Data.Repositories;
+using ASI.Basecode.Services.Dto;
 using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
 using Microsoft.AspNetCore.Http;
@@ -24,20 +25,18 @@ namespace ASI.Basecode.Services.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public List<TicketViewModel> GetListOfTickets()
+        public List<TicketDto> GetListOfTickets()
         {
             var tickets = _ticketRepository.GetTickets().Join(_userRepository.GetUsers(),
                   ticket => ticket.CreatedBy, 
                   user => user.UserId,    
-                  (ticket, user) => new TicketViewModel
+                  (ticket, user) => new TicketDto
                   {
                       TicketId = ticket.TicketId,
                       Title = ticket.Title,
                       Description = ticket.Description,
                       TeamAssignedId = ticket.TeamAssignedId,
                       AssigneeId = ticket.AssigneeId,
-                      CategoryId = ticket.CategoryId,
-                      StatusId = ticket.StatusId,
                       CreatedBy = user.Name,
                       StatusName = ticket.Status.StatusName,
                       CategoryName = ticket.Category.CategoryName,
@@ -48,7 +47,34 @@ namespace ASI.Basecode.Services.Services
             return tickets;
         }
 
-        public void AddTicket(TicketViewModel model)
+        public (Ticket, bool) GetTicketById(int ticketId)
+        {
+            var ticket = _ticketRepository.GetTicketById(ticketId); 
+
+            if(ticket == null)
+            {
+                return (null, false);
+            }
+
+            return (ticket, true);
+        }
+
+        public List<TicketCategory> GetTicketCategoryList()
+        {
+            return _ticketRepository.GetTicketCategories().ToList();
+        }
+
+        public List<TicketStatus> GetTicketStatusList()
+        {
+            return _ticketRepository.GetTicketStatuses().ToList();
+        }
+
+        public List<TicketPriority> GetTicketPriorityList()
+        {
+            return _ticketRepository.GetTicketPriorities().ToList();
+        }
+
+        public void AddTicket(TicketFormModel model)
         {
             var ticket = new Ticket();
 
@@ -57,6 +83,7 @@ namespace ASI.Basecode.Services.Services
             ticket.AssigneeId = model.AssigneeId;
             ticket.TeamAssignedId = model.TeamAssignedId;
             ticket.StatusId = model.StatusId;
+            ticket.PriorityId = model.PriorityId;
             ticket.CategoryId = model.CategoryId;
             ticket.CreatedTime = DateTime.UtcNow;
 
@@ -67,7 +94,7 @@ namespace ASI.Basecode.Services.Services
             _ticketRepository.AddTicket(ticket);
         }
 
-        public void EditTicket(TicketViewModel model)
+        public void EditTicket(TicketFormModel model)
         {
 
             var ticket = _ticketRepository.GetTicketById(model.TicketId);

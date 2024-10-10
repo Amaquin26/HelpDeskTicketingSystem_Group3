@@ -12,46 +12,55 @@ namespace ASI.Basecode.Services.Validations
     /// and ensures that both properties are not set at the same time.
     /// </summary>
     /// <remarks>
-    /// Use this attribute to enforce that a ViewModel must have either one property 
+    /// Use this attribute to enforce that it must have either one property 
     /// or the other set, but not both. This is useful in scenarios where 
     /// a choice must be made between two options.
     /// </remarks>
-    public class EitherOrRequiredAttribute: ValidationAttribute
+    public class EitherOrRequiredAttribute : ValidationAttribute
     {
-        private readonly string[] _propertyNames;
+        private readonly string _propertyName1;
+        private readonly string _propertyName2;
 
         public string NeitherMessage { get; set; } = "At least one of {0} or {1} must be provided.";
         public string BothMessage { get; set; } = "Only one of {0} or {1} should be provided.";
 
         public EitherOrRequiredAttribute(string propertyName1, string propertyName2)
         {
-            _propertyNames = new[] { propertyName1, propertyName2 };
+            _propertyName1 = propertyName1;
+            _propertyName2 = propertyName2;
         }
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            var property1 = validationContext.ObjectType.GetProperty(_propertyNames[0]);
-            var property2 = validationContext.ObjectType.GetProperty(_propertyNames[1]);
+            // Retrieve property values
+            object value1 = GetPropertyValue(value, _propertyName1);
+            object value2 = GetPropertyValue(value, _propertyName2);
 
-            if (property1 == null || property2 == null)
+            if (IsNullOrEmpty(value1) && IsNullOrEmpty(value2))
             {
-                throw new ArgumentException("Both properties must be defined.");
+                return new ValidationResult(string.Format(NeitherMessage, _propertyName1, _propertyName2));
             }
 
-            var value1 = property1.GetValue(validationContext.ObjectInstance);
-            var value2 = property2.GetValue(validationContext.ObjectInstance);
-
-            if (value1 == null && value2 == null)
+            if (!IsNullOrEmpty(value1) && !IsNullOrEmpty(value2))
             {
-                return new ValidationResult(string.Format(NeitherMessage, _propertyNames[0], _propertyNames[1]));
-            }
-
-            if (value1 != null && value2 != null)
-            {
-                return new ValidationResult(string.Format(BothMessage, _propertyNames[0], _propertyNames[1]));
+                return new ValidationResult(string.Format(BothMessage, _propertyName1, _propertyName2));
             }
 
             return ValidationResult.Success;
+        }
+
+        private bool IsNullOrEmpty(object value)
+        {
+            return value == null || (value is string str && string.IsNullOrWhiteSpace(str));
+        }
+
+        private object GetPropertyValue(object obj, string propertyName)
+        {
+            if (obj == null || string.IsNullOrEmpty(propertyName))
+                return null;
+
+            var property = obj.GetType().GetProperty(propertyName);
+            return property?.GetValue(obj);
         }
     }
 }
