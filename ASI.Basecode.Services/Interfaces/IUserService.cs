@@ -11,9 +11,10 @@ namespace ASI.Basecode.Services.Interfaces
         LoginResult AuthenticateUser(string userid, string password, ref User user);
         void AddUser(UserViewModel model);
         List<User> GetUsers();
+        IQueryable<User> GetUser(bool onlyAgents);
+        void AddUser(User user);
         void UpdateUser(User user);
         void DeleteUser(User user);
-        IQueryable<User> GetUser(bool onlyAgents);
         IQueryable<User> GetAgents();
     }
 }

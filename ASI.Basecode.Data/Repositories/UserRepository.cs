@@ -2,6 +2,7 @@
 using ASI.Basecode.Data.Models;
 using Basecode.Data.Repositories;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 
 namespace ASI.Basecode.Data.Repositories
@@ -16,6 +17,7 @@ namespace ASI.Basecode.Data.Repositories
         {
             // Return only active users
             return this.GetDbSet<User>().Include(u => u.Role).Where(u => u.IsActive);
+            return this.GetDbSet<User>().Where(u => u.IsActive); // Filters for active users
         }
 
         public bool UserExists(string userId)
@@ -42,21 +44,14 @@ namespace ASI.Basecode.Data.Repositories
 
         public void UpdateUser(User user)
         {
-            if (user != null)
-            {
-                this.GetDbSet<User>().Update(user);
-                UnitOfWork.SaveChanges();
-            }
+            this.GetDbSet<User>().Update(user);
+            UnitOfWork.SaveChanges();
         }
 
         public void DeleteUser(User user)
         {
-            if (user != null)
-            {
-                user.IsActive = false; // Soft delete by marking as inactive
-                UpdateUser(user); // Update the user record
-                UnitOfWork.SaveChanges();
-            }
+            this.GetDbSet<User>().Update(user);
+            UnitOfWork.SaveChanges();
         }
     }
 }

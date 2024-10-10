@@ -16,7 +16,6 @@ namespace ASI.Basecode.WebApp.Controllers
             _userService = userService;
         }
 
-
         // Displays a list of active users
         public IActionResult Index(bool onlyAgents = false)
         {
@@ -37,38 +36,42 @@ namespace ASI.Basecode.WebApp.Controllers
         // Loads the Create User form
         public IActionResult Create()
         {
-            return View();
+            return View(); 
         }
 
-        // Handles the form submission for creating a new user
+        // CREATE
         [HttpPost]
-        public IActionResult Create(UserViewModel model)
+        public IActionResult Create(User user) 
         {
-            if (ModelState.IsValid)
-            {
-                _userService.AddUser(model);
-                return RedirectToAction("Index");
-            }
-            return View(model);
-        }
 
-        // Loads the Edit User form for the specified user ID
+                _userService.AddUser(user); 
+                return RedirectToAction("Index","User");
+        }
         public IActionResult Edit(string id)
         {
-            var user = _userService.GetUsers().FirstOrDefault(u => u.UserId == id);
+            var user = _userService.GetUsers().FirstOrDefault(x => x.UserId == id);
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("Index");// Optionally handle the case where the user is not found
+            }
             return View(user);
         }
 
-        // Handles the form submission for editing an existing user
+        //EDIT USER
         [HttpPost]
         public IActionResult Edit(User user)
         {
             if (user != null)
             {
                 _userService.UpdateUser(user);
+                TempData["SuccessMessage"] = "User has been edited";
             }
-            return RedirectToAction("Index");
+
+            return RedirectToAction("Index", "User");
         }
+
+        
 
         // Marks a user as inactive instead of hard deleting them
         public IActionResult Delete(string id)
@@ -76,7 +79,7 @@ namespace ASI.Basecode.WebApp.Controllers
             var user = _userService.GetUsers().FirstOrDefault(u => u.UserId == id);
             if (user != null)
             {
-                _userService.DeleteUser(user);
+                _userService.DeleteUser(user);  // Perform soft delete
             }
             return RedirectToAction("Index");
         }

@@ -102,7 +102,6 @@ namespace ASI.Basecode.WebApp.Controllers
                 return View();
             }
         }
-
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Register()
@@ -119,15 +118,34 @@ namespace ASI.Basecode.WebApp.Controllers
                 _userService.AddUser(model);
                 return RedirectToAction("Login", "Account");
             }
-            catch(InvalidDataException ex)
+            catch (InvalidDataException ex)
             {
                 TempData["ErrorMessage"] = ex.Message;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 TempData["ErrorMessage"] = Resources.Messages.Errors.ServerError;
             }
             return View();
+        }
+        [HttpPost]
+        [AllowAnonymous]
+        public IActionResult AnotherRegister(User user)
+        {
+            try
+            {
+                _userService.AddUser(user); // This calls AddUser(UserModel model)
+                return RedirectToAction("Login", "Account");
+            }
+            catch (InvalidDataException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = Resources.Messages.Errors.ServerError;
+            }
+            return View(user); // Ensure the correct model type is returned to the view.
         }
 
         /// <summary>
