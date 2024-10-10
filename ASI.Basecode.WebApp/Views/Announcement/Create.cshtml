@@ -1,0 +1,40 @@
+﻿@using ASI.Basecode.Services.ServiceModels
+
+@model AnnouncementViewModel
+@{
+    ViewData["Title"] = "Create Announcement";
+}
+
+<div class="content p-4" style="margin-left: 200px;">
+    <h3>Create Announcement</h3>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title">Create New Announcement</h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" method="post">
+                <div class="form-group mb-3">
+                    <label asp-for="Title" class="control-label"></label>
+                    <input asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="Content" class="control-label"></label>
+                    <textarea asp-for="Content" class="form-control"></textarea>
+                    <span asp-validation-for="Content" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <input type="submit" value="Create" class="btn btn-primary" />
+                    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
