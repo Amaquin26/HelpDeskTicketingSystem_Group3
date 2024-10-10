@@ -1,12 +1,8 @@
-﻿@model ASI.Basecode.Data.Models.User
-@{
-    ViewBag.Title = "Add User";
-}
+﻿@model ASI.Basecode.Services.ServiceModels.UserModel
 
 @section styles {
     <link rel="stylesheet" href="~/css/login.css" />
 }
-
 <div class="container py-5 h-100 register-box">
     <div class="row d-flex justify-content-center align-items-center h-100">
         <div class="col-xl-10">
@@ -19,6 +15,7 @@
                                  style="width: 185px;" alt="logo">
                         </div>
                         <form method="post" asp-action="Edit">
+
                             <div class="form-outline mb-4">
                                 <label class="form-label" for="name">Name</label>
                                 <input type="text" id="name" class="form-control"
@@ -36,18 +33,18 @@
                             <div class="form-outline mb-4">
                                 <label class="form-label" for="password">Password</label>
                                 <input type="password" id="password" class="form-control"
-                                       asp-for="Password" placeholder="Enter password" required />
+                                       asp-for="Password" placeholder="Enter new password (leave blank if unchanged)" />
                                 <span asp-validation-for="Password" class="text-danger"></span>
                             </div>
 
                             <div class="form-outline mb-4">
                                 <label class="form-label" for="roleId">Role</label>
-                                <select id="roleId" class="form-control" asp-for="RoleId" asp-items="ViewBag.Roles" required>
+                                <select id="roleId" class="form-control" asp-for="RoleId" required>
                                     <option value="">Select Role</option>
-                                    <option value="1">Super </option>
+                                    <option value="1">Super Admin</option>
                                     <option value="2">Admin</option>
                                     <option value="3">Agent</option>
-                                    <option value="4">"User"</option>
+                                    <option value="4">User</option>
                                 </select>
                                 <span asp-validation-for="RoleId" class="text-danger"></span>
                             </div>
@@ -61,7 +58,7 @@
 
                             <div class="text-center pt-1 mb-5 pb-1 d-flex flex-column align-items-center">
                                 <button class="btn btn-primary btn-block login-btn gradient-custom-2 mb-3" type="submit">
-                                    Create User
+                                    Update User
                                 </button>
                                 <a asp-controller="User" asp-action="Index">
                                     &#8592 Back
@@ -74,7 +71,6 @@
         </div>
     </div>
 </div>
-
 @section scripts {
     <script>
         // Check for error message and display Toastr notification
