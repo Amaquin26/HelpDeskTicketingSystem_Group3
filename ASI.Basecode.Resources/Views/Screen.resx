@@ -126,6 +126,9 @@
   <data name="DontHaveAcc" xml:space="preserve">
     <value>Don't have an account?</value>
   </data>
+  <data name="Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
   <data name="ForgotPass" xml:space="preserve">
     <value>Forgot password?</value>
   </data>
@@ -134,8 +137,5 @@
   </data>
   <data name="Password" xml:space="preserve">
     <value>Password</value>
-  </data>
-  <data name="UserId" xml:space="preserve">
-    <value>UserId</value>
   </data>
 </root>
