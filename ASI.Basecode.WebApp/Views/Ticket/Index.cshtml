@@ -122,7 +122,7 @@
 </div>
 
 <!-- Side Modal for Edit Ticket -->
-<div class="modal-side p-3" id="editTicketModal">
+<div class="modal modal-side p-3" id="editTicketModal">
     <div class="modal-header mb-3">
         <h5 class="modal-title">Edit Ticket #00001</h5>
         <button type="button" class="btn-close" id="closeEditModalBtn"></button>
@@ -308,20 +308,9 @@
         toggleLabel.textContent = sidebar.classList.contains('collapsed') ? 'Show Sidebar' : 'Hide Sidebar';
     });
 
-    const createTicketModal = document.getElementById('createTicketModal');
-    const editTicketModal = document.getElementById('editTicketModal');
-
-    document.getElementById('createTicketBtn').addEventListener('click', function () {
-        createTicketModal.style.display = 'block';
-        editTicketModal.style.display = 'none'; // Ensure the edit modal is hidden
-    });
-
-    document.getElementById('closeModalBtn').addEventListener('click', function () {
-        createTicketModal.style.display = 'none';
-    });
-
     document.getElementById('closeEditModalBtn').addEventListener('click', function () {
         editTicketModal.style.display = 'none';
+        backdrop.classList.remove('show');
     });
 
     function openDeleteModal(ticketId, status, priority, category) {
@@ -330,7 +319,25 @@
         document.querySelector('#deleteTicketModal .modal-body .status').textContent = `${status}`;
         document.querySelector('#deleteTicketModal .modal-body .priority').textContent = `${priority}`;
         document.querySelector('#deleteTicketModal .modal-body .category').textContent = `${category}`;
-        $('#deleteTicketModal').modal('show');
+        $('#deleteTicketModal').modal('show');    
+    }
+
+    function openEditModal(ticketId, title, description, category, priority, status, assignee) {
+        // Set the modal header text with the ticket ID
+        document.querySelector('#editTicketModal .modal-title').textContent = `Edit Ticket #${ticketId}`;
+
+        // Set the values in the form inputs
+        // document.getElementById('title').value = title;
+        // document.getElementById('editTicketDescription').value = description;
+        // document.getElementById('editTicketCategory').value = category;
+        // document.getElementById('editTicketPriority').value = priority;
+        // document.getElementById('editTicketStatus').value = status;
+        // document.getElementById('editTicketAssign').value = assignee;
+
+        // Show the modal
+        // document.getElementById('editTicketModal').classList.add('show');
+        // backdrop.classList.add('show');
+        $('#editTicketModal').modal('show');
     }
 
     // toggleSidebar.addEventListener('click', () => {
@@ -350,28 +357,6 @@
 
     // toggleDropdown.addEventListener('click', () => {
     //     dropdownMenu.classList.toggle('show');
-    // });
-
-    // document.getElementById('createTicketBtn').addEventListener('click', function() {
-    //     document.getElementById('createTicketModal').classList.add('show');
-    //     backdrop.classList.add('show');
-    // });
-
-    // document.getElementById('closeModalBtn').addEventListener('click', function() {
-    //     document.getElementById('createTicketModal').classList.remove('show');
-    //     backdrop.classList.remove('show');
-    // });
-
-    // document.querySelectorAll('.edit').forEach(button => {
-    //     button.addEventListener('click', function() {
-    //         document.getElementById('editTicketModal').classList.add('show');
-    //         backdrop.classList.add('show');
-    //     });
-    // });
-
-    // document.getElementById('closeEditModalBtn').addEventListener('click', function() {
-    //     document.getElementById('editTicketModal').classList.remove('show');
-    //     backdrop.classList.remove('show');
     // });
 </script>
 
@@ -413,7 +398,16 @@
                     '<a href="" class="edit btn btn-outline-primary btn-sm">' +
                     '<i class="fas fa-eye"></i>' +
                     '</a>' +
-                    '<button class="edit btn btn-outline-danger btn-sm">' +
+                    // Edit button with data attributes to pass ticket information
+                    '<button class="edit btn btn-outline-danger btn-sm edit-btn" ' +
+                    'data-ticket-id="' + ticket.ticketId + '" ' +
+                    'data-title="' + ticket.title + '" ' +
+                    'data-description="' + ticket.description + '" ' +
+                    'data-category="' + ticket.categoryId + '" ' +
+                    'data-priority="' + ticket.priorityId + '" ' +
+                    'data-status="' + ticket.statusId + '" ' +
+                    'data-assignee="' + ticket.assigneeId + '" ' +
+                    '>' +
                     '<i class="fas fa-edit"></i>' +
                     '</button>' +
                     // Delete button with event handler for opening the delete modal
@@ -433,19 +427,25 @@
                 const category = $(this).data('category');
                 openDeleteModal(ticketId, status, priority, category);
             });
+
+            // Attach event listener to dynamically created edit buttons
+            $('.edit-btn').on('click', function () {
+                // Get data attributes from the clicked button
+                const ticketId = $(this).data('ticket-id');
+                const title = $(this).data('title');
+                const description = $(this).data('description');
+                const category = $(this).data('category');
+                const priority = $(this).data('priority');
+                const status = $(this).data('status');
+                const assignee = $(this).data('assignee');
+
+                openEditModal(ticketId, title, description, category, priority, status, assignee);
+            });
+
         }, function (error) {
             console.error('Error loading tickets:', error);
         });
     }
-
-    // function addTicket(ticketData) {
-    //     ajaxRequest('@Url.Page("/Tickets", "AddTicket")', 'POST', JSON.stringify(ticketData), function (response) {
-    //         alert('Ticket added successfully!');
-    //         loadTickets();  // Reload the tickets after adding
-    //     }, function (error) {
-    //         console.error('Error adding ticket:', error);
-    //     });
-    // }
 
     // function deleteTicket(ticketId) {
     //     ajaxRequest('@Url.Page("/Tickets", "DeleteTicket")', 'DELETE', JSON.stringify({ ticketId: ticketId }), function (response) {
