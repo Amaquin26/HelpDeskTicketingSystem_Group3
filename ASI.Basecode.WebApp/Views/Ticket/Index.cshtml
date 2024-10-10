@@ -46,7 +46,7 @@
 
     <h3 class="mb-4"><strong>Ticket Management</strong></h3>
 
-    <!-- Responsive Tickets List Table -->
+    <!-- Dynamic Tickets List Table -->
     <div class="table-responsive">
         <table id="ticketTable" class="table table-bordered table-hover">
             <thead>
@@ -77,7 +77,16 @@
                                 <!-- Example actions (Edit, Delete, etc.) -->
                                 <a href="@Url.Action("ViewTicket", "Ticket", new { ticketId = ticket.TicketId })" class="edit btn btn-outline-primary btn-sm"><i class="fas fa-eye"></i></a>
                                 <a href="@Url.Action("EditTicket", "Ticket", new { ticketId = ticket.TicketId })" class="edit btn btn-outline-danger btn-sm edit-btn"><i class="fas fa-edit"></i></a>
-                                <a href="@Url.Action("DeleteTicket", "Ticket", new { ticketId = ticket.TicketId })" class="edit btn btn-outline-danger btn-sm delete-btn"><i class="fas fa-trash-alt"></i></a>
+                                <a href="#"
+                                   class="edit btn btn-outline-danger btn-sm delete-btn"
+                                   data-bs-toggle="modal"
+                                   data-bs-target="#deleteTicketModal"
+                                   data-ticket-id="@ticket.TicketId"
+                                   data-ticket-status="@ticket.StatusName"
+                                   data-ticket-priority="@ticket.PriorityName"
+                                   data-ticket-category="@ticket.CategoryName">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
                             </td>
                         </tr>
                         index++; // Increment the row number
@@ -205,6 +214,53 @@
                 }
             }
         }
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var deleteButtons = document.querySelectorAll('.delete-btn');
+        var ticketIdElement = document.getElementById('ticketId');
+        var statusElement = document.querySelector('.status');
+        var priorityElement = document.querySelector('.priority');
+        var categoryElement = document.querySelector('.category');
+
+        deleteButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                // Get ticket details from data attributes
+                var ticketId = this.getAttribute('data-ticket-id');
+                var status = this.getAttribute('data-ticket-status');
+                var priority = this.getAttribute('data-ticket-priority');
+                var category = this.getAttribute('data-ticket-category');
+
+                // Populate the modal with the ticket data
+                ticketIdElement.textContent = ticketId;
+                statusElement.textContent = status;
+                priorityElement.textContent = priority;
+                categoryElement.textContent = category;
+            });
+        });
+    });
+
+    document.querySelector('#deleteTicketModal .btn-danger').addEventListener('click', function () {
+        var ticketId = document.getElementById('ticketId').textContent;
+
+        // Perform an AJAX request or form submission to delete the ticket
+        fetch(`/Ticket/DeleteTicket`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ ticketId})
+        })
+            .then(response => {
+                if (response.ok) {
+                    // Close modal and refresh or update the table
+                    location.reload(); // Or remove the row from the table
+                } else {
+                    alert('Failed to delete ticket.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
     });
 </script>
 

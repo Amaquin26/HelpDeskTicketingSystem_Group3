@@ -1,6 +1,7 @@
 ﻿using ASI.Basecode.Data.Models;
 using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
+using ASI.Basecode.WebApp.Models;
 using ASI.Basecode.WebApp.Mvc;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
@@ -15,8 +16,8 @@ namespace ASI.Basecode.WebApp.Controllers
         private readonly ITicketService _ticketService;
 
         public TicketController(
-            IHttpContextAccessor httpContextAccessor, 
-            ILoggerFactory loggerFactory, 
+            IHttpContextAccessor httpContextAccessor,
+            ILoggerFactory loggerFactory,
             IConfiguration configuration,
             ITicketService ticketService,
             IMapper mapper = null) : base(httpContextAccessor, loggerFactory, configuration, mapper)
@@ -26,7 +27,7 @@ namespace ASI.Basecode.WebApp.Controllers
 
         [HttpGet]
         public IActionResult Index()
-        {   
+        {
             var tickets = _ticketService.GetListOfTickets();
 
             return View(tickets);
@@ -61,7 +62,7 @@ namespace ASI.Basecode.WebApp.Controllers
 
             var ticket = result.Item1;
 
-            if(ticket == null)
+            if (ticket == null)
             {
                 return NotFound(new { Message = "Ticket not found" });
             }
@@ -88,7 +89,7 @@ namespace ASI.Basecode.WebApp.Controllers
         public JsonResult GetTickets()
         {
             var tickets = _ticketService.GetListOfTickets();
-            return Json(tickets); 
+            return Json(tickets);
         }
 
         [HttpPost]
@@ -173,6 +174,13 @@ namespace ASI.Basecode.WebApp.Controllers
 
             _ticketService.EditTicket(ticket);
             return RedirectToAction("Index");
+        }
+
+        [HttpDelete]
+        public IActionResult DeleteTicket([FromBody] TicketDeleteRequest request)
+        {
+            _ticketService.DeleteTicket(request.TicketId);
+            return Ok();
         }
     }
 }
