@@ -1,5 +1,76 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model IEnumerable<ASI.Basecode.Services.ServiceModels.TeamViewModel>
+
+<div class="content p-4" style="margin-left: 200px;">
+    <h3 class="mb-4"><strong>Team Management</strong></h3>
+
+    <!-- Add Team Button -->
+    <a asp-action="Create" class="btn btn-success mb-3">Add Team</a>
+
+    <!-- Dynamic Team List Table -->
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Team Name</th>
+                    <th scope="col">Team Leader</th>
+                    <th scope="col">Specialization</th>
+                    <th scope="col">Created By</th>
+                    <th scope="col">Date Created</th>
+                    <th scope="col" class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    int index = 1;
+                    foreach (var team in Model)
+                    {
+                                <tr>
+                                    <td>@index</td>
+                                    <td>@team.TeamName</td>
+                                    <td>@team.TeamLeaderId</td>
+                                    <td>@team.TeamSpecialization</td>
+                                    <td>@team.CreatedBy</td>
+                                    <td>@team.CreatedTime.ToShortDateString()</td>
+                                    <td class="text-center">
+                                        <!-- Action Buttons (View/Edit/Delete) -->
+                                        <a href="@Url.Action("Edit", "Team", new { id = team.TeamId })" class="edit btn btn-outline-primary btn-sm"><i class="fas fa-edit"></i></a>
+                                        <button class="btn btn-outline-danger btn-sm" onclick="deleteTeam(@team.TeamId)">Delete</button>
+                                    </td>
+                                </tr>
+                        index++;
+                    }
+                }
+                else
+                {
+                        <tr>
+                            <td colspan="7" class="text-center">No teams available.</td>
+                        </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function deleteTeam(teamId) {
+        if (confirm('Are you sure you want to delete this team?')) {
+            $.ajax({
+                url: '@Url.Action("Delete", "Team")',
+                type: 'POST',
+                data: { id: teamId },
+                success: function (result) {
+                    if (result.success) {
+                        location.reload();
+                    } else {
+                        alert(result.message || 'Error deleting team.');
+                    }
+                },
+                error: function () {
+                    alert('Error deleting team.');
+                }
+            });
+        }
+    }
+</script>

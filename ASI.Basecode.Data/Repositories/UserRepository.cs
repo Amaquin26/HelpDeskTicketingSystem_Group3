@@ -2,15 +2,18 @@
 using ASI.Basecode.Data.Models;
 using Basecode.Data.Repositories;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace ASI.Basecode.Data.Repositories
 {
     public class UserRepository : BaseRepository, IUserRepository
     {
+        public IEnumerable<object> Users => throw new System.NotImplementedException();
+
         public UserRepository(IUnitOfWork unitOfWork) : base(unitOfWork) 
         {
-        }
+        } 
 
         public IQueryable<User> GetUsers()
         {
@@ -58,5 +61,6 @@ namespace ASI.Basecode.Data.Repositories
                 UnitOfWork.SaveChanges();
             }
         }
+
     }
 }
