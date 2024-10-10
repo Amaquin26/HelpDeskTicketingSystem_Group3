@@ -17,7 +17,6 @@ namespace ASI.Basecode.Data.Models
         public DateTime CreatedTime { get; set; }
         public string? UpdatedBy { get; set; }
         public DateTime? UpdatedTime { get; set; }
-        public bool IsInactive { get; set; }
         public bool IsActive { get; set; } = true;
 
         // Navigation properties

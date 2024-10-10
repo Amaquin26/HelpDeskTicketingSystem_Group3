@@ -53,7 +53,6 @@ namespace ASI.Basecode.Data
                     .IsUnicode(false);
 
                 entity.Property(e => e.UpdatedBy)
-                    .IsRequired()
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
