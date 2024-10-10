@@ -1,0 +1,60 @@
+﻿@model IEnumerable<ASI.Basecode.Data.Models.User>
+
+<div class="container pt-5">
+    <a asp-controller="User" asp-action="Create" class="btn btn-outline-primary">Add User</a>
+    <div class="row justify-content-center">
+        <div class="col-md-6 mt-2">
+            <div class="card mb-1 shadow-sm p-3">
+                <div class="row">
+                    <div class="col-6 text-center">
+                        <div class="card bg-danger mb-2">
+                            <p class="card-text font-weight-bold">Role 1 = "Super Admin"</p>
+                        </div>
+                    </div>
+                    <div class="col-6 text-center">
+                        <div class="card bg-info mb-2">
+                            <p class="card-text font-weight-bold">Role 2 = "Admin"</p>
+                        </div>
+                    </div>
+                    <div class="col-6 text-center">
+                        <div class="card bg-warning mb-2">
+                            <p class="card-text font-weight-bold">Role 3 = "Agents"</p>
+                        </div>
+                    </div>
+                    <div class="col-6 text-center">
+                        <div class="card bg-secondary mb-2">
+                            <p class="card-text font-weight-bold">Role 4 = "User"</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        @if (Model == null || !Model.Any())
+        {
+            <h4 class="card-text font-weight-bold">No users to display</h4>
+        }
+        else
+        {
+            foreach (var user in Model)
+            {
+                <div class="col-md-4">
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-body">
+                            <h4 class="card-text font-weight-bold">@user.Name</h4>
+                            <p class="card-text"><b>Email: @user.Email</b></p>
+                            <p class="card-text">Role: <b>@user.RoleId</b></p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">User ID: @user.UserId</small>
+                            </div>
+                            <a href="/User/Edit?id=@user.UserId" class="btn btn-primary">Edit</a>
+                            <a href="/User/Delete?id=@user.UserId" class="btn btn-danger">Delete</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
