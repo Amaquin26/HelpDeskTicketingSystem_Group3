@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace ASI.Basecode.Services.ServiceModels
 {
+    [EitherOrRequired(nameof(AssigneeId), nameof(TeamAssignedId),
+              NeitherMessage = "Please provide either an Assignee ID or a Team Assigned ID.",
+              BothMessage = "You cannot assign both an Assignee ID and a Team Assigned ID.")]
     public class TicketFormModel
     {
         public int TicketId { get; set; }
@@ -27,15 +30,7 @@ namespace ASI.Basecode.Services.ServiceModels
 
         [Required(ErrorMessage = "Priority is required.")]
         public int PriorityId { get; set; }
-
-        [EitherOrRequired(nameof(AssigneeId), nameof(TeamAssignedId),
-                      NeitherMessage = "Please provide either an Assignee ID or a Team Assigned ID.",
-                      BothMessage = "You cannot assign both an Assignee ID and a Team Assigned ID.")]
         public string? AssigneeId { get; set; }
-
-        [EitherOrRequired(nameof(AssigneeId), nameof(TeamAssignedId),
-                      NeitherMessage = "Please provide either an Assignee ID or a Team Assigned ID.",
-                      BothMessage = "You cannot assign both an Assignee ID and a Team Assigned ID.")]
         public int? TeamAssignedId { get; set; }
     }
 }

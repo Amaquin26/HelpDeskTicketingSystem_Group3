@@ -47,6 +47,18 @@ namespace ASI.Basecode.Services.Services
             return tickets;
         }
 
+        public (Ticket, bool) GetTicketById(int ticketId)
+        {
+            var ticket = _ticketRepository.GetTicketById(ticketId); 
+
+            if(ticket == null)
+            {
+                return (null, false);
+            }
+
+            return (ticket, true);
+        }
+
         public List<TicketCategory> GetTicketCategoryList()
         {
             return _ticketRepository.GetTicketCategories().ToList();

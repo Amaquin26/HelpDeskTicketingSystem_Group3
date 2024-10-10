@@ -21,6 +21,16 @@ namespace ASI.Basecode.Services.Interfaces
         List<TicketDto> GetListOfTickets();
 
         /// <summary>
+        /// Retrieves a ticket by its ID and returns the ticket along with a success flag.
+        /// </summary>
+        /// <param name="ticketId">The ID of the ticket to retrieve.</param>
+        /// <returns>
+        /// A tuple where the first element is the ticket object and the second element 
+        /// is a boolean indicating whether the ticket was found (true) or not (false).
+        /// </returns>
+        (Ticket, bool) GetTicketById(int ticketId);
+
+        /// <summary>
         /// Retrieves a list of all ticket categories from the database.
         /// </summary>
         /// <returns>

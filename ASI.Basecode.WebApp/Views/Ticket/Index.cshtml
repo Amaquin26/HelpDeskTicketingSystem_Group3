@@ -1,7 +1,7 @@
 ﻿@{
     ViewData["Title"] = "Ticket Page";
 }
-@model ASI.Basecode.Services.ServiceModels.TicketViewModel
+@model IEnumerable<ASI.Basecode.Services.Dto.TicketDto>
 
 <!-- Main Content -->
 <div class="content p-4" style="margin-left: 200px;">
@@ -61,122 +61,41 @@
                 </tr>
             </thead>
             <tbody id="ticketList">
+                @if (Model != null && Model.Any())
+                {
+                    int index = 1; // To maintain the row number
+                    foreach (var ticket in Model)
+                    {
+                        <tr>
+                            <td>@index</td>
+                            <td>@ticket.Description</td>
+                            <td>@ticket.CreatedBy</td>
+                            <td>@ticket.CategoryName</td>
+                            <td>@ticket.PriorityName</td>
+                            <td>@ticket.StatusName</td>
+                            <td class="text-center">
+                                <!-- Example actions (Edit, Delete, etc.) -->
+                                <a href="@Url.Action("ViewTicket", "Ticket", new { ticketId = ticket.TicketId })" class="edit btn btn-outline-primary btn-sm"><i class="fas fa-eye"></i></a>
+                                <a href="@Url.Action("EditTicket", "Ticket", new { ticketId = ticket.TicketId })" class="edit btn btn-outline-danger btn-sm edit-btn"><i class="fas fa-edit"></i></a>
+                                <a href="@Url.Action("DeleteTicket", "Ticket", new { ticketId = ticket.TicketId })" class="edit btn btn-outline-danger btn-sm delete-btn"><i class="fas fa-trash-alt"></i></a>
+                            </td>
+                        </tr>
+                        index++; // Increment the row number
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" class="text-center">No tickets available.</td>
+                    </tr>
+                }
             </tbody>
         </table>
     </div>
 </div>
 
 <!-- Floating Add User Button -->
-<button class="btn btn-danger floating-btn" id="createTicketBtn" style="border-radius:999999px !important;">
-    <i class="fas fa-plus"></i>
-</button>
-
-<!-- Side Modal for Create Ticket -->
-<div class="modal-side p-3" id="createTicketModal">
-    <div class="modal-header">
-        <h5 class="modal-title">Create Ticket</h5>
-        <button type="button" class="btn-close" id="closeModalBtn"></button>
-    </div>
-    <div class="modal-body">
-        <form method="post" asp-action="AddTicket" asp-controller="Ticket">
-            <div class="mb-3">
-                <label asp-for="Ticket.Title" class="form-label">Title</label>
-                <input asp-for="Ticket.Title" class="form-control" id="title" placeholder="Enter ticket title" required>
-                <span asp-validation-for="Ticket.Title" class="text-danger"></span>
-            </div>
-            <div class="mb-3">
-                <label asp-for="Ticket.Description" class="form-label">Issue Description</label>
-                <textarea asp-for="Ticket.Description" class="form-control" id="ticketDescription" rows="3" placeholder="Describe the issue" required></textarea>
-                <span asp-validation-for="Ticket.Description" class="text-danger"></span>
-            </div>
-            <div class="mb-3">
-                <label asp-for="Ticket.CategoryId" class="form-label">Category</label>
-                <select asp-for="Ticket.CategoryId" class="form-select" id="category" asp-items="@(new SelectList(Model.TicketCategories, "CategoryId", "CategoryName"))">
-                    <option value="">-- Select Category --</option> <!-- Optional default option -->
-                </select>
-                <span asp-validation-for="Ticket.CategoryId" class="text-danger"></span>
-            </div>
-            <div class="mb-3">
-                <label asp-for="Ticket.PriorityId" class="form-label">Priority</label>
-                <select asp-for="Ticket.PriorityId" class="form-select" id="category" asp-items="@(new SelectList(Model.ticketPriorities, "PriorityId", "PriorityName"))">
-                    <option value="">-- Select Priority --</option> <!-- Optional default option -->
-                </select>
-                <span asp-validation-for="Ticket.PriorityId" class="text-danger"></span>
-            </div>
-            <div class="mb-3">
-                <label for="ticketAssign" class="form-label">Assign to Agent/Team</label>
-                <select class="form-select" id="ticketAssign" required>
-                    <option selected disabled>Select agent/team</option>
-                    <option value="agent1">Agent 1</option>
-                    <option value="agent2">Agent 2</option>
-                    <option value="team1">Team 1</option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="ticketAttachment" class="form-label">Attachments</label>
-                <input type="file" class="form-control"  multiple id="ticketAttachment">
-            </div>
-            <button type="submit" class="btn btn-danger w-100">Create Ticket</button>
-        </form>
-    </div>
-</div>
-
-<!-- Side Modal for Edit Ticket -->
-<div class="modal modal-side p-3" id="editTicketModal">
-    <div class="modal-header mb-3">
-        <h5 class="modal-title">Edit Ticket #00001</h5>
-        <button type="button" class="btn-close" id="closeEditModalBtn"></button>
-    </div>
-    <div class="modal-body">
-        <form>
-            <div class="mb-3">
-                <label for="title" class="form-label">Title</label>
-                <input type="text" class="form-control" id="title" placeholder="Enter ticket title" value="Cannot login to account" required>
-            </div>
-            <div class="mb-3">
-                <label for="editTicketDescription" class="form-label">Issue Description</label>
-                <textarea class="form-control" id="editTicketDescription" rows="3" placeholder="Update the issue description" required>The user is experiencing issues logging into their account. Every time they try to log in, they receive an error message stating that their credentials are incorrect. The user has already attempted resetting their password, but the issue persists.</textarea>
-            </div>
-            <div class="mb-3">
-                <label for="editTicketCategory" class="form-label">Category</label>
-                <select class="form-select" id="editTicketCategory" required>
-                    <option disabled>Select category</option>
-                    <option selected value="technical">Technical</option>
-                    <option value="billing">Billing</option>
-                    <option value="general">General Inquiry</option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="editTicketStatus" class="form-label">Status</label>
-                <select class="form-select" id="editTicketStatus" required>
-                    <option disabled>Select priority</option>
-                    <option selected value="open">Open</option>
-                    <option value="in-progress">In Progress</option>
-                    <option value="resolve">Resolve</option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="editTicketPriority" class="form-label">Priority</label>
-                <select class="form-select" id="editTicketPriority" required>
-                    <option selected disabled>Select priority</option>
-                    <option value="low">Low</option>
-                    <option selected value="medium">Medium</option>
-                    <option value="high">High</option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="editTicketAssign" class="form-label">Reassign to Agent/Team</label>
-                <select class="form-select" id="editTicketAssign" required>
-                    <option disabled>Select agent/team</option>
-                    <option selected value="agent1">Agent 1</option>
-                    <option value="agent2">Agent 2</option>
-                    <option value="team1">Team 1</option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-outline-danger w-100">Update Ticket</button>
-        </form>
-    </div>
-</div>
+<a asp-action="AddTicket" asp-controller="Ticket" class="text-decoration-none btn btn-danger floating-btn d-flex" style="border-radius:999999px !important;"><i class="fas fa-plus"></i></a>
 
 <!-- Delete Ticket Modal -->
 <div class="modal fade" id="deleteTicketModal" tabindex="-1" aria-labelledby="deleteTicketModalLabel" aria-hidden="true">
@@ -197,7 +116,6 @@
         </div>
     </div>
 </div>
-
 
 <!-- Include jQuery before DataTables -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -262,8 +180,6 @@
         }
     });
 
-
-
     // Tickets by Priority
     const ticketsByPriorityCtx = document.getElementById('ticketsByPriorityChart').getContext('2d');
     new Chart(ticketsByPriorityCtx, {
@@ -291,182 +207,5 @@
         }
     });
 </script>
-<script>
-    $(document).ready(function() {
-        $('#ticketTable').DataTable();
-    });
 
-    const sidebar = document.getElementById('sidebar');
-    const toggleSidebar = document.getElementById('toggleSidebar');
-    const toggleIcon = toggleSidebar.querySelector('i');
-    const toggleLabel = toggleSidebar.querySelector('span');
 
-    toggleSidebar.addEventListener('click', function () {
-        sidebar.classList.toggle('collapsed');
-        toggleIcon.classList.toggle('fa-arrow-left');
-        toggleIcon.classList.toggle('fa-arrow-right');
-        toggleLabel.textContent = sidebar.classList.contains('collapsed') ? 'Show Sidebar' : 'Hide Sidebar';
-    });
-
-    document.getElementById('closeEditModalBtn').addEventListener('click', function () {
-        editTicketModal.style.display = 'none';
-        backdrop.classList.remove('show');
-    });
-
-    function openDeleteModal(ticketId, status, priority, category) {
-        document.getElementById('deleteTicketModalLabel').textContent = `Delete Ticket #${ticketId}`;
-        document.querySelector('#deleteTicketModal .modal-body strong').textContent = `${ticketId}`;
-        document.querySelector('#deleteTicketModal .modal-body .status').textContent = `${status}`;
-        document.querySelector('#deleteTicketModal .modal-body .priority').textContent = `${priority}`;
-        document.querySelector('#deleteTicketModal .modal-body .category').textContent = `${category}`;
-        $('#deleteTicketModal').modal('show');    
-    }
-
-    function openEditModal(ticketId, title, description, category, priority, status, assignee) {
-        // Set the modal header text with the ticket ID
-        document.querySelector('#editTicketModal .modal-title').textContent = `Edit Ticket #${ticketId}`;
-
-        // Set the values in the form inputs
-        // document.getElementById('title').value = title;
-        // document.getElementById('editTicketDescription').value = description;
-        // document.getElementById('editTicketCategory').value = category;
-        // document.getElementById('editTicketPriority').value = priority;
-        // document.getElementById('editTicketStatus').value = status;
-        // document.getElementById('editTicketAssign').value = assignee;
-
-        // Show the modal
-        // document.getElementById('editTicketModal').classList.add('show');
-        // backdrop.classList.add('show');
-        $('#editTicketModal').modal('show');
-    }
-
-    // toggleSidebar.addEventListener('click', () => {
-    //     sidebar.classList.toggle('shrink');
-    //     if (sidebar.classList.contains('shrink')) {
-    //         toggleIcon.className = 'fas fa-chevron-right';
-    //         toggleLabel.textContent = 'Show';
-    //         content.style.marginLeft = '60px';
-    //     } else {
-    //         toggleIcon.className = 'fas fa-chevron-left';
-    //         toggleLabel.textContent = 'Hide';
-    //         content.style.marginLeft = '200px';
-    //     }
-    //     const marginLeft = sidebar.classList.contains('shrink') ? '60px' : '200px';
-    //     document.querySelector('.content').style.marginLeft = marginLeft;
-    // });
-
-    // toggleDropdown.addEventListener('click', () => {
-    //     dropdownMenu.classList.toggle('show');
-    // });
-</script>
-
-<script>
-    function ajaxRequest(url, method, data, successCallback, errorCallback) {
-        $.ajax({
-            url: url,
-            method: method,
-            data: data,
-            contentType: "application/json; charset=utf-8",
-            success: function (response) {
-                if (typeof successCallback === 'function') {
-                    successCallback(response);
-                }
-            },
-            error: function (err) {
-                if (typeof errorCallback === 'function') {
-                    errorCallback(err);
-                }
-            }
-        });
-    }
-
-    function loadTickets() {
-        ajaxRequest('@Url.Action("GetTickets", "Ticket")', 'GET', null, function (data) {
-            const ticketList = $('#ticketList');
-            ticketList.empty();  // Clear the list before adding new items
-
-            $.each(data, function (i, ticket) {
-                ticketList.append('<tr>');
-                ticketList.append('<th scope="row">' + ticket.ticketId + '</th>');
-                ticketList.append('<td>' + ticket.description + '</td>');
-                ticketList.append('<td>' + ticket.createdBy + '</td>');
-                ticketList.append('<td>' + ticket.categoryName + '</td>');
-                ticketList.append('<td>' + ticket.priorityName + '</td>');
-                ticketList.append('<td>' + ticket.statusName + '</td>');
-                ticketList.append(
-                    '<td class="text-center">' +
-                    '<a href="" class="edit btn btn-outline-primary btn-sm">' +
-                    '<i class="fas fa-eye"></i>' +
-                    '</a>' +
-                    // Edit button with data attributes to pass ticket information
-                    '<button class="edit btn btn-outline-danger btn-sm edit-btn" ' +
-                    'data-ticket-id="' + ticket.ticketId + '" ' +
-                    'data-title="' + ticket.title + '" ' +
-                    'data-description="' + ticket.description + '" ' +
-                    'data-category="' + ticket.categoryId + '" ' +
-                    'data-priority="' + ticket.priorityId + '" ' +
-                    'data-status="' + ticket.statusId + '" ' +
-                    'data-assignee="' + ticket.assigneeId + '" ' +
-                    '>' +
-                    '<i class="fas fa-edit"></i>' +
-                    '</button>' +
-                    // Delete button with event handler for opening the delete modal
-                    '<button class="edit btn btn-outline-danger btn-sm delete-btn" data-ticket-id="' + ticket.ticketId + '" data-status="' + ticket.statusName + '" data-priority="' + ticket.priorityName + '" data-category="' + ticket.categoryName + '">' +
-                    '<i class="fas fa-trash-alt"></i>' +
-                    '</button>' +
-                    '</td>'
-                );
-                ticketList.append('</tr>');
-            });
-
-            // Attach event listener to dynamically created delete buttons
-            $('.delete-btn').on('click', function () {
-                const ticketId = $(this).data('ticket-id');
-                const status = $(this).data('status');
-                const priority = $(this).data('priority');
-                const category = $(this).data('category');
-                openDeleteModal(ticketId, status, priority, category);
-            });
-
-            // Attach event listener to dynamically created edit buttons
-            $('.edit-btn').on('click', function () {
-                // Get data attributes from the clicked button
-                const ticketId = $(this).data('ticket-id');
-                const title = $(this).data('title');
-                const description = $(this).data('description');
-                const category = $(this).data('category');
-                const priority = $(this).data('priority');
-                const status = $(this).data('status');
-                const assignee = $(this).data('assignee');
-
-                openEditModal(ticketId, title, description, category, priority, status, assignee);
-            });
-
-        }, function (error) {
-            console.error('Error loading tickets:', error);
-        });
-    }
-
-    // function deleteTicket(ticketId) {
-    //     ajaxRequest('@Url.Page("/Tickets", "DeleteTicket")', 'DELETE', JSON.stringify({ ticketId: ticketId }), function (response) {
-    //         alert('Ticket deleted successfully!');
-    //         loadTickets();  // Reload the tickets after deleting
-    //     }, function (error) {
-    //         console.error('Error deleting ticket:', error);
-    //     });
-    // }
-
-    $(document).ready(function () {
-        loadTickets();
-
-        $('#createTicketBtn').click(function () {
-            document.getElementById('createTicketModal').classList.add('show');
-            backdrop.classList.add('show');
-        });
-
-        $('#closeModalBtn').click(function () {
-            document.getElementById('createTicketModal').classList.remove('show');
-            backdrop.classList.remove('show');
-        });
-    });
-</script>

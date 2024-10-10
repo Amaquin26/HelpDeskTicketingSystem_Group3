@@ -1,4 +1,5 @@
-﻿using ASI.Basecode.Services.Interfaces;
+﻿using ASI.Basecode.Data.Models;
+using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
 using ASI.Basecode.WebApp.Mvc;
 using AutoMapper;
@@ -23,7 +24,16 @@ namespace ASI.Basecode.WebApp.Controllers
             _ticketService = ticketService;
         }
 
+        [HttpGet]
         public IActionResult Index()
+        {   
+            var tickets = _ticketService.GetListOfTickets();
+
+            return View(tickets);
+        }
+
+        [HttpGet]
+        public IActionResult AddTicket()
         {
             var ticketModel = new TicketViewModel();
 
@@ -32,9 +42,44 @@ namespace ASI.Basecode.WebApp.Controllers
             var ticketCategories = _ticketService.GetTicketCategoryList();
 
             ticketModel.Ticket = new TicketFormModel();
-            ticketModel.ticketPriorities = ticketPriorities;
+            ticketModel.TicketPriorities = ticketPriorities;
             ticketModel.TicketCategories = ticketCategories;
-            ticketModel.TicketStatuses = ticketStatuses;    
+            ticketModel.TicketStatuses = ticketStatuses;
+
+            return View(ticketModel);
+        }
+
+        [HttpGet]
+        public IActionResult EditTicket(int ticketId)
+        {
+            var ticketModel = new TicketViewModel();
+
+            var ticketStatuses = _ticketService.GetTicketStatusList();
+            var ticketPriorities = _ticketService.GetTicketPriorityList();
+            var ticketCategories = _ticketService.GetTicketCategoryList();
+            var result = _ticketService.GetTicketById(ticketId);
+
+            var ticket = result.Item1;
+
+            if(ticket == null)
+            {
+                return NotFound(new { Message = "Ticket not found" });
+            }
+
+            ticketModel.Ticket = new TicketFormModel
+            {
+                TicketId = ticket.TicketId,
+                Title = ticket.Title,
+                Description = ticket.Description,
+                AssigneeId = ticket.AssigneeId,
+                TeamAssignedId = ticket.TeamAssignedId,
+                CategoryId = ticket.CategoryId,
+                StatusId = ticket.StatusId,
+                PriorityId = ticket.StatusId
+            };
+            ticketModel.TicketPriorities = ticketPriorities;
+            ticketModel.TicketCategories = ticketCategories;
+            ticketModel.TicketStatuses = ticketStatuses;
 
             return View(ticketModel);
         }
@@ -49,6 +94,30 @@ namespace ASI.Basecode.WebApp.Controllers
         [HttpPost]
         public IActionResult AddTicket(TicketViewModel ticketModel)
         {
+            // Set to open by default
+            ticketModel.Ticket.StatusId = 1;
+
+            //Return the view with the model to show validation errors
+            if (!ModelState.IsValid)
+            {
+                if (ticketModel.TicketStatuses.Count == 0)
+                {
+                    ticketModel.TicketStatuses = _ticketService.GetTicketStatusList();
+                }
+
+                if (ticketModel.TicketPriorities.Count == 0)
+                {
+                    ticketModel.TicketPriorities = _ticketService.GetTicketPriorityList();
+                }
+
+                if (ticketModel.TicketCategories.Count == 0)
+                {
+                    ticketModel.TicketCategories = _ticketService.GetTicketCategoryList();
+                }
+
+                return View(ticketModel);
+            }
+
             var ticketFormModel = ticketModel.Ticket;
 
             var ticket = new TicketFormModel
@@ -57,14 +126,52 @@ namespace ASI.Basecode.WebApp.Controllers
                 Description = ticketFormModel.Description,
                 PriorityId = ticketFormModel.PriorityId,
                 CategoryId = ticketFormModel.CategoryId,
-                //StatusId = ticketFormModel.StatusId,
-                //AssigneeId = ticketFormModel.AssigneeId,
                 StatusId = 1,
-                AssigneeId = "bf99147b-422b-4ea6-874b-7ae5836eea95",
+                AssigneeId = ticketFormModel.AssigneeId,
                 TeamAssignedId = ticketFormModel.TeamAssignedId,
             };
 
             _ticketService.AddTicket(ticket);
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public IActionResult EditTicket(TicketViewModel ticketModel)
+        {
+            //Return the view with the model to show validation errors
+            if (!ModelState.IsValid)
+            {
+                if (ticketModel.TicketStatuses.Count == 0)
+                {
+                    ticketModel.TicketStatuses = _ticketService.GetTicketStatusList();
+                }
+
+                if (ticketModel.TicketPriorities.Count == 0)
+                {
+                    ticketModel.TicketPriorities = _ticketService.GetTicketPriorityList();
+                }
+
+                if (ticketModel.TicketCategories.Count == 0)
+                {
+                    ticketModel.TicketCategories = _ticketService.GetTicketCategoryList();
+                }
+
+                return View(ticketModel);
+            }
+
+            var ticket = new TicketFormModel
+            {
+                TicketId = ticketModel.Ticket.TicketId,
+                Title = ticketModel.Ticket.Title,
+                Description = ticketModel.Ticket.Description,
+                AssigneeId = ticketModel.Ticket.AssigneeId,
+                TeamAssignedId = ticketModel.Ticket.TeamAssignedId,
+                CategoryId = ticketModel.Ticket.CategoryId,
+                StatusId = ticketModel.Ticket.StatusId,
+                PriorityId = ticketModel.Ticket.StatusId
+            };
+
+            _ticketService.EditTicket(ticket);
             return RedirectToAction("Index");
         }
     }
