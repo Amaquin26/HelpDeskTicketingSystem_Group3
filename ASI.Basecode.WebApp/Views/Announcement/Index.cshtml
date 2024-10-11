@@ -1,0 +1,55 @@
+﻿@using ASI.Basecode.Services.ServiceModels
+
+@model List<AnnouncementViewModel>
+@{
+    ViewData["Title"] = "Announcements";
+}
+
+<div class="content p-4" style="margin-left: 200px;">
+    <h3><strong>Announcements</strong></h3>
+    <a asp-action="Create" class="btn btn-success mb-3">Add Announcement</a>
+
+    <div class="row">
+        @foreach (var announcement in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">@announcement.Title</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">@announcement.Content</p>
+                        <p class="text-muted">Created by: @announcement.CreatedBy</p>
+                        <p class="text-muted">Date created: @announcement.CreatedTime.ToShortDateString()</p>
+                    </div>
+                    <div class="card-footer text-center">
+                        <a asp-action="Edit" asp-route-id="@announcement.AnnouncementId" class="btn btn-primary">Edit</a>
+                        <button class="btn btn-danger" onclick="deleteAnnouncement(@announcement.AnnouncementId)">Delete</button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+    function deleteAnnouncement(announcementId) {
+        if (confirm('Are you sure you want to delete this announcement?')) {
+            $.ajax({
+                url: '@Url.Action("Delete", "Announcement")',
+                type: 'POST',
+                data: { id: announcementId },
+                success: function (result) {
+                    if (result.success) {
+                        location.reload();
+                    } else {
+                        alert(result.message || 'Error deleting announcement.');
+                    }
+                },
+                error: function () {
+                    alert('Error deleting announcement.');
+                }
+            });
+        }
+    }
+</script>
