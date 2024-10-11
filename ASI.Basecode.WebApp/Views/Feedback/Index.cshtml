@@ -1,0 +1,66 @@
+﻿@{
+    ViewData["Title"] = "Feedback Page";
+}
+
+<div class="content p-4" style="margin-left: 200px;">
+    <h3 class="mb-4"><strong>Feedbacks</strong></h3>
+
+    <!-- Add Feedback Button -->
+    <a asp-action="Create" class="btn btn-success mb-3">Add Feedback</a>
+
+    <!-- Feedback List Table -->
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">Feedback ID</th>
+                    <th scope="col">Ticket ID</th>
+                    <th scope="col">Feedback By</th>
+                    <th scope="col">Comment</th>
+                    <th scope="col">Rating</th>
+                    <th scope="col">Date Created</th>
+                    <th scope="col" class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var feedback in Model)
+                {
+                    <tr>
+                        <td>@feedback.FeedbackId</td>
+                        <td>@feedback.TicketId</td>
+                        <td>@feedback.CreatedBy</td>
+                        <td>@feedback.Comment</td>
+                        <td>@feedback.Rating</td>
+                        <td>@feedback.CreatedTime.ToShortDateString()</td>
+                        <td class="text-center">
+                            <a asp-action="Edit" asp-route-id="@feedback.FeedbackId" class="btn btn-sm btn-primary">Edit</a>
+                            <button class="btn btn-sm btn-danger" onclick="deleteFeedback(@feedback.FeedbackId)">Delete</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function deleteFeedback(feedbackId) {
+        if (confirm('Are you sure you want to delete this feedback?')) {
+            $.ajax({
+                url: '@Url.Action("Delete", "Feedback")',
+                type: 'POST',
+                data: { id: feedbackId },
+                success: function (result) {
+                    if (result.success) {
+                        location.reload();
+                    } else {
+                        alert(result.message || 'Error deleting feedback.');
+                    }
+                },
+                error: function () {
+                    alert('Error deleting feedback.');
+                }
+            });
+        }
+    }
+</script>
