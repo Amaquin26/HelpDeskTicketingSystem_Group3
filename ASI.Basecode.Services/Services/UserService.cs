@@ -49,7 +49,32 @@ namespace ASI.Basecode.Services.Services
                 user.UserId = userId.ToString();
                 user.RoleId = 1;
                 user.Name = model.Name;
-                user.Email = model.Email;
+                user.IsActive = model.IsActive;
+                user.Email = "Jermain@buang.com";
+                _repository.AddUser(user);
+            }
+            else
+            {
+                throw new InvalidDataException(Resources.Messages.Errors.UserExists);
+            }
+        }
+        public void AddUser(User user)
+        {
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
+            if (!_repository.UserExists(user.Email)) // Check if user exists by email
+            {
+                // Set additional properties for the new user
+                user.UserId = Guid.NewGuid().ToString(); 
+                user.Password = PasswordManager.EncryptPassword(user.Password);
+                user.CreatedTime = DateTime.Now;
+                user.UpdatedTime = DateTime.Now;
+                user.CreatedBy = Environment.UserName;
+                user.UpdatedBy = Environment.UserName;
+
                 _repository.AddUser(user);
             }
             else
@@ -59,32 +84,36 @@ namespace ASI.Basecode.Services.Services
         }
         public List<User> GetUsers()
         {
-            // Filter only active users (IsInactive = false)
             return _repository.GetUsers().Where(u => !u.IsActive).ToList();
         }
         public void DeleteUser(User user)
         {
-            var existingUser = _repository.GetUsers().FirstOrDefault(x => x.UserId == user.UserId);
+            var existingUser = _repository.GetUsers().FirstOrDefault(u => u.UserId == user.UserId);
             if (existingUser != null)
             {
-                existingUser.IsActive = false; // Soft delete by marking as inactive
-                _repository.UpdateUser(existingUser); // Use repository to update the user
+                existingUser.IsActive = user.IsActive == false;
+                _repository.DeleteUser(existingUser);
             }
         }
         public void UpdateUser(User user)
         {
-            var existingUser = _repository.GetUsers().FirstOrDefault(x => x.UserId == user.UserId);
+            var existingUser = _repository.GetUsers().FirstOrDefault(u => u.UserId == user.UserId);
             if (existingUser != null)
             {
                 existingUser.Name = user.Name;
-                existingUser.Password = PasswordManager.EncryptPassword(user.Password); // Encrypt the password
                 existingUser.Email = user.Email;
-                existingUser.UpdatedTime = DateTime.Now; // Update timestamp
-                existingUser.UpdatedBy = Environment.UserName; // Update who changed it
+                if (!string.IsNullOrEmpty(user.Password))
+                {
+                    existingUser.Password = PasswordManager.EncryptPassword(user.Password); // Optional: Encrypt password if necessary
+                }
+                existingUser.RoleId = user.RoleId;
+                existingUser.UpdatedTime = DateTime.Now;
+                existingUser.UpdatedBy = Environment.UserName;
 
-                _repository.UpdateUser(existingUser); // Use repository to update the user
+                _repository.UpdateUser(existingUser);
             }
         }
+
         public IQueryable<User> GetUser(bool onlyAgents)
         {
             if (onlyAgents)
