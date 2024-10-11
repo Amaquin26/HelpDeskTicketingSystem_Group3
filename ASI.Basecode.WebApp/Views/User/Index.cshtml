@@ -30,7 +30,6 @@
             </div>
         </div>
     </div>
-
     <div class="row">
         @if (Model == null || !Model.Any())
         {
@@ -58,3 +57,14 @@
         }
     </div>
 </div>
+
+
+@section scripts {
+    <script>
+        // Check for error message and display Toastr notification
+        var ErrorMessage = '@TempData["ErrorMessage"]';
+        if (ErrorMessage) {
+            toastr.error(ErrorMessage);
+        }
+    </script>
+}
