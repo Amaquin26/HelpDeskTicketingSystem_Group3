@@ -68,7 +68,7 @@ namespace ASI.Basecode.Services.Services
             if (!_repository.UserExists(user.Email)) // Check if user exists by email
             {
                 // Set additional properties for the new user
-                user.UserId = Guid.NewGuid().ToString(); // Generate a new unique UserId
+                user.UserId = Guid.NewGuid().ToString(); 
                 user.Password = PasswordManager.EncryptPassword(user.Password);
                 user.CreatedTime = DateTime.Now;
                 user.UpdatedTime = DateTime.Now;
@@ -88,24 +88,29 @@ namespace ASI.Basecode.Services.Services
         }
         public void DeleteUser(User user)
         {
-            var existingUser = user;
+            var existingUser = _repository.GetUsers().FirstOrDefault(u => u.UserId == user.UserId);
             if (existingUser != null)
             {
                 existingUser.IsActive = user.IsActive == false;
-                _repository.DeleteUser(user);
+                _repository.DeleteUser(existingUser);
             }
         }
         public void UpdateUser(User user)
         {
-            var existingUser = user;
+            var existingUser = _repository.GetUsers().FirstOrDefault(u => u.UserId == user.UserId);
             if (existingUser != null)
             {
-                existingUser.UserId = user.UserId;
                 existingUser.Name = user.Name;
                 existingUser.Email = user.Email;
-                existingUser.Password = user.Password;
+                if (!string.IsNullOrEmpty(user.Password))
+                {
+                    existingUser.Password = PasswordManager.EncryptPassword(user.Password); // Optional: Encrypt password if necessary
+                }
                 existingUser.RoleId = user.RoleId;
-                _repository.UpdateUser(user);
+                existingUser.UpdatedTime = DateTime.Now;
+                existingUser.UpdatedBy = Environment.UserName;
+
+                _repository.UpdateUser(existingUser);
             }
         }
 

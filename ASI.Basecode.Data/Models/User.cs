@@ -24,5 +24,7 @@ namespace ASI.Basecode.Data.Models
         public ICollection<Team> TeamsLed { get; set; } 
         public ICollection<Team> Teams { get; set; }
         public Role Role { get; set; }
+
+
     }
 }
