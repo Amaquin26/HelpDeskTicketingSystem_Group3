@@ -6,50 +6,133 @@
 }
 
 <div class="content p-4" style="margin-left: 200px;">
-    <h3><strong>Announcements</strong></h3>
-    <a asp-action="Create" class="btn btn-success mb-3">Add Announcement</a>
+    <h3 class="mb-4"><strong>Announcements</strong></h3>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <!-- Search Input -->
+        <input type="text" id="searchInput" class="form-control me-2" placeholder="Search Announcements" style="flex: 1;">
 
-    <div class="row">
-        @foreach (var announcement in Model)
-        {
-            <div class="col-md-4 mb-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title">@announcement.Title</h5>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-text">@announcement.Content</p>
-                        <p class="text-muted">Created by: @announcement.CreatedBy</p>
-                        <p class="text-muted">Date created: @announcement.CreatedTime.ToShortDateString()</p>
-                    </div>
-                    <div class="card-footer text-center">
-                        <a asp-action="Edit" asp-route-id="@announcement.AnnouncementId" class="btn btn-primary">Edit</a>
-                        <button class="btn btn-danger" onclick="deleteAnnouncement(@announcement.AnnouncementId)">Delete</button>
-                    </div>
-                </div>
-            </div>
-        }
+        <!-- Add Announcement Button -->
+        <a asp-action="Create" class="btn btn-success">Add Announcement</a>
     </div>
+
+    <!-- Announcement List (Card Layout) -->
+    <div id="announcementList" class="row"></div>
+
+    <!-- Pagination Controls -->
+    <nav>
+        <ul id="pagination" class="pagination justify-content-center"></ul>
+    </nav>
 </div>
 
-<script>
-    function deleteAnnouncement(announcementId) {
-        if (confirm('Are you sure you want to delete this announcement?')) {
-            $.ajax({
-                url: '@Url.Action("Delete", "Announcement")',
-                type: 'POST',
-                data: { id: announcementId },
-                success: function (result) {
-                    if (result.success) {
-                        location.reload();
-                    } else {
-                        alert(result.message || 'Error deleting announcement.');
-                    }
-                },
-                error: function () {
-                    alert('Error deleting announcement.');
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            var announcements = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model)); // Get data from the model
+            var currentPage = 1;
+            var itemsPerPage = 12;
+
+            // Function to display announcement cards
+            function displayAnnouncements(announcementsToShow) {
+                var announcementList = $('#announcementList');
+                announcementList.empty(); // Clear previous announcements
+
+                announcementsToShow.forEach(function (announcement) {
+                    var card = `
+                                <div class="col-md-4 mb-4">
+                                    <div class="card h-100">
+                                        <div class="card-body d-flex flex-column">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <p class="card-text mb-0 small">
+                                                        <i class="fas fa-user-circle text-muted"></i> <strong>${announcement.CreatedBy}</strong>
+                                                    </p>
+                                                    <p class="card-text mb-0 text-muted small">${new Date(announcement.CreatedTime).toLocaleDateString()}</p>
+                                                </div>
+                                                <div>
+                                                    <a href="/Announcement/Edit?id=${announcement.AnnouncementId}" class="btn btn-sm btn-outline-success me-1">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteAnnouncement(${announcement.AnnouncementId})">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <hr />
+                                            <p class="card-text mb-0"><strong>${announcement.Title}</strong></p>
+                                            <p class="card-text flex-grow-1">${announcement.Content}</p>
+                                        </div>
+                                    </div>
+                                </div>`;
+
+                    announcementList.append(card);
+                });
+            }
+
+            // Function to handle pagination
+            function paginate(announcements, page, itemsPerPage) {
+                var start = (page - 1) * itemsPerPage;
+                var end = start + itemsPerPage;
+                return announcements.slice(start, end);
+            }
+
+            // Function to create pagination buttons
+            function createPagination(totalItems, itemsPerPage) {
+                var totalPages = Math.ceil(totalItems / itemsPerPage);
+                var pagination = $('#pagination');
+                pagination.empty(); // Clear previous pagination
+
+                for (var i = 1; i <= totalPages; i++) {
+                    var pageItem = `
+                                <li class="page-item">
+                                                    <a class="page-link${i === currentPage ? ' bg-success text-white' : ' text-success'}" href="#" data-page="${i}">${i}</a>
+                                </li>`;
+                    pagination.append(pageItem);
                 }
+
+                // Add click event to page buttons
+                $('.page-link').click(function (e) {
+                    e.preventDefault();
+                    currentPage = parseInt($(this).data('page'));
+                    var paginatedAnnouncements = paginate(announcements, currentPage, itemsPerPage);
+                    displayAnnouncements(paginatedAnnouncements);
+                    createPagination(announcements.length, itemsPerPage); // Refresh pagination
+                });
+            }
+
+            // Function to handle search
+            $('#searchInput').on('keyup', function () {
+                var searchText = $(this).val().toLowerCase();
+                var filteredAnnouncements = announcements.filter(function (announcement) {
+                    return announcement.Title.toLowerCase().includes(searchText) || announcement.Content.toLowerCase().includes(searchText) || announcement.CreatedBy.toLowerCase().includes(searchText);
+                });
+                currentPage = 1; // Reset to first page
+                displayAnnouncements(paginate(filteredAnnouncements, currentPage, itemsPerPage));
+                createPagination(filteredAnnouncements.length, itemsPerPage);
             });
+
+            // Initial display of announcements and pagination
+            displayAnnouncements(paginate(announcements, currentPage, itemsPerPage));
+            createPagination(announcements.length, itemsPerPage);
+        });
+
+        function deleteAnnouncement(announcementId) {
+            if (confirm('Are you sure you want to delete this announcement?')) {
+                $.ajax({
+                    url: '@Url.Action("Delete", "Announcement")',
+                    type: 'POST',
+                    data: { id: announcementId },
+                    success: function (result) {
+                        if (result.success) {
+                            location.reload();
+                        } else {
+                            alert(result.message || 'Error deleting announcement.');
+                        }
+                    },
+                    error: function () {
+                        alert('Error deleting announcement.');
+                    }
+                });
+            }
         }
-    }
-</script>
+    </script>
+}

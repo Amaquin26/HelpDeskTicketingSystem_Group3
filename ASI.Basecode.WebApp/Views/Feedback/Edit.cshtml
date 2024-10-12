@@ -2,27 +2,42 @@
 @{
     ViewData["Title"] = "Edit Feedback";
 }
+
 <div class="content p-4" style="margin-left: 200px;">
     <h3>Edit Feedback</h3>
     <form asp-action="Edit" method="post">
         <input type="hidden" asp-for="FeedbackId" />
         <input type="hidden" asp-for="TicketId" />
+
         <div class="form-group mb-3">
-            <label asp-for="TicketTitle">Ticket Title</label>
+            <label asp-for="TicketTitle" class="form-label">Ticket Title</label>
             <input asp-for="TicketTitle" class="form-control" readonly />
             <span asp-validation-for="TicketTitle" class="text-danger"></span>
         </div>
+
         <div class="form-group mb-3">
-            <label asp-for="Comment"></label>
+            <label asp-for="Comment" class="form-label">Comment</label>
             <textarea asp-for="Comment" class="form-control" required></textarea>
             <span asp-validation-for="Comment" class="text-danger"></span>
         </div>
+
         <div class="form-group mb-3">
-            <label asp-for="Rating"></label>
+            <label asp-for="Rating" class="form-label">Rating</label>
             <input asp-for="Rating" type="number" min="1" max="5" class="form-control" required />
             <span asp-validation-for="Rating" class="text-danger"></span>
         </div>
-        <button type="submit" class="btn btn-primary">Update</button>
-        <a asp-action="Index" class="btn btn-secondary">Back</a>
+
+        <div class="d-flex">
+            <button type="submit" class="btn btn-success">Update</button>
+            <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
+        </div>
     </form>
 </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // You can add any additional JavaScript/jQuery here if needed
+        });
+    </script>
+}

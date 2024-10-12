@@ -2,27 +2,33 @@
 @{
     ViewData["Title"] = "Create Feedback";
 }
+
 <div class="content p-4" style="margin-left: 200px;">
     <h3>Create Feedback</h3>
     <form asp-action="Create" method="post">
-        <div class="mb-3">
-            <label asp-for="TicketId"></label>
+        <div class="form-group mb-3">
+            <label asp-for="TicketId" class="form-label">Select Ticket</label>
             <select asp-for="TicketId" class="form-select" id="ticketId" asp-items="@(new SelectList(Model.Tickets, "TicketId", "Title"))">
                 <option value="">-- Select Ticket --</option> <!-- Optional default option -->
             </select>
             <span asp-validation-for="TicketId" class="text-danger"></span>
         </div>
+
         <div class="form-group mb-3">
-            <label asp-for="Comment"></label>
+            <label asp-for="Comment" class="form-label">Comment</label>
             <textarea asp-for="Comment" class="form-control" required></textarea>
             <span asp-validation-for="Comment" class="text-danger"></span>
         </div>
+
         <div class="form-group mb-3">
-            <label asp-for="Rating"></label>
+            <label asp-for="Rating" class="form-label">Rating</label>
             <input asp-for="Rating" type="number" min="1" max="5" class="form-control" required />
             <span asp-validation-for="Rating" class="text-danger"></span>
         </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
-        <a asp-action="Index" class="btn btn-secondary">Back</a>
+
+        <div class="d-flex">
+            <button type="submit" class="btn btn-success">Create</button>
+            <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
+        </div>
     </form>
 </div>
