@@ -5,46 +5,10 @@
 
 <!-- Main Content -->
 <div class="content p-4" style="margin-left: 200px;">
-    @*<h3 class="mb-4"><strong>Ticket Summary</strong></h3>
-     <div class="row">
-        <!-- Tickets by Category -->
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Tickets by Category</h5>
-                    <div class="chart-container">
-                        <canvas id="ticketsByCategoryChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tickets by Status -->
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Tickets by Status</h5>
-                    <div class="chart-container">
-                        <canvas id="ticketsByStatusChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tickets by Priority -->
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Tickets by Priority</h5>
-                    <div class="chart-container">
-                        <canvas id="ticketsByPriorityChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> *@
-
     <h3 class="mb-4"><strong>Ticket Management</strong></h3>
+
+    <!-- Add Feedback Button -->
+    <a asp-action="AddTicket" asp-controller="Ticket" class="btn btn-success mb-3">Add Ticket</a>
 
     <!-- Dynamic Tickets List Table -->
     <div class="table-responsive">
@@ -103,8 +67,9 @@
     </div>
 </div>
 
-<!-- Floating Add User Button -->
+@* <!-- Floating Add User Button -->
 <a asp-action="AddTicket" asp-controller="Ticket" class="text-decoration-none btn btn-danger floating-btn d-flex" style="border-radius:999999px !important;"><i class="fas fa-plus"></i></a>
+ *@
 
 <!-- Delete Ticket Modal -->
 <div class="modal fade" id="deleteTicketModal" tabindex="-1" aria-labelledby="deleteTicketModalLabel" aria-hidden="true">
