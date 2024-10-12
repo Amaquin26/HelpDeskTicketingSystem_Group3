@@ -138,8 +138,7 @@
                                             <td>${ticket.categoryName}</td>
                                             <td><span class="${getPriorityLabelClass(ticket.priorityName)}">${ticket.priorityName}</span></td>
                                             <td><span class="${getStatusPillClass(ticket.statusName)}">${ticket.statusName}</span></td>
-                                            <td class="text-center">
-                                                <a href="/Ticket/${ticket.ticketId}" class="edit btn btn-outline-primary btn-sm"><i class="fas fa-eye"></i></a>
+                                            <td class="text-center">                                              
                                                 <a href="/Ticket/EditTicket?ticketId=${ticket.ticketId}" class="edit btn btn-outline-success btn-sm"><i class="fas fa-edit"></i></a>
                                                 <a href="#" class="edit btn btn-outline-danger btn-sm delete-btn" data-bs-toggle="modal" data-bs-target="#deleteTicketModal" data-ticket-id="${ticket.ticketId}" data-ticket-status="${ticket.statusName}" data-ticket-priority="${ticket.priorityName}" data-ticket-category="${ticket.categoryName}">
                                                     <i class="fas fa-trash-alt"></i>
