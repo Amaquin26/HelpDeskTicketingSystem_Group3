@@ -11,31 +11,8 @@
     <h3 class="mb-4"><strong>User Management</strong></h3>
 
     <div class="d-flex justify-content-between align-items-center mb-3">
+        <input type="text" id="searchInput" class="form-control me-2" placeholder="Search Users" style="flex: 1;" value="@searchQuery">
         <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createUserModal">Add New User</button>
-
-        <form method="get" asp-action="Index" class="form-inline">
-            <div class="row">
-                <div class="col">
-                    <input type="text" name="searchName" class="form-control mb-2" placeholder="Search by Name" />
-                </div>
-                <div class="col">
-                    <input type="text" name="searchEmail" class="form-control mb-2" placeholder="Search by Email" />
-                </div>
-                <div class="col">
-                    <select name="searchRoleId" class="form-select mb-2">
-                        <option value="">Select Role</option>
-                        @foreach (var role in ViewBag.Roles)
-                        {
-                            <option value="@role.Value">@role.Text</option>
-                        }
-                        }
-                    </select>
-                </div>
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-primary btn-sm mb-2">Search</button>
-                </div>
-            </div>
-        </form>
     </div>
 
     @if (!ViewData.ModelState.IsValid)
@@ -51,7 +28,7 @@
     }
 
     <div class="table-responsive">
-        <table class="table table-striped mt-3 align-middle">
+        <table class="table table-bordered table-hover">
             <thead>
                 <tr>
                     <th>User ID</th>
@@ -62,42 +39,43 @@
                     <th class="action-column">Actions</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="userItems">
                 @foreach (var user in Model)
                 {
                     <tr>
                         <td>@user.UserId</td>
-                        <td>@user.Name</td>
-                        <td>@user.Email</td>
+                        <td class="text-capitalize">@user.Name</td>
+                        <td class="text-lowercase">@user.Email</td>
                         <td>
                             @if (user.RoleId == 1)
                             {
-                                <span>Super Admin</span>
+                                <span class="badge rounded-pill bg-danger">Super Admin</span>
                             }
                             else if (user.RoleId == 2)
                             {
-                                <span>Admin</span>
+                                <span class="badge rounded-pill border border-danger text-danger">Admin</span>
                             }
                             else if (user.RoleId == 3)
                             {
-                                <span>Agents</span>
+                                <span class="badge rounded-pill bg-dark text-white">Agent</span>
                             }
                             else if (user.RoleId == 4)
                             {
-                                <span>User</span>
+                                <span class="badge rounded-pill border border-dark text-dark">User</span>
                             }
                             else
                             {
-                                <span>Unknown</span>
+                                <span class="badge rounded-pill border border-light">User</span>
                             }
                         </td>
                         <td>@user.CreatedTime</td>
                         <td>
-                            <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#editUserModal-@user.UserId">
-                                Edit
+                            <a class="edit btn btn-outline-primary btn-sm"><i class="fas fa-eye"></i></a>
+                            <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#editUserModal-@user.UserId">
+                                <i class="fas fa-edit"></i>
                             </button>
-                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal-@user.UserId">
-                                Delete
+                            <button type="button" class="btn btn-outline-danger btn-sm delete-btn" data-bs-toggle="modal" data-bs-target="#deleteUserModal-@user.UserId">
+                                <i class="fas fa-trash-alt"></i>
                             </button>
                         </td>
                     </tr>
@@ -105,6 +83,11 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Pagination Controls -->
+    <nav>
+        <ul id="pagination" class="pagination justify-content-center"></ul>
+    </nav>
 
     <!-- Create User Modal -->
     <div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
@@ -132,17 +115,17 @@
 
                         <div class="mb-3">
                             <label for="EmailCreate" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="Email" name="Email" required>
+                            <input type="email" class="form-control" id="EmailCreate" name="Email" required>
                         </div>
 
                         <div class="mb-3">
                             <label for="NameCreate" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="Name" name="Name" required>
+                            <input type="text" class="form-control" id="NameCreate" name="Name" required>
                         </div>
 
                         <div class="mb-3">
                             <label for="PasswordCreate" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="Password" name="Password" required>
+                            <input type="password" class="form-control" id="PasswordCreate" name="Password" required>
                         </div>
                         <div class="mb-3">
                             <label for="RoleIdCreate" class="form-label">Role</label>
@@ -169,7 +152,7 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="editUserModalLabel-@user.UserId">Edit User @user.Name</h5>
+                        <h5 class="modal-title" id="editUserModalLabel-@user.UserId">Edit User</h5>
                         <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close"><i class="bi bi-x-lg"></i></button>
                     </div>
                     <div class="modal-body">
@@ -177,31 +160,23 @@
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="UserId" value="@user.UserId" />
                             <div class="mb-3">
-                                <label for="EmailEdit-@user.UserId" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="EmailEdit-@user.UserId" name="Email" value="@user.Email" required>
+                                <label for="EmailEdit" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="EmailEdit" name="Email" value="@user.Email" required>
                             </div>
                             <div class="mb-3">
-                                <label for="NameEdit-@user.UserId" class="form-label">Name</label>
-                                <input type="text" class="form-control" id="NameEdit-@user.UserId" name="Name" value="@user.Name" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="PasswordEdit-@user.UserId" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="PasswordEdit-@user.UserId" name="Password" placeholder="Leave blank to keep existing password">
+                                <label for="NameEdit" class="form-label">Name</label>
+                                <input type="text" class="form-control" id="NameEdit" name="Name" value="@user.Name" required>
                             </div>
                             <div class="mb-3">
                                 <label for="RoleIdEdit" class="form-label">Role</label>
                                 <select class="form-select" id="RoleIdEdit" name="RoleId" required>
-                                    <option value="" disabled selected>Select a Role</option>
-                                    <option value="1" >Super Admin</option>
-                                    <option value="2" >Admin</option>
-                                    <option value="3" >Agents</option>
-                                    <option value="4" >User</option>
+                                    <option value="1">Super Admin</option>
+                                    <option value="2">Admin</option>
+                                    <option value="3">Agents</option>
+                                    <option value="4">User</option>
                                 </select>
                             </div>
-
-
-
-                            <button type="submit" class="btn btn-success">Update User</button>
+                            <button type="submit" class="btn btn-success">Save Changes</button>
                         </form>
                     </div>
                 </div>
@@ -212,17 +187,20 @@
     <!-- Delete User Modal -->
     @foreach (var user in Model)
     {
-        <div class="modal fade" id="deleteUserModal-@user.UserId" tabindex="-1" role="dialog" aria-labelledby="deleteUserModalLabel-@user.UserId" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal fade" id="deleteUserModal-@user.UserId" tabindex="-1" aria-labelledby="deleteUserModalLabel-@user.UserId" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="deleteUserModalLabel-@user.UserId">Delete User @user.Name</h5>
+                        <h5 class="modal-title" id="deleteUserModalLabel-@user.UserId">Delete User</h5>
                         <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close"><i class="bi bi-x-lg"></i></button>
                     </div>
                     <div class="modal-body">
+                        <p>Are you sure you want to delete this user?</p>
+                        <p><strong>User ID: </strong>@user.UserId</p>
+                        <p><strong>Name: </strong>@user.Name</p>
                         <form asp-action="Delete" method="post">
+                            @Html.AntiForgeryToken()
                             <input type="hidden" name="UserId" value="@user.UserId" />
-                            <p>Are you sure you want to delete user @user.Name?</p>
                             <button type="submit" class="btn btn-danger">Delete</button>
                         </form>
                     </div>
@@ -230,6 +208,21 @@
             </div>
         </div>
     }
+
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Search functionality
+            $("#searchInput").on("keyup", function () {
+                var searchValue = $(this).val().toLowerCase();
+                $("#userItems tr").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(searchValue) > -1);
+                });
+            });
+        });
+    </script>
+}
