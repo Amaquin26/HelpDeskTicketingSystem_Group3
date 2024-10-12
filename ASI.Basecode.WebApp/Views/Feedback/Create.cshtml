@@ -6,7 +6,7 @@
     <h3>Create Feedback</h3>
     <form asp-action="Create" method="post">
         <div class="mb-3">
-            <label asp-for="TicketId"></label>
+            <label asp-for="TicketId">Ticket</label>
             <select asp-for="TicketId" class="form-select" id="ticketId" asp-items="@(new SelectList(Model.Tickets, "TicketId", "Title"))">
                 <option value="">-- Select Ticket --</option> <!-- Optional default option -->
             </select>

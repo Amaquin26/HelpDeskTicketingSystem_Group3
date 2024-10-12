@@ -1,29 +1,36 @@
-.gradient-custom-2 {
-    /* fallback for old browsers */
-    background: #ff0000; /* Red */
-    /* Chrome 10-25, Safari 5.1-6 */
-    background: -webkit-linear-gradient(to right, #ff0000, #000000); /* Red, Black */
-    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-    background: linear-gradient(to right, #ff0000, #000000); /* Red, Black */
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #f7f7f7;
 }
 
-.login-btn {
-    width: 180px;
+.login-card {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: white;
 }
 
-.register-box {
-    width: 600px;
-}
-
-@media (min-width: 768px) {
-    .gradient-form {
-        height: 100vh !important;
+    .login-card img {
+        width: 100px;
+        margin-bottom: 20px;
     }
-}
 
-@media (min-width: 769px) {
-    .gradient-custom-2 {
-        border-top-right-radius: .3rem;
-        border-bottom-right-radius: .3rem;
+    .login-card .form-control {
+        border-radius: 5px;
     }
-}
+
+    .login-card .btn-primary {
+        border-radius: 5px;
+        padding: 10px;
+    }
+
+    .login-card h2 {
+        margin-bottom: 20px;
+        font-size: 24px;
+        font-weight: bold;
+    }

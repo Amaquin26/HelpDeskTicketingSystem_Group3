@@ -7,7 +7,48 @@
 @section styles {
     <link rel="stylesheet" href="~/css/login.css" />
 }
-<div class="container py-5 h-100 register-box">
+
+<div class="login-card text-center">
+    <!-- Logo -->
+    <img src="~/img/icon-red.png" alt="Help Desk Logo" class="img-fluid">
+
+    <!-- Register Label -->
+    <h2>Register an Account</h2>
+
+    <!-- Register Form -->
+    <form method="post" method="post" action="/Account/Register">
+        <div class="mb-3">
+            <label class="form-label visually-hidden">Email</label>
+            <input asp-for="Email" type="text" class="form-control" id="email" placeholder="Email">
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label class="form-label visually-hidden">Name</label>
+            <input asp-for="Name" type="text" class="form-control" id="name" placeholder="Name">
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label class="form-label visually-hidden">Password</label>
+            <input asp-for="Password" type="password" class="form-control" id="password" placeholder="Password" required>
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label class="form-label visually-hidden">Confirm Password</label>
+            <input asp-for="ConfirmPassword" type="password" class="form-control" id="confirmpassword" placeholder="Confirm Password" required>
+            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+        </div>
+        <button class="btn btn-danger w-100" type="submit">
+            Register
+        </button>
+        <div class="d-flex align-items-center justify-content-center pb-4">
+            <a asp-controller="Account" asp-action="Login">
+                &#8592 Back
+            </a>
+        </div>
+    </form>
+</div>
+
+@* <div class="container py-5 h-100 register-box">
     <div class="row d-flex justify-content-center align-items-center h-100">
         <div class="col-xl-10">
             <div class="card rounded-3 text-black">
@@ -58,7 +99,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> *@
 @section scripts {
     <script>
         // Check for error message and display Toastr notification

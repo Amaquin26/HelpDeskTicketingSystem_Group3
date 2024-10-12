@@ -8,49 +8,34 @@
 
 <br />
 <div class="content p-4" style="margin-left: 200px;">
-    <h1 class="fw-bold mb-3" >User Management</h1>
-    <div class="container text-center mb-2">
-        <div class="row">
-            <div class="col-5">
-                <input type="text" class="form-control mb-2"
-                       style="text-align:center;background-color:lightcoral;font-weight:bold;border:2px black solid;"
-                       value="Role 1 = Super Admin" readonly />
-            </div>
-            <div class="col-5">
-                <input type="text" class="form-control mb-2"
-                       style="text-align:center;background-color:deepskyblue;font-weight:bold;border:2px black solid;"
-                       value="Role 2 = Admin" readonly />
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-5">
-                <input type="text" class="form-control mb-2"
-                       style="text-align:center;background-color:darkorange;font-weight:bold;border:2px black solid;"
-                       value="Role 3 = Agents" readonly />
-            </div>
-            <div class="col-5">
-                <input type="text" class="form-control mb-2"
-                       style="text-align:center;background-color:lightpink;font-weight:bold;border:2px black solid;"
-                       value="Role 4 = Users" readonly />
-            </div>
-        </div>
-    </div>
+    <h3 class="mb-4"><strong>User Management</strong></h3>
+
     <div class="d-flex justify-content-between align-items-center mb-3">
         <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createUserModal">Add New User</button>
 
-        <form method="get" asp-action="Index">
-        <input type="text" name="searchName" placeholder="Search by Name" />
-        <input type="text" name="searchEmail" placeholder="Search by Email" />
-        <select name="searchRoleId">
-            <option value="">Select Role</option>
-            @foreach (var role in ViewBag.Roles)
-            {
-                <option value="@role.Value">@role.Text</option>
-            }
-        </select>
-            <button type="submit" class="btn btn-sm btn-success">Search</button>
-    </form>
-
+        <form method="get" asp-action="Index" class="form-inline">
+            <div class="row">
+                <div class="col">
+                    <input type="text" name="searchName" class="form-control mb-2" placeholder="Search by Name" />
+                </div>
+                <div class="col">
+                    <input type="text" name="searchEmail" class="form-control mb-2" placeholder="Search by Email" />
+                </div>
+                <div class="col">
+                    <select name="searchRoleId" class="form-select mb-2">
+                        <option value="">Select Role</option>
+                        @foreach (var role in ViewBag.Roles)
+                        {
+                            <option value="@role.Value">@role.Text</option>
+                        }
+                        }
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary btn-sm mb-2">Search</button>
+                </div>
+            </div>
+        </form>
     </div>
 
     @if (!ViewData.ModelState.IsValid)
@@ -72,7 +57,7 @@
                     <th>User ID</th>
                     <th>Name</th>
                     <th>Email</th>
-                    <th>Role ID</th>
+                    <th>Role</th>
                     <th>Created Time</th>
                     <th class="action-column">Actions</th>
                 </tr>
@@ -84,7 +69,28 @@
                         <td>@user.UserId</td>
                         <td>@user.Name</td>
                         <td>@user.Email</td>
-                        <td>@user.RoleId</td>
+                        <td>
+                            @if (user.RoleId == 1)
+                            {
+                                <span>Super Admin</span>
+                            }
+                            else if (user.RoleId == 2)
+                            {
+                                <span>Admin</span>
+                            }
+                            else if (user.RoleId == 3)
+                            {
+                                <span>Agents</span>
+                            }
+                            else if (user.RoleId == 4)
+                            {
+                                <span>User</span>
+                            }
+                            else
+                            {
+                                <span>Unknown</span>
+                            }
+                        </td>
                         <td>@user.CreatedTime</td>
                         <td>
                             <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#editUserModal-@user.UserId">
