@@ -47,7 +47,7 @@ namespace ASI.Basecode.Data
 
             modelBuilder.Entity<TicketCategory>().HasData(
                 new TicketCategory { CategoryId = 1, CategoryName = "Bug" },
-                new TicketCategory { CategoryId = 2, CategoryName = "Feature Request'" },
+                new TicketCategory { CategoryId = 2, CategoryName = "Feature Request" },
                 new TicketCategory { CategoryId = 3, CategoryName = "Inquiry" },
                 new TicketCategory { CategoryId = 4, CategoryName = "Support" },
                 new TicketCategory { CategoryId = 5, CategoryName = "Maintenance" }
