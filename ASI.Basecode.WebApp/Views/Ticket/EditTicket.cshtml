@@ -5,6 +5,7 @@
 
 <div class="content p-4" style="margin-left: 200px;">
     <h3 class="mb-4"><strong>Edit Ticket</strong></h3>
+    <div asp-validation-summary="All" class="text-danger"></div>
     <form method="post" asp-action="EditTicket" asp-controller="Ticket">
         <input hidden asp-for="Ticket.TicketId" />
         <div class="mb-3">
@@ -52,10 +53,10 @@
             </select>
             <span asp-validation-for="Ticket.TeamAssignedId" class="text-danger"></span>
         </div>
-        <div class="mb-3">
+        @* <div class="mb-3">
             <label for="ticketAttachment" class="form-label">Attachments</label>
             <input type="file" class="form-control" multiple id="ticketAttachment">
-        </div>
+        </div> *@
         <button type="submit" class="btn btn-danger" style="float:right;">Edit Ticket</button>
     </form>
 </div>

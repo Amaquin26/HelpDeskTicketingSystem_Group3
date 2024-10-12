@@ -22,5 +22,7 @@ namespace ASI.Basecode.Services.ServiceModels
         public int Rating { get; set; }
         public string CreatedBy { get; set; }
         public DateTime CreatedTime { get; set; }
+        public string TicketTitle { get; set; } 
+        public List<Ticket> Tickets { get; set; } = new List<Ticket>();
     }
 }

@@ -1,4 +1,5 @@
-﻿using ASI.Basecode.Services.Interfaces;
+﻿using ASI.Basecode.Data.Models;
+using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -7,10 +8,12 @@ using System.Linq;
 public class FeedbackController : Controller
 {
     private readonly IFeedbackService _feedbackService;
+    private readonly ITicketService _ticketService;
 
-    public FeedbackController(IFeedbackService feedbackService)
+    public FeedbackController(IFeedbackService feedbackService, ITicketService ticketService)
     {
         _feedbackService = feedbackService;
+        _ticketService = ticketService;
     }
 
     public IActionResult Index()
@@ -22,7 +25,16 @@ public class FeedbackController : Controller
     [HttpGet]
     public IActionResult Create()
     {
-        return View();
+        var feedbackViewModel = new FeedbackViewModel();
+
+        feedbackViewModel.Tickets = _ticketService.GetListOfTickets().Select(t => new Ticket
+        {
+            TicketId = t.TicketId,
+            Title = t.Title,
+            Description = t.Description,
+        }).ToList();
+
+        return View(feedbackViewModel);
     }
 
     [HttpPost]

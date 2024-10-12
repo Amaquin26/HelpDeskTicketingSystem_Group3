@@ -33,7 +33,8 @@ namespace ASI.Basecode.Services.Services
                     Comment = f.Comment,
                     Rating = f.Rating,
                     CreatedBy = f.User.Name,
-                    CreatedTime = f.CreatedTime
+                    CreatedTime = f.CreatedTime,
+                    TicketTitle = f.Ticket.Title
                 }).ToList();
         }
 

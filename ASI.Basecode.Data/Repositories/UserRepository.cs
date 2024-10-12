@@ -20,7 +20,12 @@ namespace ASI.Basecode.Data.Repositories
         {
             // Return only active users
             return this.GetDbSet<User>().Include(u => u.Role).Where(u => u.IsActive);
-            return this.GetDbSet<User>().Where(u => u.IsActive); // Filters for active users
+        }
+
+        public IQueryable<User> GetTeamLeaders()
+        {
+            // Return only active team leader
+            return this.GetDbSet<Team>().Include(t => t.TeamLeader).Select(u => u.TeamLeader).Where(u => u.IsActive);
         }
 
         public bool UserExists(string userId)
@@ -35,8 +40,8 @@ namespace ASI.Basecode.Data.Repositories
 
         public IQueryable<User> GetAgents()
         {
-            // Return only active agents with RoleId 3
-            return this.GetDbSet<User>().Where(x => x.RoleId == 3 && x.IsActive);
+            // Return only active agents 
+            return this.GetDbSet<User>().Include(u => u.Role).Where(u => u.IsActive && u.RoleId == 3);
         }
 
         public void AddUser(User user)

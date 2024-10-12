@@ -2,6 +2,7 @@
 using ASI.Basecode.Services.ServiceModels;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Linq;
 
 namespace ASI.Basecode.WebApp.Controllers
 {
@@ -10,9 +11,10 @@ namespace ASI.Basecode.WebApp.Controllers
         private readonly ITeamService _teamService;
         private readonly IUserService _userService;
 
-        public TeamController(ITeamService teamService)
+        public TeamController(ITeamService teamService, IUserService userService)
         {
             _teamService = teamService;
+            _userService = userService;
         }
 
         public IActionResult Index()
@@ -24,6 +26,8 @@ namespace ASI.Basecode.WebApp.Controllers
         [HttpGet]
         public IActionResult Create()
         {
+            ViewBag.TeamLeaders = _userService.GetAgents().ToList();
+
             return View();
         }
 
@@ -42,6 +46,7 @@ namespace ASI.Basecode.WebApp.Controllers
         public IActionResult Edit(int id)
         {
             var team = _teamService.GetTeamById(id);
+            ViewBag.TeamLeaders = _userService.GetAgents().ToList();
             if (team == null)
             {
                 return NotFound();

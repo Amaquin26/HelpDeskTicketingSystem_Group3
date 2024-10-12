@@ -126,5 +126,10 @@ namespace ASI.Basecode.Services.Services
         {
             return _repository.GetAgents(); // Call the repository method to get agents
         }
+
+        public IQueryable<User> GetTeamLeaders()
+        {
+            return _repository.GetTeamLeaders(); // Call the repository method to get team leaders
+        }
     }
 }

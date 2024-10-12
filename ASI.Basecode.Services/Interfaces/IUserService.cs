@@ -17,5 +17,6 @@ namespace ASI.Basecode.Services.Interfaces
         void UpdateUser(User user);
         void DeleteUser(User user);
         IQueryable<User> GetAgents();
+        IQueryable<User> GetTeamLeaders();
     }
 }
