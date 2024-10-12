@@ -5,16 +5,21 @@ using ASI.Basecode.Services.ServiceModels;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
+using ASI.Basecode.Data.Repositories;
 
 namespace ASI.Basecode.Services.Services
 {
     public class FeedbackService : IFeedbackService
     {
         private readonly IFeedbackRepository _feedbackRepository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public FeedbackService(IFeedbackRepository feedbackRepository)
+        public FeedbackService(IFeedbackRepository feedbackRepository, IHttpContextAccessor httpContextAccessor)
         {
             _feedbackRepository = feedbackRepository;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public List<FeedbackViewModel> GetListOfFeedbacks()
@@ -34,10 +39,12 @@ namespace ASI.Basecode.Services.Services
 
         public void AddFeedback(FeedbackViewModel model)
         {
+            var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
             var feedback = new Feedback
             {
                 TicketId = model.TicketId,
-                UserId = model.UserId,
+                UserId = userId,
                 Comment = model.Comment,
                 Rating = model.Rating,
                 CreatedTime = DateTime.UtcNow

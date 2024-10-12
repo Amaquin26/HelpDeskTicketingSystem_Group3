@@ -2,9 +2,11 @@
 using ASI.Basecode.Data.Models;
 using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,10 +15,12 @@ namespace ASI.Basecode.Services.Services
     public class AnnouncementService : IAnnouncementService
     {
         private readonly IAnnouncementRepository _announcementRepository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AnnouncementService(IAnnouncementRepository announcementRepository)
+        public AnnouncementService(IAnnouncementRepository announcementRepository, IHttpContextAccessor httpContextAccessor)
         {
             _announcementRepository = announcementRepository;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public List<AnnouncementViewModel> GetListOfAnnouncements()
@@ -36,11 +40,13 @@ namespace ASI.Basecode.Services.Services
 
         public void AddAnnouncement(AnnouncementViewModel model)
         {
+            var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
             var announcement = new Announcement
             {
                 Title = model.Title,
                 Content = model.Content,
-                CreatedBy = model.CreatedBy,
+                CreatedBy = userId,
                 CreatedTime = DateTime.UtcNow
             };
             _announcementRepository.AddAnnouncement(announcement);
