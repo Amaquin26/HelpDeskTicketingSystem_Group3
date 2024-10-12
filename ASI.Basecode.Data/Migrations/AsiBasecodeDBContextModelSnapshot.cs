@@ -90,9 +90,6 @@ namespace ASI.Basecode.Data.Migrations
                     b.Property<string>("Comment")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("CreatedTime")
                         .HasColumnType("datetime2");
 
@@ -128,6 +125,28 @@ namespace ASI.Basecode.Data.Migrations
                     b.HasKey("RoleId");
 
                     b.ToTable("Roles");
+
+                    b.HasData(
+                        new
+                        {
+                            RoleId = 1,
+                            RoleName = "Super Admin"
+                        },
+                        new
+                        {
+                            RoleId = 2,
+                            RoleName = "Admin"
+                        },
+                        new
+                        {
+                            RoleId = 3,
+                            RoleName = "Agent"
+                        },
+                        new
+                        {
+                            RoleId = 4,
+                            RoleName = "User"
+                        });
                 });
 
             modelBuilder.Entity("ASI.Basecode.Data.Models.Team", b =>
@@ -189,13 +208,13 @@ namespace ASI.Basecode.Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("PriorityId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("ResolvedTime")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("StatusId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("StatusId1")
                         .HasColumnType("int");
 
                     b.Property<int?>("TeamAssignedId")
@@ -216,9 +235,9 @@ namespace ASI.Basecode.Data.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("StatusId");
+                    b.HasIndex("PriorityId");
 
-                    b.HasIndex("StatusId1");
+                    b.HasIndex("StatusId");
 
                     b.HasIndex("TeamAssignedId");
 
@@ -239,6 +258,66 @@ namespace ASI.Basecode.Data.Migrations
                     b.HasKey("CategoryId");
 
                     b.ToTable("TicketCategories");
+
+                    b.HasData(
+                        new
+                        {
+                            CategoryId = 1,
+                            CategoryName = "Bug"
+                        },
+                        new
+                        {
+                            CategoryId = 2,
+                            CategoryName = "Feature Request'"
+                        },
+                        new
+                        {
+                            CategoryId = 3,
+                            CategoryName = "Inquiry"
+                        },
+                        new
+                        {
+                            CategoryId = 4,
+                            CategoryName = "Support"
+                        },
+                        new
+                        {
+                            CategoryId = 5,
+                            CategoryName = "Maintenance"
+                        });
+                });
+
+            modelBuilder.Entity("ASI.Basecode.Data.Models.TicketPriority", b =>
+                {
+                    b.Property<int>("PriorityId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PriorityId"), 1L, 1);
+
+                    b.Property<string>("PriorityName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("PriorityId");
+
+                    b.ToTable("TicketPriorities");
+
+                    b.HasData(
+                        new
+                        {
+                            PriorityId = 1,
+                            PriorityName = "Low"
+                        },
+                        new
+                        {
+                            PriorityId = 2,
+                            PriorityName = "Medium"
+                        },
+                        new
+                        {
+                            PriorityId = 3,
+                            PriorityName = "High"
+                        });
                 });
 
             modelBuilder.Entity("ASI.Basecode.Data.Models.TicketStatus", b =>
@@ -255,6 +334,33 @@ namespace ASI.Basecode.Data.Migrations
                     b.HasKey("StatusId");
 
                     b.ToTable("TicketStatuses");
+
+                    b.HasData(
+                        new
+                        {
+                            StatusId = 1,
+                            StatusName = "Open"
+                        },
+                        new
+                        {
+                            StatusId = 2,
+                            StatusName = "In Progress"
+                        },
+                        new
+                        {
+                            StatusId = 3,
+                            StatusName = "Resolved"
+                        },
+                        new
+                        {
+                            StatusId = 4,
+                            StatusName = "Closed"
+                        },
+                        new
+                        {
+                            StatusId = 5,
+                            StatusName = "On Hold"
+                        });
                 });
 
             modelBuilder.Entity("ASI.Basecode.Data.Models.User", b =>
@@ -276,6 +382,9 @@ namespace ASI.Basecode.Data.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -295,7 +404,6 @@ namespace ASI.Basecode.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("UpdatedBy")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .IsUnicode(false)
                         .HasColumnType("varchar(50)");
@@ -311,6 +419,19 @@ namespace ASI.Basecode.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "5c37344a-f1b4-47f3-a8e4-d2154591358e",
+                            CreatedBy = "System",
+                            CreatedTime = new DateTime(2024, 10, 12, 12, 3, 43, 954, DateTimeKind.Local).AddTicks(9197),
+                            Email = "resolveit.agent@mail.com",
+                            IsActive = true,
+                            Name = "Agent 007",
+                            Password = "Kw7+jFXwfGw/o6Mi2vJEXw==",
+                            RoleId = 3
+                        });
                 });
 
             modelBuilder.Entity("TeamUser", b =>
@@ -389,15 +510,17 @@ namespace ASI.Basecode.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ASI.Basecode.Data.Models.TicketStatus", null)
+                    b.HasOne("ASI.Basecode.Data.Models.TicketPriority", "Priority")
                         .WithMany("Tickets")
-                        .HasForeignKey("StatusId")
+                        .HasForeignKey("PriorityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("ASI.Basecode.Data.Models.TicketStatus", "Status")
-                        .WithMany()
-                        .HasForeignKey("StatusId1");
+                        .WithMany("Tickets")
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ASI.Basecode.Data.Models.Team", "Team")
                         .WithMany("Tickets")
@@ -407,6 +530,8 @@ namespace ASI.Basecode.Data.Migrations
                     b.Navigation("Assignee");
 
                     b.Navigation("Category");
+
+                    b.Navigation("Priority");
 
                     b.Navigation("Status");
 
@@ -455,6 +580,11 @@ namespace ASI.Basecode.Data.Migrations
                 });
 
             modelBuilder.Entity("ASI.Basecode.Data.Models.TicketCategory", b =>
+                {
+                    b.Navigation("Tickets");
+                });
+
+            modelBuilder.Entity("ASI.Basecode.Data.Models.TicketPriority", b =>
                 {
                     b.Navigation("Tickets");
                 });

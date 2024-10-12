@@ -50,7 +50,7 @@ namespace ASI.Basecode.Services.Services
                 user.RoleId = 1;
                 user.Name = model.Name;
                 user.IsActive = model.IsActive;
-                user.Email = "Jermain@buang.com";
+                user.Email = model.Email;
                 _repository.AddUser(user);
             }
             else

@@ -19,8 +19,11 @@ namespace ASI.Basecode.Services.ServiceModels
         public string Email { get; set; }
 
         [Required(ErrorMessage = "Password is required.")]
+        [DataType(DataType.Password)]
         public string Password { get; set; }
 
+        [DataType(DataType.Password)]
+        [Compare("Password", ErrorMessage = "Password do not match")]
         public string ConfirmPassword { get; set; } 
 
         [Required(ErrorMessage = "Role is required.")]
