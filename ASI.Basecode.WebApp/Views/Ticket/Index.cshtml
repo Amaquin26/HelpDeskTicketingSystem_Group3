@@ -1,7 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Ticket Page";
 }
-@model IEnumerable<ASI.Basecode.Services.Dto.TicketDto>
 
 <!-- Main Content -->
 <div class="content p-4" style="margin-left: 200px;">
@@ -52,7 +51,7 @@
                 <p><strong>Status: </strong><span class="status"></span></p>
                 <p><strong>Priority: </strong><span class="priority"></span></p>
                 <p><strong>Category: </strong><span class="category"></span></p>
-                <button type="button" class="btn btn-danger w-100">Delete Ticket</button>
+                <button type="button" id="delete-confirm-btn" class="btn btn-danger w-100">Delete Ticket</button>
             </div>
         </div>
     </div>
@@ -66,12 +65,31 @@
 
     <script>
         $(document).ready(function () {
-            var tickets = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model)); // Get data from the model
             var currentPage = 1;
             var itemsPerPage = 20;
 
+            function fetchTickets() {
+                $.ajax({
+                    url: '/Ticket/GetTickets',
+                    type: 'GET',
+                    success: function (data) {
+                        tickets = data;
+                        var paginatedTickets = paginate(tickets, currentPage, itemsPerPage);
+                        displayTickets(paginatedTickets);
+                        createPagination(tickets.length, itemsPerPage);
+                    },
+                    error: function (xhr, status, error) {
+                        toastr.error('Error fetching tickets');
+                    }
+                });
+            }
+
+            fetchTickets();
+
             // Function to get pill classes based on status
             function getStatusPillClass(status) {
+                if (!status) return '';
+
                 switch (status.toLowerCase()) {
                     case 'open':
                         return 'badge text-danger';
@@ -90,6 +108,8 @@
 
             // Function to get label classes based on priority
             function getPriorityLabelClass(priority) {
+                if (!priority) return '';
+
                 switch (priority.toLowerCase()) {
                     case 'low':
                         return 'badge rounded-pill bg-light my-1 text-secondary';
@@ -112,16 +132,16 @@
                 ticketsToShow.forEach(function (ticket) {
                     var row = `
                                         <tr>
-                                            <td>${ticket.TicketId}</td>
-                                            <td>${ticket.Description}</td>
-                                            <td>${ticket.CreatedBy}</td>
-                                            <td>${ticket.CategoryName}</td>
-                                            <td><span class="${getPriorityLabelClass(ticket.PriorityName)}">${ticket.PriorityName}</span></td>
-                                            <td><span class="${getStatusPillClass(ticket.StatusName)}">${ticket.StatusName}</span></td>
+                                            <td>${ticket.ticketId}</td>
+                                            <td>${ticket.description}</td>
+                                            <td>${ticket.createdBy}</td>
+                                            <td>${ticket.categoryName}</td>
+                                            <td><span class="${getPriorityLabelClass(ticket.priorityName)}">${ticket.priorityName}</span></td>
+                                            <td><span class="${getStatusPillClass(ticket.statusName)}">${ticket.statusName}</span></td>
                                             <td class="text-center">
-                                                <a href="/Ticket/${ticket.TicketId}" class="edit btn btn-outline-primary btn-sm"><i class="fas fa-eye"></i></a>
-                                                <a href="/Ticket/EditTicket?ticketId=${ticket.TicketId}" class="edit btn btn-outline-success btn-sm"><i class="fas fa-edit"></i></a>
-                                                <a href="#" class="edit btn btn-outline-danger btn-sm delete-btn" data-bs-toggle="modal" data-bs-target="#deleteTicketModal" data-ticket-id="${ticket.TicketId}" data-ticket-status="${ticket.StatusName}" data-ticket-priority="${ticket.PriorityName}" data-ticket-category="${ticket.CategoryName}">
+                                                <a href="/Ticket/${ticket.ticketId}" class="edit btn btn-outline-primary btn-sm"><i class="fas fa-eye"></i></a>
+                                                <a href="/Ticket/EditTicket?ticketId=${ticket.ticketId}" class="edit btn btn-outline-success btn-sm"><i class="fas fa-edit"></i></a>
+                                                <a href="#" class="edit btn btn-outline-danger btn-sm delete-btn" data-bs-toggle="modal" data-bs-target="#deleteTicketModal" data-ticket-id="${ticket.ticketId}" data-ticket-status="${ticket.statusName}" data-ticket-priority="${ticket.priorityName}" data-ticket-category="${ticket.categoryName}">
                                                     <i class="fas fa-trash-alt"></i>
                                                 </a>
                                             </td>
@@ -130,18 +150,16 @@
                 });
             }
 
-            // Function to handle pagination
             function paginate(tickets, page, itemsPerPage) {
                 var start = (page - 1) * itemsPerPage;
                 var end = start + itemsPerPage;
                 return tickets.slice(start, end);
             }
 
-            // Function to create pagination buttons
             function createPagination(totalItems, itemsPerPage) {
                 var totalPages = Math.ceil(totalItems / itemsPerPage);
                 var pagination = $('#pagination');
-                pagination.empty(); // Clear previous pagination
+                pagination.empty(); 
 
                 for (var i = 1; i <= totalPages; i++) {
                     var pageItem = `
@@ -151,7 +169,6 @@
                     pagination.append(pageItem);
                 }
 
-                // Add click event to page buttons
                 $('.page-link').click(function (e) {
                     e.preventDefault();
                     currentPage = parseInt($(this).data('page'));
@@ -161,31 +178,57 @@
                 });
             }
 
-            // Function to filter tickets based on search input
             function filterTickets(searchTerm) {
                 return tickets.filter(ticket =>
-                    ticket.Description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    ticket.CreatedBy.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    ticket.CategoryName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    ticket.PriorityName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    ticket.StatusName.toLowerCase().includes(searchTerm.toLowerCase())
+                    ticket.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    ticket.createdBy.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    ticket.categoryName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    ticket.priorityName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    ticket.statusName.toLowerCase().includes(searchTerm.toLowerCase())
                 );
             }
 
-            // Event listener for search input
             $('#searchInput').on('keyup', function () {
                 var searchTerm = $(this).val();
                 var filteredTickets = filterTickets(searchTerm);
-                currentPage = 1; // Reset to first page on search
+                currentPage = 1; 
                 var paginatedTickets = paginate(filteredTickets, currentPage, itemsPerPage);
                 displayTickets(paginatedTickets);
                 createPagination(filteredTickets.length, itemsPerPage);
             });
 
-            // Initial display
-            var paginatedTickets = paginate(tickets, currentPage, itemsPerPage);
-            displayTickets(paginatedTickets);
-            createPagination(tickets.length, itemsPerPage);
+            $(document).on('click', '.delete-btn', function () {
+                var ticketId = $(this).data('ticket-id');
+                var ticketStatus = $(this).data('ticket-status');
+                var ticketPriority = $(this).data('ticket-priority');
+                var ticketCategory = $(this).data('ticket-category');
+
+                $('#deleteTicketModal #ticketId').text(ticketId);
+                $('#deleteTicketModal .status').text(ticketStatus);
+                $('#deleteTicketModal .priority').text(ticketPriority);
+                $('#deleteTicketModal .category').text(ticketCategory);
+            });
+
+            $(document).on('click', '#delete-confirm-btn', function () {
+                var ticketId = $('#deleteTicketModal #ticketId').text();
+
+                $.ajax({
+                    url: `/Ticket/DeleteTicket?id=${ticketId}`,
+                    type: 'DELETE',
+                    success: function (result) {
+                        $('#deleteTicketModal').modal('hide');
+
+                        toastr.success('Ticket deleted successfully!');
+
+                        fetchTickets();
+
+                    },
+                    error: function (xhr, status, error) {
+
+                        toastr.error('Error deleting ticket');
+                    }
+                });
+            });       
         });
     </script>
 }

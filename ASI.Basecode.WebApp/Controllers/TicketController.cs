@@ -4,6 +4,7 @@ using ASI.Basecode.Services.ServiceModels;
 using ASI.Basecode.WebApp.Models;
 using ASI.Basecode.WebApp.Mvc;
 using AutoMapper;
+using Hangfire;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -35,9 +36,7 @@ namespace ASI.Basecode.WebApp.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            var tickets = _ticketService.GetListOfTickets();
-
-            return View(tickets);
+            return View();
         }
 
         [HttpGet]
@@ -224,10 +223,20 @@ namespace ASI.Basecode.WebApp.Controllers
         }
 
         [HttpDelete]
-        public IActionResult DeleteTicket([FromBody] TicketDeleteRequest request)
+        public IActionResult DeleteTicket([FromQuery]int id)
         {
-            _ticketService.DeleteTicket(request.TicketId);
-            return Ok();
+            // Find the ticket by ID
+            var result = _ticketService.GetTicketById(id);
+
+            if (result.Item2 == false)
+            {
+                return NotFound();
+            }
+
+            // Delete the ticket
+            _ticketService.DeleteTicket(id);
+
+            return Ok(); // Return 200 OK on success
         }
     }
 }
