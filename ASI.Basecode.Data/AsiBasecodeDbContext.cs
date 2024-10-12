@@ -30,6 +30,35 @@ namespace ASI.Basecode.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Role>().HasData(
+                new Role { RoleId = 1, RoleName = "Super Admin" },
+                new Role { RoleId = 2, RoleName = "Admin" },
+                new Role { RoleId = 3, RoleName = "Agent" },
+                new Role { RoleId = 4, RoleName = "User" }
+            );
+
+            modelBuilder.Entity<TicketStatus>().HasData(
+                new TicketStatus { StatusId = 1, StatusName = "Open" },
+                new TicketStatus { StatusId = 2, StatusName = "In Progress" },
+                new TicketStatus { StatusId = 3, StatusName = "Resolved" },
+                new TicketStatus { StatusId = 4, StatusName = "Closed" },
+                new TicketStatus { StatusId = 5, StatusName = "On Hold" }
+            );
+
+            modelBuilder.Entity<TicketCategory>().HasData(
+                new TicketCategory { CategoryId = 1, CategoryName = "Bug" },
+                new TicketCategory { CategoryId = 2, CategoryName = "Feature Request'" },
+                new TicketCategory { CategoryId = 3, CategoryName = "Inquiry" },
+                new TicketCategory { CategoryId = 4, CategoryName = "Support" },
+                new TicketCategory { CategoryId = 5, CategoryName = "Maintenance" }
+            );
+
+            modelBuilder.Entity<TicketPriority>().HasData(
+                new TicketPriority { PriorityId = 1, PriorityName = "Low" },
+                new TicketPriority { PriorityId = 2, PriorityName = "Medium" },
+                new TicketPriority { PriorityId = 3, PriorityName = "High" }
+            );
+
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasIndex(e => e.UserId, "UQ__Users__1788CC4D5F4A160F")
@@ -62,7 +91,22 @@ namespace ASI.Basecode.Data
                     .IsRequired()
                     .HasMaxLength(50)
                     .IsUnicode(false);
-            });           
+
+
+            });
+
+            modelBuilder.Entity<User>().HasData(
+                new User { 
+                    UserId = "5c37344a-f1b4-47f3-a8e4-d2154591358e",
+                    Name = "Agent 007",
+                    Password = "Kw7+jFXwfGw/o6Mi2vJEXw==", //123
+                    RoleId = 3,
+                    Email = "resolveit.agent@mail.com",
+                    CreatedBy = "System",
+                    CreatedTime = DateTime.Now,
+                    IsActive = true
+                }
+            );
 
             // User and Role Relationship
             modelBuilder.Entity<User>()

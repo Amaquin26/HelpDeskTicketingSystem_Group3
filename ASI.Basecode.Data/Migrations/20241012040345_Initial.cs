@@ -36,6 +36,19 @@ namespace ASI.Basecode.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "TicketPriorities",
+                columns: table => new
+                {
+                    PriorityId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PriorityName = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TicketPriorities", x => x.PriorityId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TicketStatuses",
                 columns: table => new
                 {
@@ -55,12 +68,14 @@ namespace ASI.Basecode.Data.Migrations
                     UserId = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: false),
                     Name = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: false),
                     Password = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: false),
-                    TeamId = table.Column<int>(type: "int", nullable: false),
+                    TeamId = table.Column<int>(type: "int", nullable: true),
                     RoleId = table.Column<int>(type: "int", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedBy = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: false),
                     CreatedTime = table.Column<DateTime>(type: "datetime", nullable: false),
-                    UpdatedBy = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: false),
-                    UpdatedTime = table.Column<DateTime>(type: "datetime", nullable: true)
+                    UpdatedBy = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: true),
+                    UpdatedTime = table.Column<DateTime>(type: "datetime", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -131,15 +146,15 @@ namespace ASI.Basecode.Data.Migrations
                     AssigneeId = table.Column<string>(type: "varchar(50)", nullable: true),
                     TeamAssignedId = table.Column<int>(type: "int", nullable: true),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StatusId = table.Column<int>(type: "int", nullable: false),
+                    PriorityId = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CategoryId = table.Column<int>(type: "int", nullable: false),
-                    StatusId = table.Column<int>(type: "int", nullable: false),
                     CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UpdatedTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ResolvedTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    StatusId1 = table.Column<int>(type: "int", nullable: true)
+                    ResolvedTime = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -157,16 +172,17 @@ namespace ASI.Basecode.Data.Migrations
                         principalColumn: "CategoryId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
+                        name: "FK_Tickets_TicketPriorities_PriorityId",
+                        column: x => x.PriorityId,
+                        principalTable: "TicketPriorities",
+                        principalColumn: "PriorityId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_Tickets_TicketStatuses_StatusId",
                         column: x => x.StatusId,
                         principalTable: "TicketStatuses",
                         principalColumn: "StatusId",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Tickets_TicketStatuses_StatusId1",
-                        column: x => x.StatusId1,
-                        principalTable: "TicketStatuses",
-                        principalColumn: "StatusId");
                     table.ForeignKey(
                         name: "FK_Tickets_Users_AssigneeId",
                         column: x => x.AssigneeId,
@@ -230,7 +246,6 @@ namespace ASI.Basecode.Data.Migrations
                     UserId = table.Column<string>(type: "varchar(50)", nullable: true),
                     Comment = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Rating = table.Column<int>(type: "int", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -248,6 +263,56 @@ namespace ASI.Basecode.Data.Migrations
                         principalTable: "Users",
                         principalColumn: "UserId");
                 });
+
+            migrationBuilder.InsertData(
+                table: "Roles",
+                columns: new[] { "RoleId", "RoleName" },
+                values: new object[,]
+                {
+                    { 1, "Super Admin" },
+                    { 2, "Admin" },
+                    { 3, "Agent" },
+                    { 4, "User" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "TicketCategories",
+                columns: new[] { "CategoryId", "CategoryName" },
+                values: new object[,]
+                {
+                    { 1, "Bug" },
+                    { 2, "Feature Request'" },
+                    { 3, "Inquiry" },
+                    { 4, "Support" },
+                    { 5, "Maintenance" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "TicketPriorities",
+                columns: new[] { "PriorityId", "PriorityName" },
+                values: new object[,]
+                {
+                    { 1, "Low" },
+                    { 2, "Medium" },
+                    { 3, "High" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "TicketStatuses",
+                columns: new[] { "StatusId", "StatusName" },
+                values: new object[,]
+                {
+                    { 1, "Open" },
+                    { 2, "In Progress" },
+                    { 3, "Resolved" },
+                    { 4, "Closed" },
+                    { 5, "On Hold" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "UserId", "CreatedBy", "CreatedTime", "Email", "IsActive", "Name", "Password", "RoleId", "TeamId", "UpdatedBy", "UpdatedTime" },
+                values: new object[] { "5c37344a-f1b4-47f3-a8e4-d2154591358e", "System", new DateTime(2024, 10, 12, 12, 3, 43, 954, DateTimeKind.Local).AddTicks(9197), "resolveit.agent@mail.com", true, "Agent 007", "Kw7+jFXwfGw/o6Mi2vJEXw==", 3, null, null, null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Announcements_CreatedBy",
@@ -285,14 +350,14 @@ namespace ASI.Basecode.Data.Migrations
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Tickets_PriorityId",
+                table: "Tickets",
+                column: "PriorityId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Tickets_StatusId",
                 table: "Tickets",
                 column: "StatusId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Tickets_StatusId1",
-                table: "Tickets",
-                column: "StatusId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tickets_TeamAssignedId",
@@ -338,6 +403,9 @@ namespace ASI.Basecode.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "TicketCategories");
+
+            migrationBuilder.DropTable(
+                name: "TicketPriorities");
 
             migrationBuilder.DropTable(
                 name: "TicketStatuses");

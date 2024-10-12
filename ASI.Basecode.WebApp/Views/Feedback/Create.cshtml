@@ -6,8 +6,13 @@
 <div class="content p-4" style="margin-left: 200px;">
     <h3>Create Feedback</h3>
     <form asp-action="Create" method="post">
+<<<<<<< HEAD
         <div class="form-group mb-3">
             <label asp-for="TicketId" class="form-label">Select Ticket</label>
+=======
+        <div class="mb-3">
+            <label asp-for="TicketId">Ticket</label>
+>>>>>>> origin/main
             <select asp-for="TicketId" class="form-select" id="ticketId" asp-items="@(new SelectList(Model.Tickets, "TicketId", "Title"))">
                 <option value="">-- Select Ticket --</option> <!-- Optional default option -->
             </select>
