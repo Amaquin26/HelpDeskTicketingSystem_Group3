@@ -5,9 +5,11 @@
 <div class="content p-4" style="margin-left: 200px;">
     <h3>Create Feedback</h3>
     <form asp-action="Create" method="post">
-        <div class="form-group mb-3">
+        <div class="mb-3">
             <label asp-for="TicketId"></label>
-            <input asp-for="TicketId" class="form-control" required />
+            <select asp-for="TicketId" class="form-select" id="ticketId" asp-items="@(new SelectList(Model.Tickets, "TicketId", "Title"))">
+                <option value="">-- Select Ticket --</option> <!-- Optional default option -->
+            </select>
             <span asp-validation-for="TicketId" class="text-danger"></span>
         </div>
         <div class="form-group mb-3">

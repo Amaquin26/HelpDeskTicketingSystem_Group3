@@ -11,13 +11,13 @@
             <input asp-for="TeamName" class="form-control" required />
             <span asp-validation-for="TeamName" class="text-danger"></span>
         </div>
-
         <div class="form-group mb-3">
-            <label asp-for="TeamLeaderId" class="form-label"></label>
-            <select asp-for="TeamLeaderId" class="form-control" asp-items="ViewBag.TeamLeaders"></select>
+            <label asp-for="TeamLeaderId" class="form-label">Team Leader</label>
+            <select asp-for="TeamLeaderId" class="form-select" id="teamLeader" asp-items="@(new SelectList(ViewBag.TeamLeaders, "UserId", "Name"))">
+                <option value="">-- Select Team Leader --</option> <!-- Optional default option -->
+            </select>
             <span asp-validation-for="TeamLeaderId" class="text-danger"></span>
         </div>
-
         <div class="form-group mb-3">
             <label asp-for="TeamSpecialization" class="form-label"></label>
             <input asp-for="TeamSpecialization" class="form-control" required />

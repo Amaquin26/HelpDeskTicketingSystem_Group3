@@ -8,21 +8,28 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 
 namespace ASI.Basecode.WebApp.Controllers
 {
     public class TicketController : ControllerBase<TicketController>
     {
         private readonly ITicketService _ticketService;
+        private readonly IUserService _userService;
+        private readonly ITeamService _teamService;
 
         public TicketController(
             IHttpContextAccessor httpContextAccessor,
             ILoggerFactory loggerFactory,
             IConfiguration configuration,
             ITicketService ticketService,
-            IMapper mapper = null) : base(httpContextAccessor, loggerFactory, configuration, mapper)
+            IUserService userService,
+            ITeamService teamService,
+        IMapper mapper = null) : base(httpContextAccessor, loggerFactory, configuration, mapper)
         {
             _ticketService = ticketService;
+            _userService = userService;
+            _teamService = teamService;
         }
 
         [HttpGet]
@@ -46,6 +53,12 @@ namespace ASI.Basecode.WebApp.Controllers
             ticketModel.TicketPriorities = ticketPriorities;
             ticketModel.TicketCategories = ticketCategories;
             ticketModel.TicketStatuses = ticketStatuses;
+            ticketModel.Agents = _userService.GetAgents().ToList();
+            ticketModel.Teams = _teamService.GetListOfTeams().Select(t => new Team
+            {
+                TeamId = t.TeamId,
+                TeamName = t.TeamName,
+            }).ToList();
 
             return View(ticketModel);
         }
@@ -81,6 +94,12 @@ namespace ASI.Basecode.WebApp.Controllers
             ticketModel.TicketPriorities = ticketPriorities;
             ticketModel.TicketCategories = ticketCategories;
             ticketModel.TicketStatuses = ticketStatuses;
+            ticketModel.Agents = _userService.GetAgents().ToList();
+            ticketModel.Teams = _teamService.GetListOfTeams().Select(t => new Team
+            {
+                TeamId = t.TeamId,
+                TeamName = t.TeamName,
+            }).ToList();
 
             return View(ticketModel);
         }
@@ -114,6 +133,20 @@ namespace ASI.Basecode.WebApp.Controllers
                 if (ticketModel.TicketCategories.Count == 0)
                 {
                     ticketModel.TicketCategories = _ticketService.GetTicketCategoryList();
+                }
+
+                if (ticketModel.Agents.Count == 0)
+                {
+                    ticketModel.Agents = _userService.GetAgents().ToList();
+                }
+
+                if (ticketModel.Teams.Count == 0)
+                {
+                    ticketModel.Teams = _teamService.GetListOfTeams().Select(t => new Team
+                    {
+                        TeamId = t.TeamId,
+                        TeamName = t.TeamName,
+                    }).ToList();
                 }
 
                 return View(ticketModel);
@@ -155,6 +188,20 @@ namespace ASI.Basecode.WebApp.Controllers
                 if (ticketModel.TicketCategories.Count == 0)
                 {
                     ticketModel.TicketCategories = _ticketService.GetTicketCategoryList();
+                }
+
+                if (ticketModel.Agents.Count == 0)
+                {
+                    ticketModel.Agents = _userService.GetAgents().ToList();
+                }
+
+                if (ticketModel.Teams.Count == 0)
+                {
+                    ticketModel.Teams = _teamService.GetListOfTeams().Select(t => new Team
+                    {
+                        TeamId = t.TeamId,
+                        TeamName = t.TeamName,
+                    }).ToList();
                 }
 
                 return View(ticketModel);

@@ -10,9 +10,9 @@
         <label>Resolve.it</label>
     </div>
     <ul>
-        <li class="@(IsActive("Profile", null) ? "active" : "")">
+        @* <li class="@(IsActive("Profile", null) ? "active" : "")">
             <a asp-action="Profile" asp-controller="Account"><i class="fas fa-user"></i> <span>Profile</span></a>
-        </li>
+        </li> *@
         <li class="@(IsActive("Index", "Ticket") ? "active" : "")">
             <a asp-action="Index" asp-controller="Ticket"><i class="fas fa-ticket-alt"></i> <span>Tickets</span></a>
         </li>
@@ -28,9 +28,9 @@
         <li class="@(IsActive("Index", "Feedback") ? "active" : "")">
             <a asp-action="Index" asp-controller="Feedback"><i class="fas fa-sliders-h"></i> <span>Feedbacks</span></a>
         </li>
-        <li>
+        @* <li>
             <a asp-action="Logout" asp-controller="Account"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
-        </li>
+        </li> *@
     </ul>
 </div>
 
