@@ -22,6 +22,7 @@ namespace ASI.Basecode.Services.ServiceModels
         public string CreatedBy { get; set; }
 
         public DateTime CreatedTime { get; set; }
+        public string TeamLeaderName { get; set; }
     }
 
 }

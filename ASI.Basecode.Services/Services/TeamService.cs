@@ -2,6 +2,7 @@
 using ASI.Basecode.Data.Models;
 using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
+using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,7 +30,8 @@ namespace ASI.Basecode.Services.Services
                 TeamLeaderId = t.TeamLeaderId,
                 TeamSpecialization = t.TeamSpecialization,
                 CreatedBy = t.CreatedBy,
-                CreatedTime = t.CreatedTime
+                CreatedTime = t.CreatedTime,
+                TeamLeaderName = t.TeamLeader.Name
             }).ToList();
         }
 

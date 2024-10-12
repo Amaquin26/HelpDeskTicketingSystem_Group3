@@ -15,7 +15,6 @@ namespace ASI.Basecode.Data.Models
         public string UserId { get; set; }                    
         public string Comment { get; set; }
         public int Rating { get; set; }
-        public string CreatedBy { get; set; }
         public DateTime CreatedTime { get; set; }
 
 
