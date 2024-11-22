@@ -66,17 +66,23 @@ namespace ASI.Basecode.WebApp.Controllers
         }
 
         [HttpPost]
-        public JsonResult Delete(int id)
+        public IActionResult Delete(int teamId)
         {
-            try
+            _teamService.DeleteTeam(teamId);
+            return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public IActionResult TeamDetails(int id)
+        {
+            var team = _teamService.GetTeamDetails(id);
+
+            if (team == null)
             {
-                _teamService.DeleteTeam(id);
-                return Json(new { success = true });
+                return RedirectToAction("Index");
             }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = ex.Message });
-            }
+
+            return View(team);
         }
     }
 

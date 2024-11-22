@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Configuration;
 using System.Linq;
 
 namespace ASI.Basecode.WebApp.Controllers
@@ -36,7 +37,9 @@ namespace ASI.Basecode.WebApp.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            return View();
+            var tickets = _ticketService.GetListOfTickets();
+
+            return View(tickets);
         }
 
         [HttpGet]
@@ -52,7 +55,7 @@ namespace ASI.Basecode.WebApp.Controllers
             ticketModel.TicketPriorities = ticketPriorities;
             ticketModel.TicketCategories = ticketCategories;
             ticketModel.TicketStatuses = ticketStatuses;
-            ticketModel.Agents = _userService.GetAgents().ToList();
+            ticketModel.Agents = _userService.GetAgents().Where(x => x.RoleId == 3).ToList();
             ticketModel.Teams = _teamService.GetListOfTeams().Select(t => new Team
             {
                 TeamId = t.TeamId,
@@ -63,14 +66,14 @@ namespace ASI.Basecode.WebApp.Controllers
         }
 
         [HttpGet]
-        public IActionResult EditTicket(int ticketId)
+        public IActionResult EditTicket(int id)
         {
             var ticketModel = new TicketViewModel();
 
             var ticketStatuses = _ticketService.GetTicketStatusList();
             var ticketPriorities = _ticketService.GetTicketPriorityList();
             var ticketCategories = _ticketService.GetTicketCategoryList();
-            var result = _ticketService.GetTicketById(ticketId);
+            var result = _ticketService.GetTicketById(id);
 
             var ticket = result.Item1;
 
@@ -93,7 +96,7 @@ namespace ASI.Basecode.WebApp.Controllers
             ticketModel.TicketPriorities = ticketPriorities;
             ticketModel.TicketCategories = ticketCategories;
             ticketModel.TicketStatuses = ticketStatuses;
-            ticketModel.Agents = _userService.GetAgents().ToList();
+            ticketModel.Agents = _userService.GetAgents().Where(x => x.RoleId == 3).ToList();
             ticketModel.Teams = _teamService.GetListOfTeams().Select(t => new Team
             {
                 TeamId = t.TeamId,
@@ -161,7 +164,7 @@ namespace ASI.Basecode.WebApp.Controllers
                 CategoryId = ticketFormModel.CategoryId,
                 StatusId = 1,
                 AssigneeId = ticketFormModel.AssigneeId,
-                TeamAssignedId = ticketFormModel.TeamAssignedId,
+                Files = ticketFormModel.Files,
             };
 
             _ticketService.AddTicket(ticket);
@@ -222,11 +225,11 @@ namespace ASI.Basecode.WebApp.Controllers
             return RedirectToAction("Index");
         }
 
-        [HttpDelete]
-        public IActionResult DeleteTicket([FromQuery]int id)
+        [HttpPost]
+        public IActionResult DeleteTicket(int ticketId)
         {
             // Find the ticket by ID
-            var result = _ticketService.GetTicketById(id);
+            var result = _ticketService.GetTicketById(ticketId);
 
             if (result.Item2 == false)
             {
@@ -234,9 +237,19 @@ namespace ASI.Basecode.WebApp.Controllers
             }
 
             // Delete the ticket
-            _ticketService.DeleteTicket(id);
+            _ticketService.DeleteTicket(ticketId);
 
-            return Ok(); // Return 200 OK on success
+            return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public IActionResult ViewTicket(int id)
+        {
+            var ticketModel = _ticketService.GetTicketById(id);
+
+            var ticket = ticketModel.Item1;
+
+            return View(ticket);
         }
     }
 }

@@ -25,7 +25,7 @@
         <div class="mb-3">
             <label asp-for="Ticket.StatusId" class="form-label">Status</label>
             <select asp-for="Ticket.StatusId" class="form-select" id="status" asp-items="@(new SelectList(Model.TicketStatuses, "StatusId", "StatusName"))">
-                <option value="">-- Select Status --</option>
+                <option value="">Select Status</option>
             </select>
             <span asp-validation-for="Ticket.StatusId" class="text-danger"></span>
         </div>
@@ -33,7 +33,7 @@
         <div class="mb-3">
             <label asp-for="Ticket.CategoryId" class="form-label">Category</label>
             <select asp-for="Ticket.CategoryId" class="form-select" id="category" asp-items="@(new SelectList(Model.TicketCategories, "CategoryId", "CategoryName"))">
-                <option value="">-- Select Category --</option>
+                <option value="">Select Category</option>
             </select>
             <span asp-validation-for="Ticket.CategoryId" class="text-danger"></span>
         </div>
@@ -41,30 +41,42 @@
         <div class="mb-3">
             <label asp-for="Ticket.PriorityId" class="form-label">Priority</label>
             <select asp-for="Ticket.PriorityId" class="form-select" id="priority" asp-items="@(new SelectList(Model.TicketPriorities, "PriorityId", "PriorityName"))">
-                <option value="">-- Select Priority --</option>
+                <option value="">Select Priority</option>
             </select>
             <span asp-validation-for="Ticket.PriorityId" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
-            <label asp-for="Ticket.AssigneeId" class="form-label">Assign to Agent</label>
+            <label asp-for="Ticket.AssigneeId" class="form-label">Reassign to Agent</label>
             <select asp-for="Ticket.AssigneeId" class="form-select" id="ticketAssign" asp-items="@(new SelectList(Model.Agents, "UserId", "Name"))">
-                <option value="">-- Select Agent --</option>
+                <option value="">Select Agent</option>
             </select>
             <span asp-validation-for="Ticket.AssigneeId" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
-            <label asp-for="Ticket.TeamAssignedId" class="form-label">Assign to Team</label>
+            <label asp-for="Ticket.TeamAssignedId" class="form-label">Reassign to Team</label>
             <select asp-for="Ticket.TeamAssignedId" class="form-select" id="teamAssign" asp-items="@(new SelectList(Model.Teams, "TeamId", "TeamName"))">
-                <option value="">-- Select Team --</option>
+                <option value="">Select Team</option>
             </select>
             <span asp-validation-for="Ticket.TeamAssignedId" class="text-danger"></span>
         </div>
 
-        <div class="d-flex">
-            <button type="submit" class="btn btn-success">Update</button>
-            <a asp-action="Index" class="btn btn-secondary ms-2" style="float:right;">Cancel</a>
+        @* <div class="mb-3">
+            <label for="ticketAttachment" class="form-label">Attachments</label>
+            <input type="file" class="form-control" id="ticketAttachment" multiple>
+        </div>
+        <ul class="list-group mb-3">
+            <li class="list-group-item d-flex justify-content-between">
+                <a href="path/to/screenshot1.png" download>Screenshot1.png</a>
+                <i class="fas fa-x text-danger float-right"></i>
+            </li>
+            <!-- Add more attachments as needed -->
+        </ul> *@
+
+        <div class="d-flex justify-content-end gap-2">
+            <button type="submit" class="btn d-block btn-danger">Update Ticket</button>
+            <a asp-action="Index" class="btn btn-outline-danger">Cancel</a>
         </div>
     </form>
 </div>

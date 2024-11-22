@@ -19,5 +19,11 @@ namespace ASI.Basecode.Services.Dto
         public string StatusName { get; set; }
         public string CategoryName { get; set; }
         public string PriorityName { get; set; }
+        public int CategoryId { get; set; }
+        public int StatusId { get; set; }
+        public int PriorityId { get; set; }
+        public string? AgentName { get; set; }
+        public string? TeamName { get; set; }
+        public DateTime DateAdded { get; set; }
     }
 }

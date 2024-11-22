@@ -3,78 +3,54 @@
     ViewBag.Title = "Add User";
 }
 
-@section styles {
-    <link rel="stylesheet" href="~/css/login.css" />
-}
+<div class="content p-4" style="margin-left: 200px;">
+    <h3 class="mb-4"><strong>Add User</strong></h3>
 
-<div class="container py-5 h-100 register-box">
-    <div class="row d-flex justify-content-center align-items-center h-100">
-        <div class="col-xl-10">
-            <div class="card rounded-3 text-black">
-                <div class="row g-0">
-                    <div class="card-body p-md-5 mx-md-4">
-
-                        <div class="text-center">
-                            <img src="https://www.alliance.com.ph/images/asi-logo-invert.svg"
-                                 style="width: 185px;" alt="logo">
-                        </div>
-
-                        <form method="post" asp-action="Create">
-                            <div class="form-outline mb-4">
-                                <label class="form-label" for="name">Name</label>
-                                <input type="text" id="name" class="form-control"
-                                       asp-for="Name" placeholder="Enter name" required />
-                                <span asp-validation-for="Name" class="text-danger"></span>
-                            </div>
-
-                            <div class="form-outline mb-4">
-                                <label class="form-label" for="email">Email</label>
-                                <input type="email" id="email" class="form-control"
-                                       asp-for="Email" placeholder="Enter email" required />
-                                <span asp-validation-for="Email" class="text-danger"></span>
-                            </div>
-
-                            <div class="form-outline mb-4">
-                                <label class="form-label" for="password">Password</label>
-                                <input type="password" id="password" class="form-control"
-                                       asp-for="Password" placeholder="Enter password" required />
-                                <span asp-validation-for="Password" class="text-danger"></span>
-                            </div>
-
-                            <div class="form-outline mb-4">
-                                <label class="form-label" for="roleId">Role</label>
-                                <select id="roleId" class="form-control" asp-for="RoleId" asp-items="ViewBag.Roles" required>
-                                    <option value="">Select Role</option>
-                                    <option value="1">Super </option>
-                                    <option value="2">Admin</option>
-                                    <option value="3">Agent</option>
-                                    <option value="4">"User"</option>
-                                </select>
-                                <span asp-validation-for="RoleId" class="text-danger"></span>
-                            </div>
-
-                            <div class="form-outline mb-4">
-                                <label class="form-label">Status</label>
-                                <input type="text" class="form-control" value="Active" readonly />
-                            </div>
-
-                            <input type="hidden" asp-for="IsActive" value="true" />
-
-                            <div class="text-center pt-1 mb-5 pb-1 d-flex flex-column align-items-center">
-                                <button class="btn btn-primary btn-block login-btn gradient-custom-2 mb-3" type="submit">
-                                    Create User
-                                </button>
-                                <a asp-controller="User" asp-action="Index">
-                                    &#8592 Back
-                                </a>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
+    <form asp-action="Create" method="post">
+        <div class="mb-3">
+            <label for="addUserName" class="form-label">Name</label>
+            <input type="text" id="name" class="form-control"
+                   asp-for="Name" placeholder="Enter user name" required />
+            <span asp-validation-for="Name" class="text-danger"></span>
         </div>
-    </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="email">Email</label>
+            <input type="email" id="email" class="form-control"
+                   asp-for="Email" placeholder="Enter user email" required />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div c class="mb-3">
+            <label class="form-label" for="roleId">Role</label>
+            <select id="roleId" class="form-control" asp-for="RoleId" asp-items="ViewBag.Roles" required>
+                <option value="">Select role</option> <!-- Optional default option -->
+            </select>
+            <span asp-validation-for="RoleId" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="TeamId" class="form-label">Team</label>
+            <select asp-for="TeamId" class="form-select" id="teamLeader" asp-items="ViewBag.Teams">
+                <option value="">Select team</option> <!-- Optional default option -->
+            </select>
+            <span asp-validation-for="TeamId" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="password">Password</label>
+            <input type="password" id="password" class="form-control"
+                   asp-for="Password" placeholder="Enter password" required />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2">
+            <button type="submit" class="btn d-block btn-danger">Add User</button>
+            <a asp-action="Index" class="btn btn-outline-danger">Cancel</a>
+        </div>
+    </form>
 </div>
+
 
 @section scripts {
     <script>

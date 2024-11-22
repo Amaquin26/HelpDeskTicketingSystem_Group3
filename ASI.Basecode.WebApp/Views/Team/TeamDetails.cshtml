@@ -1,0 +1,114 @@
+﻿@model ASI.Basecode.Services.Dto.TeamDetailsDto
+
+@{
+    ViewData["Title"] = "Team Details Page";
+}
+
+<div class="content p-4" style="margin-left: 200px;">
+    <div class="d-flex justify-content-between mb-3">
+        <!-- Back Button on the Left -->
+        <a asp-action="Index" class="btn">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+
+        <!-- Edit and Delete Buttons on the Right -->
+        <div>
+            <a asp-action="Edit" asp-route-id="@Model.TeamId" class="edit btn btn-outline-danger me-2">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteTeamModal-@Model.TeamId">
+                <i class="fas fa-trash-alt"></i> Delete
+            </button>
+        </div>
+    </div>
+
+    <h2 class="mb-4">Team Details</h2>
+
+    <!-- Team Info Card -->
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <p class="mb-0"><strong>Team Name:</strong> @Model.Name</p>
+            <button class="edit btn text-secondary"><small>View Team Activity</small></button>
+        </div>
+        <div class="card-body">
+            <div class="row mb-2">
+                <div class="col-md-4">
+                    <p class="mb-0"><strong>Team Leader: </strong>
+                        @{
+                            if (Model.LeaderName != null)
+                            {
+                                <span>@Model.LeaderName</span>
+                            }else{
+                                <span>No Leader</span>
+                            }
+                        }
+                   </p>
+                </div>
+                <div class="col-md-4">
+                    <p class="mb-0"><strong>Specialization:</strong> @Model.Specialization</p>
+                </div>
+                <div class="col-md-4">
+                    <p class="mb-0"><strong>Customer Satisfaction Rating:</strong> @Model.CustomerRating.ToString("F2") /5</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <p class="mb-0"><strong>Tickets Resolved:</strong> @Model.TicketsResolved</p>
+                </div>
+                <div class="col-md-4">
+                    <p class="mb-0"><strong>Average Resolution Time:</strong> @Model.AverageResolutionTimeString</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="mb-4"><strong>Assigned Tickets</strong></h3>
+    <div class="mb-4">
+        <div class="btn-group" role="group" aria-label="Filter Tickets">
+            <button type="button" class="btn btn-danger">All</button>
+            <button type="button" class="btn btn-outline-danger">Open</button>
+            <button type="button" class="btn btn-outline-danger">In Progress</button>
+            <button type="button" class="btn btn-outline-danger">Closed</button>
+        </div>
+    </div>
+    <div class="row">
+        @foreach (var ticket in Model.Tickets)
+        {
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Ticket</h5>
+                        <p class="card-text"><strong>Created By: </strong>@ticket.CreatedBy</p>
+                        <p class="card-text"><strong>Issue: </strong>@ticket.Title</p>
+                        <p class="card-text"><strong>Status: </strong> @ticket.StatusName</p>
+                        <p class="card-text"><strong>Priority: </strong>@ticket.PriorityName</p>
+                        <p class="card-text"><strong>Category: </strong>@ticket.CategoryName</p>
+                        <a asp-action="ViewTicket" asp-controller="Ticket" asp-route-id="@ticket.TicketId" class="btn btn-danger">View Details</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Delete Team Modal -->
+<div class="modal fade" id="deleteTeamModal-@Model.TeamId" tabindex="-1" aria-labelledby="deleteTeamModal-@Model.TeamId" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteTeamModalLabel">Delete Team</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this user?</p>
+                <p><strong>Team Name: </strong>@Model.Name</p>
+                <p><strong>Team Leader: </strong>@Model.LeaderName</p>
+                <form asp-action="Delete" asp-controller="Team" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="TeamId" value="@Model.TeamId" />
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

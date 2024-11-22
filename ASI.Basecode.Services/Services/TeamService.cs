@@ -1,16 +1,14 @@
 ﻿using ASI.Basecode.Data.Interfaces;
 using ASI.Basecode.Data.Models;
-using ASI.Basecode.Data.Repositories;
-using ASI.Basecode.Services.Interfaces;
+using ASI.Basecode.Services.Dto;
 using ASI.Basecode.Services.ServiceModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ASI.Basecode.Services.Services
 {
@@ -18,13 +16,17 @@ namespace ASI.Basecode.Services.Services
     {
         private readonly ITeamRepository _teamRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ITicketRepository _ticketRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IFeedbackRepository _feedbackRepository;
 
-        public TeamService(ITeamRepository teamRepository, IHttpContextAccessor httpContextAccessor, IUserRepository userRepository)
+        public TeamService(ITeamRepository teamRepository, IHttpContextAccessor httpContextAccessor, IUserRepository userRepository, ITicketRepository ticketRepository, IFeedbackRepository feedbackRepository)
         {
             _teamRepository = teamRepository;
             _httpContextAccessor = httpContextAccessor;
             _userRepository = userRepository;
+            _ticketRepository = ticketRepository;
+            _feedbackRepository = feedbackRepository;
         }
 
         public List<TeamViewModel> GetListOfTeams()
@@ -97,6 +99,90 @@ namespace ASI.Basecode.Services.Services
         public void DeleteTeam(int id)
         {
             _teamRepository.DeleteTeam(id);
+        }
+
+        public TeamDetailsDto? GetTeamDetails(int id)
+        {
+            var teamDetails = _teamRepository.GetTeams()
+                .Include(x => x.TeamLeader)
+                .Where(t => t.TeamId == id)
+                .Select(team => new TeamDetailsDto
+                {
+                    TeamId = team.TeamId,
+                    Name = team.TeamName,
+                    Specialization = team.TeamSpecialization,
+                    TeamLeaderId = team.TeamLeaderId,
+                    LeaderEmail = team.TeamLeader.Email,
+                    LeaderName = team.TeamLeader.Name,
+                })
+                .FirstOrDefault();
+
+            if (teamDetails == null)
+            {
+                return null;
+            }
+
+            var tickets = _ticketRepository.GetTickets()
+                .Include(t => t.Category)
+                .Include(t => t.Status)
+                .Include(t => t.Priority)
+                .Where(t => t.TeamAssignedId == teamDetails.TeamId)
+                .ToList();
+
+            var ticketIds = tickets.Select(t => t.TicketId).ToList();
+
+            var customerRating = _feedbackRepository.GetFeedbacks()
+                .Where(t => ticketIds.Contains(t.TicketId))
+                .Select(f => f.Rating)
+                .ToList() // Bring data into memory
+                .DefaultIfEmpty(0) // Handle empty collections
+                .Average();
+
+            double averageResolutionMinutes = tickets
+             .Where(t => t.StatusId == 3 && t.ResolvedTime != null)
+            .Select(t => (t.ResolvedTime.Value - t.CreatedTime).TotalMinutes) // Get resolution times in minutes
+            .DefaultIfEmpty(0)
+            .Average();
+
+            int averageHours = (int)(averageResolutionMinutes / 60);
+            int averageMinutes = (int)(averageResolutionMinutes % 60);
+
+            string averageResolutionTime = $"{averageHours}h {averageMinutes}m";
+
+            teamDetails.TicketsResolved = tickets.Where(t => t.StatusId == 3).Count();
+            teamDetails.CustomerRating = (float)customerRating;
+            teamDetails.AverageResolutionTimeString = averageResolutionTime;
+
+            var ticketDtos = tickets.Select(t => new TicketDto
+            {
+                TicketId = t.TicketId,
+                Title = t.Title,
+                Description = t.Description,
+                AssigneeId = t.AssigneeId,
+                TeamAssignedId = t.TeamAssignedId,
+                CreatedBy = _userRepository.GetUsers()
+                        .Where(u => u.UserId == t.CreatedBy)
+                        .Select(u => u.Name)
+                        .FirstOrDefault(),
+                AgentName = _userRepository.GetUsers()
+                        .Where(u => u.UserId == t.AssigneeId)
+                        .Select(u => u.Name)
+                        .FirstOrDefault(),
+                TeamName = _teamRepository.GetTeams()
+                           .Where(te => te.TeamId == t.TeamAssignedId)
+                           .Select(te => te.TeamName)
+                           .FirstOrDefault(),
+                StatusName = t.Status.StatusName,
+                CategoryName = t.Category.CategoryName,
+                PriorityName = t.Priority.PriorityName,
+                CategoryId = t.CategoryId,
+                StatusId = t.StatusId,
+                PriorityId = t.PriorityId
+            }).ToList();
+
+            teamDetails.Tickets = ticketDtos;
+
+            return teamDetails;
         }
     }
 

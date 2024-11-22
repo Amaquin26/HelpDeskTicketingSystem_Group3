@@ -1,4 +1,5 @@
 ﻿using ASI.Basecode.Data.Models;
+using ASI.Basecode.Services.Dto;
 using ASI.Basecode.Services.ServiceModels;
 using System.Collections;
 using System.Collections.Generic;
@@ -66,5 +67,6 @@ namespace ASI.Basecode.Services.Interfaces
         /// </summary>
         /// <returns>A queryable list of team leader users.</returns>
         IQueryable<User> GetTeamLeaders();
+        UserDetailsDto? GetUserDetails(string id);
     }
 }

@@ -1,75 +1,31 @@
-﻿@model ASI.Basecode.Services.ServiceModels.UserModel
+﻿@model ASI.Basecode.Data.Models.User
 
-@section styles {
-    <link rel="stylesheet" href="~/css/login.css" />
-}
-<div class="container py-5 h-100 register-box">
-    <div class="row d-flex justify-content-center align-items-center h-100">
-        <div class="col-xl-10">
-            <div class="card rounded-3 text-black">
-                <div class="row g-0">
-                    <div class="card-body p-md-5 mx-md-4">
 
-                        <div class="text-center">
-                            <img src="https://www.alliance.com.ph/images/asi-logo-invert.svg"
-                                 style="width: 185px;" alt="logo">
-                        </div>
-                        <form method="post" asp-action="Edit">
+<div class="content p-4" style="margin-left: 200px;">
 
-                            <div class="form-outline mb-4">
-                                <label class="form-label" for="name">Name</label>
-                                <input type="text" id="name" class="form-control"
-                                       asp-for="Name" placeholder="Enter name" required />
-                                <span asp-validation-for="Name" class="text-danger"></span>
-                            </div>
+    <h3 class="mb-4"><strong>Edit User </strong></h3>
 
-                            <div class="form-outline mb-4">
-                                <label class="form-label" for="email">Email</label>
-                                <input type="email" id="email" class="form-control"
-                                       asp-for="Email" placeholder="Enter email" required />
-                                <span asp-validation-for="Email" class="text-danger"></span>
-                            </div>
-
-                            <div class="form-outline mb-4">
-                                <label class="form-label" for="password">Password</label>
-                                <input type="password" id="password" class="form-control"
-                                       asp-for="Password" placeholder="Enter new password (leave blank if unchanged)" />
-                                <span asp-validation-for="Password" class="text-danger"></span>
-                            </div>
-
-                            <div class="form-outline mb-4">
-                                <label class="form-label" for="roleId">Role</label>
-                                <select id="roleId" class="form-control" asp-for="RoleId" required>
-                                    <option value="">Select Role</option>
-                                    <option value="1">Super Admin</option>
-                                    <option value="2">Admin</option>
-                                    <option value="3">Agent</option>
-                                    <option value="4">User</option>
-                                </select>
-                                <span asp-validation-for="RoleId" class="text-danger"></span>
-                            </div>
-
-                            <div class="form-outline mb-4">
-                                <label class="form-label">Status</label>
-                                <input type="text" class="form-control" value="Active" readonly />
-                            </div>
-
-                            <input type="hidden" asp-for="IsActive" value="true" />
-
-                            <div class="text-center pt-1 mb-5 pb-1 d-flex flex-column align-items-center">
-                                <button class="btn btn-primary btn-block login-btn gradient-custom-2 mb-3" type="submit">
-                                    Update User
-                                </button>
-                                <a asp-controller="User" asp-action="Index">
-                                    &#8592 Back
-                                </a>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
+    <form method="post" asp-action="Edit">
+        <input hidden asp-for="@Model.UserId"/>
+        <div class="mb-3">
+            <label for="addUserRole" class="form-label">Role</label>
+            <select class="form-select" asp-for="@Model.RoleId" asp-items="ViewBag.Roles">
+                <option disabled>Select role</option>
+            </select>
+            <span asp-validation-for="@Model.RoleId" class="text-danger"></span>
         </div>
-    </div>
+        <div class="mb-3">
+            <label for="changeTeam" class="form-label">Team</label>
+            <select class="form-select" asp-for="@Model.TeamId" asp-items="ViewBag.Teams">
+                <option disabled>Select team</option>
+                <option value="@null">No Team</option>
+            </select>
+        </div>
+        <div class="d-flex justify-content-end gap-2">
+            <button type="submit" class="btn d-block btn-danger">Update User</button>
+            <a asp-action="Index" class="btn btn-outline-danger">Cancel</a>
+        </div>
+    </form>
 </div>
 @section scripts {
     <script>

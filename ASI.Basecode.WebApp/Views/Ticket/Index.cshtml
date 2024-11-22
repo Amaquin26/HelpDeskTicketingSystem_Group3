@@ -2,15 +2,20 @@
     ViewData["Title"] = "Ticket Page";
 }
 
+@model IEnumerable<ASI.Basecode.Services.Dto.TicketDto>
+
 <!-- Main Content -->
 <div class="content p-4" style="margin-left: 200px;">
     <h3 class="mb-4"><strong>Ticket Management</strong></h3>
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <!-- Search Input -->
-        <input type="text" id="searchInput" class="form-control me-2" placeholder="Search Tickets" style="flex: 1;">
 
-        <!-- Add Ticket Button -->
-        <a asp-action="AddTicket" asp-controller="Ticket" class="btn btn-success">Add Ticket</a>
+    <a asp-action="AddTicket" asp-controller="Ticket" class="btn btn-danger mb-3" id="button-addon2">
+        <i class="fas fa-plus"></i>
+        Add Ticket
+    </a>
+
+    <div class="input-group mb-3">
+        <input type="text" class="form-control" id="searchInput" placeholder="Search Ticket" aria-label="Recipient's username" aria-describedby="button-addon2">
+        <button class="btn btn-outline-danger" type="button" id="button-addon2">Search</button>
     </div>
 
     <!-- Dynamic Tickets List Table -->
@@ -18,216 +23,99 @@
         <table id="ticketTable" class="table table-bordered table-hover">
             <thead>
                 <tr>
-                    <th scope="col">#</th>
                     <th scope="col">Issue</th>
                     <th scope="col">Created By</th>
                     <th scope="col">Category</th>
                     <th scope="col">Priority</th>
                     <th scope="col">Status</th>
+                    <th scope="col">Date Created</th>
                     <th scope="col" class="text-center">Actions</th>
                 </tr>
             </thead>
-            <tbody id="ticketItems"></tbody>
+            <tbody id="ticketItems">
+                @foreach (var ticket in Model)
+                {
+                    <tr>
+                        <td>@ticket.Title</td>
+                        <td>@ticket.CreatedBy</td>
+                        <td>@ticket.CategoryName</td>
+                        <td>
+                        @{
+                            if (ticket.PriorityName == "Low")
+                            {
+                                <span class="badge rounded-pill bg-success">Low Priority</span>
+                            }
+                            if (ticket.PriorityName == "Medium")
+                            {
+                                <span class="badge rounded-pill bg-warning">Medium</span>
+                            }
+                            if (ticket.PriorityName == "High")
+                            {
+                                <span class="badge rounded-pill bg-danger">High</span>
+                            }
+                        }
+                        </td>
+                        <td>
+                            @{
+                                if(ticket.StatusName == "Open")
+                                {
+                                    <span class="text-warning">@ticket.StatusName</span>
+                                }
+                                if(ticket.StatusName == "In Progress")
+                                {
+                                    <span class="text-primary">@ticket.StatusName</span>
+                                }
+                                if (ticket.StatusName == "Resolved")
+                                {
+                                    <span class="text-success">@ticket.StatusName</span>
+                                }
+                                if (ticket.StatusName == "Closed")
+                                {
+                                    <span class="text-muted">@ticket.StatusName</span>
+                                }
+                            }
+                        </td>
+                        <td>@ticket.DateAdded</td>
+                        <td class="text-center">
+                            <a asp-action="ViewTicket" asp-route-id="@ticket.TicketId"  class="edit btn btn-outline-primary btn-sm text-center"><i class="fas fa-eye"></i></a>
+                            <a asp-action="EditTicket" asp-route-id="@ticket.TicketId" asp- class="btn btn-outline-danger btn-sm text-center">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button type="button" class="btn btn-outline-danger btn-sm delete-btn text-center" data-bs-toggle="modal" data-bs-target="#deleteTicketModal-@ticket.TicketId">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
         </table>
     </div>
-
-    <!-- Pagination Controls -->
-    <nav>
-        <ul id="pagination" class="pagination justify-content-center"></ul>
-    </nav>
 </div>
 
+
 <!-- Delete Ticket Modal -->
-<div class="modal fade" id="deleteTicketModal" tabindex="-1" aria-labelledby="deleteTicketModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteTicketModalLabel">Delete Ticket</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Are you sure you want to delete this ticket?</p>
-                <p><strong>Ticket ID# </strong><span id="ticketId"></span></p>
-                <p><strong>Status: </strong><span class="status"></span></p>
-                <p><strong>Priority: </strong><span class="priority"></span></p>
-                <p><strong>Category: </strong><span class="category"></span></p>
-                <button type="button" id="delete-confirm-btn" class="btn btn-danger w-100">Delete Ticket</button>
+@foreach (var ticket in Model)
+{
+    <div class="modal fade" id="deleteTicketModal-@ticket.TicketId" tabindex="-1" aria-labelledby="deleteTicketModalLabel-@ticket.TicketId" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteTicketModalLabel">Delete Ticket</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this ticket?</p>
+                    <p><strong>Created By: </strong><span class="status">@ticket.CreatedBy</span></p>
+                    <p><strong>Status: </strong><span class="status">@ticket.StatusName</span></p>
+                    <p><strong>Priority: </strong><span class="priority">@ticket.PriorityName</span></p>
+                    <p><strong>Category: </strong><span class="category">@ticket.CategoryName</span></p>
+                    <form asp-action="Delete" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="TicketId" value="@ticket.TicketId" />
+                        <button type="submit" id="delete-confirm-btn" class="btn btn-danger w-100">Delete Ticket</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
-
-@section Scripts {
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
-
-    <script>
-        $(document).ready(function () {
-            var currentPage = 1;
-            var itemsPerPage = 20;
-
-            function fetchTickets() {
-                $.ajax({
-                    url: '/Ticket/GetTickets',
-                    type: 'GET',
-                    success: function (data) {
-                        tickets = data;
-                        var paginatedTickets = paginate(tickets, currentPage, itemsPerPage);
-                        displayTickets(paginatedTickets);
-                        createPagination(tickets.length, itemsPerPage);
-                    },
-                    error: function (xhr, status, error) {
-                        toastr.error('Error fetching tickets');
-                    }
-                });
-            }
-
-            fetchTickets();
-
-            // Function to get pill classes based on status
-            function getStatusPillClass(status) {
-                if (!status) return '';
-
-                switch (status.toLowerCase()) {
-                    case 'open':
-                        return 'badge text-danger';
-                    case 'in progress':
-                        return 'badge text-success';
-                    case 'resolved':
-                        return 'badge text-secondary';
-                    case 'closed':
-                        return 'badge text-dark';
-                    case 'on hold':
-                        return 'badge text-warning';
-                    default:
-                        return 'badge text-secondary';
-                }
-            }
-
-            // Function to get label classes based on priority
-            function getPriorityLabelClass(priority) {
-                if (!priority) return '';
-
-                switch (priority.toLowerCase()) {
-                    case 'low':
-                        return 'badge rounded-pill bg-light my-1 text-secondary';
-                    case 'medium':
-                        return 'badge rounded-pill bg-secondary my-1';
-                    case 'high':
-                        return 'badge rounded-pill bg-warning my-1';
-                    case 'critical':
-                        return 'badge rounded-pill bg-danger my-1';
-                    default:
-                        return 'badge rounded-pill bg-danger my-1';
-                }
-            }
-
-            // Function to display tickets
-            function displayTickets(ticketsToShow) {
-                var ticketItems = $('#ticketItems');
-                ticketItems.empty(); // Clear previous tickets
-
-                ticketsToShow.forEach(function (ticket) {
-                    var row = `
-                                        <tr>
-                                            <td>${ticket.ticketId}</td>
-                                            <td>${ticket.description}</td>
-                                            <td>${ticket.createdBy}</td>
-                                            <td>${ticket.categoryName}</td>
-                                            <td><span class="${getPriorityLabelClass(ticket.priorityName)}">${ticket.priorityName}</span></td>
-                                            <td><span class="${getStatusPillClass(ticket.statusName)}">${ticket.statusName}</span></td>
-                                            <td class="text-center">                                              
-                                                <a href="/Ticket/EditTicket?ticketId=${ticket.ticketId}" class="edit btn btn-outline-success btn-sm"><i class="fas fa-edit"></i></a>
-                                                <a href="#" class="edit btn btn-outline-danger btn-sm delete-btn" data-bs-toggle="modal" data-bs-target="#deleteTicketModal" data-ticket-id="${ticket.ticketId}" data-ticket-status="${ticket.statusName}" data-ticket-priority="${ticket.priorityName}" data-ticket-category="${ticket.categoryName}">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </a>
-                                            </td>
-                                        </tr>`;
-                    ticketItems.append(row);
-                });
-            }
-
-            function paginate(tickets, page, itemsPerPage) {
-                var start = (page - 1) * itemsPerPage;
-                var end = start + itemsPerPage;
-                return tickets.slice(start, end);
-            }
-
-            function createPagination(totalItems, itemsPerPage) {
-                var totalPages = Math.ceil(totalItems / itemsPerPage);
-                var pagination = $('#pagination');
-                pagination.empty(); 
-
-                for (var i = 1; i <= totalPages; i++) {
-                    var pageItem = `
-                                        <li class="page-item">
-                                            <a class="page-link${i === currentPage ? ' bg-danger text-white' : ' text-success'}" href="#" data-page="${i}">${i}</a>
-                                        </li>`;
-                    pagination.append(pageItem);
-                }
-
-                $('.page-link').click(function (e) {
-                    e.preventDefault();
-                    currentPage = parseInt($(this).data('page'));
-                    var paginatedTickets = paginate(tickets, currentPage, itemsPerPage);
-                    displayTickets(paginatedTickets);
-                    createPagination(tickets.length, itemsPerPage);
-                });
-            }
-
-            function filterTickets(searchTerm) {
-                return tickets.filter(ticket =>
-                    ticket.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    ticket.createdBy.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    ticket.categoryName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    ticket.priorityName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    ticket.statusName.toLowerCase().includes(searchTerm.toLowerCase())
-                );
-            }
-
-            $('#searchInput').on('keyup', function () {
-                var searchTerm = $(this).val();
-                var filteredTickets = filterTickets(searchTerm);
-                currentPage = 1; 
-                var paginatedTickets = paginate(filteredTickets, currentPage, itemsPerPage);
-                displayTickets(paginatedTickets);
-                createPagination(filteredTickets.length, itemsPerPage);
-            });
-
-            $(document).on('click', '.delete-btn', function () {
-                var ticketId = $(this).data('ticket-id');
-                var ticketStatus = $(this).data('ticket-status');
-                var ticketPriority = $(this).data('ticket-priority');
-                var ticketCategory = $(this).data('ticket-category');
-
-                $('#deleteTicketModal #ticketId').text(ticketId);
-                $('#deleteTicketModal .status').text(ticketStatus);
-                $('#deleteTicketModal .priority').text(ticketPriority);
-                $('#deleteTicketModal .category').text(ticketCategory);
-            });
-
-            $(document).on('click', '#delete-confirm-btn', function () {
-                var ticketId = $('#deleteTicketModal #ticketId').text();
-
-                $.ajax({
-                    url: `/Ticket/DeleteTicket?id=${ticketId}`,
-                    type: 'DELETE',
-                    success: function (result) {
-                        $('#deleteTicketModal').modal('hide');
-
-                        toastr.success('Ticket deleted successfully!');
-
-                        fetchTickets();
-
-                    },
-                    error: function (xhr, status, error) {
-
-                        toastr.error('Error deleting ticket');
-                    }
-                });
-            });       
-        });
-    </script>
 }

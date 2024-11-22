@@ -144,17 +144,18 @@ namespace ASI.Basecode.Data
                 .OnDelete(DeleteBehavior.Cascade);               
 
             // Team and User Relationship (Team Leader)
-            modelBuilder.Entity<Team>()
-                .HasOne(t => t.TeamLeader)
-                .WithMany(u => u.TeamsLed) 
-                .HasForeignKey(t => t.TeamLeaderId) 
-                .OnDelete(DeleteBehavior.Restrict); 
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Team)
+                .WithMany(r => r.Users)
+                .HasForeignKey(u => u.TeamId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Team and User Relationship (Members)
-            modelBuilder.Entity<Team>()
-                .HasMany(t => t.Users) 
-                .WithMany(u => u.Teams) 
-                .UsingEntity(j => j.ToTable("UserTeams"));               
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Team) 
+                .WithMany(u => u.Users)
+                .HasForeignKey(u => u.TeamId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // TicketStatus and Ticket Relationship
             modelBuilder.Entity<TicketStatus>()

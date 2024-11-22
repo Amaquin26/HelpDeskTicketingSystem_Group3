@@ -3,30 +3,30 @@
     ViewData["Title"] = "Create Team";
 }
 <div class="content p-4" style="margin-left: 200px;">
-    <h3 class="mb-4"><strong>Create Team</strong></h3>
+    <h3 class="mb-4"><strong>Add Team</strong></h3>
 
     <form asp-action="Create" method="post">
         <div class="form-group mb-3">
-            <label asp-for="TeamName" class="form-label"></label>
-            <input asp-for="TeamName" class="form-control" required />
+            <label asp-for="TeamName" class="form-label">Team Name</label>
+            <input asp-for="TeamName" class="form-control" placeholder="Enter team name" required />
             <span asp-validation-for="TeamName" class="text-danger"></span>
         </div>
         <div class="form-group mb-3">
             <label asp-for="TeamLeaderId" class="form-label">Team Leader</label>
             <select asp-for="TeamLeaderId" class="form-select" id="teamLeader" asp-items="@(new SelectList(ViewBag.TeamLeaders, "UserId", "Name"))">
-                <option value="">-- Select Team Leader --</option> <!-- Optional default option -->
+                <option value="">Select Team Leader</option> <!-- Optional default option -->
             </select>
             <span asp-validation-for="TeamLeaderId" class="text-danger"></span>
         </div>
         <div class="form-group mb-3">
             <label asp-for="TeamSpecialization" class="form-label"></label>
-            <input asp-for="TeamSpecialization" class="form-control" required />
+            <input asp-for="TeamSpecialization" class="form-control" placeholder="Enter team specialization" required/>
             <span asp-validation-for="TeamSpecialization" class="text-danger"></span>
         </div>
 
-        <div class="form-group mt-4">
-            <button type="submit" class="btn btn-success">Create Team</button>
-            <a asp-action="Index" class="btn btn-secondary ms-2">Back</a>
+        <div class="d-flex justify-content-end gap-2">
+            <button type="submit" class="btn d-block btn-danger">Add Team</button>
+            <a asp-action="Index" class="btn btn-outline-danger">Cancel</a>
         </div>
     </form>
 </div>

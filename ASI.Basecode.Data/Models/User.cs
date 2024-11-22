@@ -22,7 +22,7 @@ namespace ASI.Basecode.Data.Models
         // Navigation properties
         public ICollection<Ticket> Tickets { get; set; }
         public ICollection<Team> TeamsLed { get; set; } 
-        public ICollection<Team> Teams { get; set; }
+        public Team Team { get; set; }
         public Role Role { get; set; }
 
 

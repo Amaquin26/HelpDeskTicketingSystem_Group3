@@ -28,7 +28,7 @@ namespace ASI.Basecode.Services.Interfaces
         /// A tuple where the first element is the ticket object and the second element 
         /// is a boolean indicating whether the ticket was found (true) or not (false).
         /// </returns>
-        (Ticket, bool) GetTicketById(int ticketId);
+        (TicketDto, bool) GetTicketById(int ticketId);
 
         /// <summary>
         /// Retrieves a list of all ticket categories from the database.

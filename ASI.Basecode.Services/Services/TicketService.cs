@@ -4,6 +4,7 @@ using ASI.Basecode.Data.Repositories;
 using ASI.Basecode.Services.Dto;
 using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
+using LinqKit;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -16,12 +17,14 @@ namespace ASI.Basecode.Services.Services
     {
         private readonly ITicketRepository _ticketRepository;
         private readonly IUserRepository _userRepository;
+        private readonly ITeamRepository _teamRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public TicketService(ITicketRepository ticketRepository, IUserRepository userRepository, IHttpContextAccessor httpContextAccessor)
+        public TicketService(ITicketRepository ticketRepository, IUserRepository userRepository, ITeamRepository teamRepository, IHttpContextAccessor httpContextAccessor)
         {
             _ticketRepository = ticketRepository;
             _userRepository = userRepository;
+            _teamRepository = teamRepository;
             _httpContextAccessor = httpContextAccessor;
         }
 
@@ -40,18 +43,54 @@ namespace ASI.Basecode.Services.Services
                       CreatedBy = user.Name,
                       StatusName = ticket.Status.StatusName,
                       CategoryName = ticket.Category.CategoryName,
-                      PriorityName = ticket.Priority.PriorityName
+                      PriorityName = ticket.Priority.PriorityName,
+                      DateAdded = ticket.CreatedTime,
+                      CategoryId = ticket.CategoryId,
+                      StatusId = ticket.StatusId,
+                      PriorityId = ticket.PriorityId
                   })
             .ToList();
 
             return tickets;
         }
 
-        public (Ticket, bool) GetTicketById(int ticketId)
+        public (TicketDto, bool) GetTicketById(int ticketId)
         {
-            var ticket = _ticketRepository.GetTicketById(ticketId); 
+            var ticket = (from t in _ticketRepository.GetTickets()
+                          join u in _userRepository.GetUsers()
+                              on t.CreatedBy equals u.UserId into createdUsers
+                          from createdUser in createdUsers.DefaultIfEmpty()
 
-            if(ticket == null)
+                          join a in _userRepository.GetUsers()
+                              on t.AssigneeId equals a.UserId into assignedAgents
+                          from assignedAgent in assignedAgents.DefaultIfEmpty()
+
+                          join te in _teamRepository.GetTeams()
+                              on t.TeamAssignedId equals te.TeamId into assignedTeams
+                          from assignedTeam in assignedTeams.DefaultIfEmpty()
+
+                          where t.TicketId == ticketId
+                          select new TicketDto
+                          {
+                              TicketId = t.TicketId,
+                              Title = t.Title,
+                              Description = t.Description,
+                              TeamAssignedId = t.TeamAssignedId,
+                              AssigneeId = t.AssigneeId,
+                              CreatedBy = createdUser.Name,
+                              StatusName = t.Status.StatusName,
+                              CategoryName = t.Category.CategoryName,
+                              PriorityName = t.Priority.PriorityName,
+                              DateAdded = t.CreatedTime,
+                              CategoryId = t.CategoryId,
+                              StatusId = t.StatusId,
+                              PriorityId = t.PriorityId,
+                              TeamName = assignedTeam.TeamName,
+                              AgentName = assignedAgent.Name
+                          })
+                        .FirstOrDefault();
+
+            if (ticket == null)
             {
                 return (null, false);
             }
@@ -110,7 +149,12 @@ namespace ASI.Basecode.Services.Services
             ticket.TeamAssignedId = model.TeamAssignedId;
             ticket.StatusId = model.StatusId;
             ticket.CategoryId = model.CategoryId;
-            ticket.UpdatedTime = DateTime.UtcNow;
+            ticket.UpdatedTime = DateTime.Now;
+
+            if (model.StatusId == 3)
+            {
+                ticket.ResolvedTime = DateTime.Now;
+            }
 
             var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 

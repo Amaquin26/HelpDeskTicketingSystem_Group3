@@ -1,0 +1,122 @@
+﻿@model ASI.Basecode.Services.Dto.TicketDto
+
+@{
+    ViewData["Title"] = "Ticket Details Page";
+}
+
+<div class="content p-4" style="margin-left: 200px;">
+    <div class="d-flex justify-content-between mb-3">
+        <!-- Back Button on the Left -->
+        <a asp-action="Index" class="btn">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+
+        <!-- Edit and Delete Buttons on the Right -->
+        <div>
+            <a asp-action="EditTicket" asp-route-id="@Model.TicketId" class="edit btn btn-outline-danger me-2">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteTicketModal-@Model.TicketId">
+                <i class="fas fa-trash-alt"></i> Delete
+            </button>
+        </div>
+    </div>
+
+    <h2 class="mb-4">Ticket Details</h2>
+    
+    <!-- Ticket Info Card -->
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="card-title mb-0">@Model.Title</h4>
+            @{
+                if (Model.PriorityName == "Low")
+                {
+                    <span class="badge rounded-pill bg-success">Low Priority</span>
+                }
+                if (Model.PriorityName == "Medium")
+                {
+                    <span class="badge rounded-pill bg-warning">Medium</span>
+                }
+                if (Model.PriorityName == "High")
+                {
+                    <span class="badge rounded-pill bg-danger">High</span>
+                }
+            }
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Ticket Content</h5>
+            <p class="card-text">
+                @Model.Description
+            </p>
+
+            <hr>
+
+            <h5 class="card-title">Attachments</h5>
+            <ul class="list-group">
+               @*  <li class="list-group-item">
+                    <a href="path/to/screenshot1.png" download>Screenshot1.png</a>
+                </li> *@
+                <!-- Add more attachments as needed -->
+            </ul>
+
+            <hr>
+
+            <h5 class="card-title">Ticket Details</h5> 
+            <p class="card-text"><strong>Created By:</strong><br>@Model.CreatedBy</p>
+            @{
+                if (@Model.TeamAssignedId != null)
+                {
+                    <p class="card-text"><strong>Agent Assigned:</strong><br>@Model.TeamName</p>
+                }else
+                {
+                    <p class="card-text"><strong>Agent Assigned:</strong><br>@Model.AgentName</p>
+                }
+            }
+
+            <p class="card-text"><strong>Ticket Status: </strong><br>
+                @{
+                    if (Model.StatusName == "Open")
+                    {
+                        <span class="text-warning">@Model.StatusName</span>
+                    }
+                    if (Model.StatusName == "In Progress")
+                    {
+                        <span class="text-primary">@Model.StatusName</span>
+                    }
+                    if (Model.StatusName == "Resolved")
+                    {
+                        <span class="text-success">@Model.StatusName</span>
+                    }
+                    if (Model.StatusName == "Closed")
+                    {
+                        <span class="text-muted">@Model.StatusName</span>
+                    }
+                }
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Ticket Modal -->
+<div class="modal fade" id="deleteTicketModal-@Model.TicketId" tabindex="-1" aria-labelledby="deleteTicketModalLabel-@Model.TicketId" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteTicketModalLabel">Delete Ticket</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this ticket?</p>
+                <p><strong>Created By: </strong><span class="status">@Model.CreatedBy</span></p>
+                <p><strong>Status: </strong><span class="status">@Model.StatusName</span></p>
+                <p><strong>Priority: </strong><span class="priority">@Model.PriorityName</span></p>
+                <p><strong>Category: </strong><span class="category">@Model.CategoryName</span></p>
+                <form asp-action="DeleteTicket" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="TicketId" value="@Model.TicketId" />
+                    <button type="submit" id="delete-confirm-btn" class="btn btn-danger w-100">Delete Ticket</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,4 +1,5 @@
 ﻿using ASI.Basecode.Data.Models;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,9 +14,8 @@ namespace ASI.Basecode.Services.ServiceModels
         public List<TicketCategory> TicketCategories { get; set; } = new List<TicketCategory>();
         public List<TicketStatus> TicketStatuses { get; set; } = new List<TicketStatus>();
         public List<TicketPriority> TicketPriorities { get; set; } = new List<TicketPriority>();
-
-        // Temporary values please change when AgentList and TeamList is available
         public List<User> Agents { get; set; } = new List<User>();
         public List<Team> Teams { get; set; } = new List<Team>();
+        public List<IFormFile> Files { get; set; } = new List<IFormFile>();
     }
 }

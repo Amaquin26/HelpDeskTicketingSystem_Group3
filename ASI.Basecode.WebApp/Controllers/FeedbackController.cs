@@ -71,16 +71,9 @@ public class FeedbackController : Controller
     }
 
     [HttpPost]
-    public JsonResult Delete(int id)
+    public IActionResult Delete(int feedbackId)
     {
-        try
-        {
-            _feedbackService.DeleteFeedback(id);
-            return Json(new { success = true });
-        }
-        catch (KeyNotFoundException)
-        {
-            return Json(new { success = false, message = "Feedback not found." });
-        }
+        _feedbackService.DeleteFeedback(feedbackId);
+        return RedirectToAction("Index");
     }
 }

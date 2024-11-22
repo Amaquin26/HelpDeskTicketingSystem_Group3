@@ -38,7 +38,9 @@ namespace ASI.Basecode.Services.Services
         /// </returns>
         public List<FeedbackViewModel> GetListOfFeedbacks()
         {
-            return _feedbackRepository.GetFeedbacks()
+            var feedbacks = _feedbackRepository.GetFeedbacks().ToList();
+
+            var feedViewModels = feedbacks
                 .Select(f => new FeedbackViewModel
                 {
                     FeedbackId = f.FeedbackId,
@@ -50,6 +52,8 @@ namespace ASI.Basecode.Services.Services
                     CreatedTime = f.CreatedTime,
                     TicketTitle = f.Ticket.Title
                 }).ToList();
+
+            return feedViewModels;
         }
 
         /// <summary>

@@ -1,28 +1,28 @@
 ﻿@{
-    ViewData["Title"] = "Add Ticket Page";
+    ViewData["Title"] = "Create Ticket Page";
 }
 @model ASI.Basecode.Services.ServiceModels.TicketViewModel
 
 <div class="content p-4" style="margin-left: 200px;">
     <h3 class="mb-4"><strong>Add Ticket</strong></h3>
     <div asp-validation-summary="All" class="text-danger"></div>
-    <form method="post" asp-action="AddTicket" asp-controller="Ticket">
+    <form method="post" enctype="multipart/form-data" asp-action="AddTicket" asp-controller="Ticket">
         <div class="mb-3">
             <label asp-for="Ticket.Title" class="form-label">Title</label>
-            <input asp-for="Ticket.Title" class="form-control" id="title" placeholder="Enter ticket title" required />
+            <input asp-for="Ticket.Title" class="form-control" id="title" placeholder="Enter ticket title" />
             <span asp-validation-for="Ticket.Title" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
             <label asp-for="Ticket.Description" class="form-label">Issue Description</label>
-            <textarea asp-for="Ticket.Description" class="form-control" id="ticketDescription" rows="3" placeholder="Describe the issue" required></textarea>
+            <textarea asp-for="Ticket.Description" class="form-control" id="ticketDescription" rows="3" placeholder="Describe the issue"></textarea>
             <span asp-validation-for="Ticket.Description" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
             <label asp-for="Ticket.CategoryId" class="form-label">Category</label>
             <select asp-for="Ticket.CategoryId" class="form-select" id="category" asp-items="@(new SelectList(Model.TicketCategories, "CategoryId", "CategoryName"))">
-                <option value="">-- Select Category --</option> <!-- Optional default option -->
+                <option value="">Select Category</option> <!-- Optional default option -->
             </select>
             <span asp-validation-for="Ticket.CategoryId" class="text-danger"></span>
         </div>
@@ -30,7 +30,7 @@
         <div class="mb-3">
             <label asp-for="Ticket.PriorityId" class="form-label">Priority</label>
             <select asp-for="Ticket.PriorityId" class="form-select" id="priority" asp-items="@(new SelectList(Model.TicketPriorities, "PriorityId", "PriorityName"))">
-                <option value="">-- Select Priority --</option> <!-- Optional default option -->
+                <option value="">Select Priority</option> <!-- Optional default option -->
             </select>
             <span asp-validation-for="Ticket.PriorityId" class="text-danger"></span>
         </div>
@@ -38,7 +38,7 @@
         <div class="mb-3">
             <label asp-for="Ticket.AssigneeId" class="form-label">Assign to Agent</label>
             <select asp-for="Ticket.AssigneeId" class="form-select" id="ticketAssign" asp-items="@(new SelectList(Model.Agents, "UserId", "Name"))">
-                <option value="">-- Select Agent --</option> <!-- Optional default option -->
+                <option value="">Select Agent</option> <!-- Optional default option -->
             </select>
             <span asp-validation-for="Ticket.AssigneeId" class="text-danger"></span>
         </div>
@@ -46,14 +46,20 @@
         <div class="mb-3">
             <label asp-for="Ticket.TeamAssignedId" class="form-label">Assign to Team</label>
             <select asp-for="Ticket.TeamAssignedId" class="form-select" id="teamAssign" asp-items="@(new SelectList(Model.Teams, "TeamId", "TeamName"))">
-                <option value="">-- Select Team --</option> <!-- Optional default option -->
+                <option value="">Select Team</option> <!-- Optional default option -->
             </select>
             <span asp-validation-for="Ticket.TeamAssignedId" class="text-danger"></span>
         </div>
 
-        <div class="d-flex">
-            <button type="submit" class="btn btn-success">Create Ticket</button>
-            <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
+        <div>
+            <label for="Files">Attachments</label>
+            <input asp-for="Files" type="file" class="form-control" accept="image/*,.pdf,.docx,.txt"  multiple />
+            <small class="text-muted">Max size: 5MB per file. Only images, pdfs, docx, and txt are allowed.</small>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2">
+            <button type="submit" class="btn d-block btn-danger">Create Ticket</button>
+            <a asp-action="Index" class="btn btn-outline-danger">Cancel</a>
         </div>
     </form>
 </div>

@@ -1,5 +1,6 @@
 ﻿using ASI.Basecode.Data.Models;
 using ASI.Basecode.Services.Validations;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -32,5 +33,8 @@ namespace ASI.Basecode.Services.ServiceModels
         public int PriorityId { get; set; }
         public string? AssigneeId { get; set; }
         public int? TeamAssignedId { get; set; }
+
+        [MaxFileSize(5)]
+        public List<IFormFile> Files { get; set; } = new List<IFormFile>();
     }
 }
