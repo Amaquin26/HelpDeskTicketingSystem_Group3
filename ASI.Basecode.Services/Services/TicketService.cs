@@ -19,13 +19,15 @@ namespace ASI.Basecode.Services.Services
         private readonly IUserRepository _userRepository;
         private readonly ITeamRepository _teamRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly INotificationRepository _notificationRepository;
 
-        public TicketService(ITicketRepository ticketRepository, IUserRepository userRepository, ITeamRepository teamRepository, IHttpContextAccessor httpContextAccessor)
+        public TicketService(ITicketRepository ticketRepository, IUserRepository userRepository, ITeamRepository teamRepository, IHttpContextAccessor httpContextAccessor, INotificationRepository notificationRepository)
         {
             _ticketRepository = ticketRepository;
             _userRepository = userRepository;
             _teamRepository = teamRepository;
             _httpContextAccessor = httpContextAccessor;
+            _notificationRepository = notificationRepository;
         }
 
         public List<TicketDto> GetListOfTickets()
@@ -41,6 +43,7 @@ namespace ASI.Basecode.Services.Services
                       TeamAssignedId = ticket.TeamAssignedId,
                       AssigneeId = ticket.AssigneeId,
                       CreatedBy = user.Name,
+                      CreatedById = ticket.CreatedBy,
                       StatusName = ticket.Status.StatusName,
                       CategoryName = ticket.Category.CategoryName,
                       PriorityName = ticket.Priority.PriorityName,

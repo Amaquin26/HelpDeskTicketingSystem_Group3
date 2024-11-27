@@ -6,11 +6,13 @@ using ASI.Basecode.Services.Manager;
 using ASI.Basecode.Services.ServiceModels;
 using AutoMapper;
 using LinqKit;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
+using System.Security.Claims;
 using static ASI.Basecode.Resources.Constants.Enums;
 
 namespace ASI.Basecode.Services.Services
@@ -22,14 +24,16 @@ namespace ASI.Basecode.Services.Services
         private readonly ITicketRepository _ticketRepository;
         private readonly IFeedbackRepository _feedbackRepository;
         private readonly IMapper _mapper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UserService(IUserRepository repository, ITeamRepository teamRepository, ITicketRepository ticketRepository, IFeedbackRepository feedbackRepository, IMapper mapper)
+        public UserService(IUserRepository repository, ITeamRepository teamRepository, ITicketRepository ticketRepository, IFeedbackRepository feedbackRepository, IHttpContextAccessor httpContextAccessor,IMapper mapper)
         {
             _mapper = mapper;
             _repository = repository;
             _teamRepository = teamRepository;
             _ticketRepository = ticketRepository;
             _feedbackRepository = feedbackRepository;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public LoginResult AuthenticateUser(string email, string password, ref User user)
@@ -119,6 +123,24 @@ namespace ASI.Basecode.Services.Services
                 existingUser.UpdatedTime = DateTime.Now;
                 existingUser.UpdatedBy = Environment.UserName;
                 existingUser.TeamId = user.TeamId;
+
+                _repository.UpdateUser(existingUser);
+            }
+        }
+
+        public void UpdateProfile(UpdateUserViewModel user)
+        {
+            var existingUser = _repository.GetUsers().FirstOrDefault(u => u.UserId == user.UserId);
+            if (existingUser != null)
+            {
+                existingUser.Name = user.Name ?? existingUser.Name;
+                existingUser.Email = user.Email ?? existingUser.Email;
+                if (!string.IsNullOrEmpty(user.Password))
+                {
+                    existingUser.Password = PasswordManager.EncryptPassword(user.Password); // Optional: Encrypt password if necessary
+                }
+                existingUser.UpdatedTime = DateTime.Now;
+                existingUser.UpdatedBy = Environment.UserName;
 
                 _repository.UpdateUser(existingUser);
             }
@@ -233,6 +255,12 @@ namespace ASI.Basecode.Services.Services
             userDetails.Tickets = ticketDtos;
 
             return userDetails;
+        }
+
+        public User? GetMyProfile()
+        {
+            var id = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return _repository.GetUsers().FirstOrDefault(x => x.UserId == id);
         }
     }
 }

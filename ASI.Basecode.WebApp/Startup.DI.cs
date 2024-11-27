@@ -39,6 +39,7 @@ namespace ASI.Basecode.WebApp
             this._services.AddScoped<IAnnouncementService, AnnouncementService>();
             this._services.AddScoped<ITeamService, TeamService>();
             this._services.AddScoped<IFeedbackService, FeedbackService>();
+            this._services.AddScoped<INotificationService, NotificationService>();
 
 
             // Repositories
@@ -47,6 +48,7 @@ namespace ASI.Basecode.WebApp
             this._services.AddScoped<IAnnouncementRepository, AnnouncementRepository>();
             this._services.AddScoped<ITeamRepository, TeamRepository>();
             this._services.AddScoped<IFeedbackRepository, FeedbackRepository>();
+            this._services.AddScoped<INotificationRepository, NotificationRepository>();
 
             // Manager Class
             this._services.AddScoped<SignInManager>();

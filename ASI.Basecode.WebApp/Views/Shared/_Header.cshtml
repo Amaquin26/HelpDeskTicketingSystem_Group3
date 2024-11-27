@@ -19,8 +19,8 @@
         <li class="@(IsActive("Index", "Team") ? "active" : "")">
             <a asp-action="Index" asp-controller="Team"><i class="fas fa-users-cog"></i> <span>Teams</span></a>
         </li>
-        <li class="@(IsActive("Index", "Feedback") ? "active" : "")">
-            <a asp-action="Index" asp-controller="Feedback"><i class="fas fa-comments"></i><span>Feedbacks</span></a>
+        <li class="@(IsActive("Index", "Notification") ? "active" : "")">
+            <a asp-action="Index" asp-controller="Notification"><i class="fas fa-bell"></i> <span>Notifications</span></a>
         </li>
         <li>
             <a asp-action="SignOutUser" asp-controller="Account"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>

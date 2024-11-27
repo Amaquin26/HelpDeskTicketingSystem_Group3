@@ -1,9 +1,10 @@
 ﻿@model ASI.Basecode.Services.ServiceModels.FeedbackViewModel
 @{
     ViewData["Title"] = "Edit Feedback";
+    Layout = "~/Views/Shared/_LayoutUser.cshtml";
 }
 
-<div class="content p-4" style="margin-left: 200px;">
+<div class="container content">
     <h3>Edit Feedback</h3>
     <form asp-action="Edit" method="post">
         <input type="hidden" asp-for="FeedbackId" />

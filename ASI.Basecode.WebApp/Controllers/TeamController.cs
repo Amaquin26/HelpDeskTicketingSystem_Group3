@@ -1,6 +1,7 @@
 ﻿using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Linq;
 
@@ -26,7 +27,13 @@ namespace ASI.Basecode.WebApp.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            ViewBag.TeamLeaders = _userService.GetAgents().ToList();
+            ViewBag.TeamLeaders = _userService.GetAgents()
+            .Select(teamLeader => new SelectListItem
+            {
+                Value = teamLeader.UserId,
+                Text = teamLeader.Name
+            })
+            .ToList();
 
             return View();
         }
@@ -46,7 +53,13 @@ namespace ASI.Basecode.WebApp.Controllers
         public IActionResult Edit(int id)
         {
             var team = _teamService.GetTeamById(id);
-            ViewBag.TeamLeaders = _userService.GetAgents().ToList();
+            ViewBag.TeamLeaders = _userService.GetAgents()
+            .Select(teamLeader => new SelectListItem
+            {
+                Value = teamLeader.UserId,
+                Text = teamLeader.Name
+            })
+            .ToList();
             if (team == null)
             {
                 return NotFound();

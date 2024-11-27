@@ -13,7 +13,7 @@
         </div>
         <div class="form-group mb-3">
             <label asp-for="TeamLeaderId" class="form-label">Team Leader</label>
-            <select asp-for="TeamLeaderId" class="form-select" id="teamLeader" asp-items="@(new SelectList(ViewBag.TeamLeaders, "UserId", "Name"))">
+            <select asp-for="TeamLeaderId" class="form-select" id="teamLeader" asp-items="ViewBag.TeamLeaders">
                 <option value="">Select Team Leader</option> <!-- Optional default option -->
             </select>
             <span asp-validation-for="TeamLeaderId" class="text-danger"></span>

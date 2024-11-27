@@ -68,5 +68,7 @@ namespace ASI.Basecode.Services.Interfaces
         /// <returns>A queryable list of team leader users.</returns>
         IQueryable<User> GetTeamLeaders();
         UserDetailsDto? GetUserDetails(string id);
+        User? GetMyProfile();
+        void UpdateProfile(UpdateUserViewModel user);
     }
 }

@@ -94,7 +94,7 @@ namespace ASI.Basecode.WebApp.Controllers
             if (user == null)
             {
                 TempData["ErrorMessage"] = "User not found.";
-                return RedirectToAction("Index");// Optionally handle the case where the user is not found
+                return RedirectToAction("Index");
             }
 
             ViewBag.Teams = _teamService.GetListOfTeams()
@@ -149,6 +149,38 @@ namespace ASI.Basecode.WebApp.Controllers
             }
 
             return View(user);
+        }
+
+        public IActionResult UpdateProfile()
+        {
+            var user = _userService.GetMyProfile();
+
+            var userModel = new UpdateUserViewModel
+            {
+                UserId = user.UserId,
+                Email = user.Email,
+                Name = user.Name,
+            };
+
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("Index");
+            }
+            return View(userModel);
+        }
+
+        //EDIT USER
+        [HttpPost]
+        public IActionResult UpdateProfile(UpdateUserViewModel user)
+        {
+            if (user != null)
+            {
+                _userService.UpdateProfile(user);
+                TempData["SuccessMessage"] = "User has been edited";
+            }
+
+            return RedirectToAction("Index", "UserTicket");
         }
     }
 }

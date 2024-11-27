@@ -16,6 +16,7 @@ namespace ASI.Basecode.Services.Dto
         public string AssigneeId { get; set; }
         public int? TeamAssignedId { get; set; }
         public string CreatedBy { get; set; }
+        public string CreatedById { get; set; }
         public string StatusName { get; set; }
         public string CategoryName { get; set; }
         public string PriorityName { get; set; }

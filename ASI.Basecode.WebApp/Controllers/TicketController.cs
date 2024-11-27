@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Configuration;
 using System.Linq;
+using System.Security.Claims;
 
 namespace ASI.Basecode.WebApp.Controllers
 {
@@ -19,6 +20,7 @@ namespace ASI.Basecode.WebApp.Controllers
         private readonly ITicketService _ticketService;
         private readonly IUserService _userService;
         private readonly ITeamService _teamService;
+        private readonly INotificationService _notificationService;
 
         public TicketController(
             IHttpContextAccessor httpContextAccessor,
@@ -27,11 +29,13 @@ namespace ASI.Basecode.WebApp.Controllers
             ITicketService ticketService,
             IUserService userService,
             ITeamService teamService,
+            INotificationService notificationService,
         IMapper mapper = null) : base(httpContextAccessor, loggerFactory, configuration, mapper)
         {
             _ticketService = ticketService;
             _userService = userService;
             _teamService = teamService;
+            _notificationService = notificationService;
         }
 
         [HttpGet]
@@ -168,6 +172,15 @@ namespace ASI.Basecode.WebApp.Controllers
             };
 
             _ticketService.AddTicket(ticket);
+            _notificationService.AddNotification(
+                new Notification
+                {
+                    Title = "You have been assigned to a ticket",
+                    Description = "New ticket was assigned to you",
+                    DateCreated = System.DateTime.Now,
+                    UserId=ticket.AssigneeId
+                }
+            );
             return RedirectToAction("Index");
         }
 
@@ -222,6 +235,15 @@ namespace ASI.Basecode.WebApp.Controllers
             };
 
             _ticketService.EditTicket(ticket);
+            _notificationService.AddNotification(
+                new Notification
+                {
+                    Title = "Ticket updated",
+                    Description = "Ticket that was assigned to you was updated",
+                    DateCreated = System.DateTime.Now,
+                    UserId = ticket.AssigneeId
+                }
+            );
             return RedirectToAction("Index");
         }
 

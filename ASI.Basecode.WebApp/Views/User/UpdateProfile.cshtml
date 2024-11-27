@@ -1,0 +1,40 @@
+﻿@{
+    ViewData["Title"] = "Update Profile Page";
+    Layout = "~/Views/Shared/_LayoutUser.cshtml";
+}
+@model ASI.Basecode.Services.ServiceModels.UpdateUserViewModel
+
+
+<div class="container content">
+    <div class="row">
+
+        <h3 class="mb-4"><strong>Change Password</strong></h3>
+        <form method="post" action="UpdateProfile">
+            <div class="mb-3">
+                <input asp-for="@Model.UserId" hidden>
+                <label for="addUserName" class="form-label">Name</label>
+                <input asp-for="@Model.Name" class="form-control" id="addUserName" placeholder="Enter user name" required>
+                <span asp-validation-for="@Model.Name" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label for="addUserEmail" class="form-label">Email</label>
+                <input asp-for="@Model.Email" class="form-control" id="addUserEmail" placeholder="Enter user email" required>
+                <span asp-validation-for="@Model.Email" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label for="title" class="form-label">New Password</label>
+                <input asp-for="@Model.Password" class="form-control" id="title">
+            </div>
+            <div class="mb-3">
+                <label for="title" class="form-label">Confirm Password</label>
+                <input asp-for="@Model.ConfirmPassword" class="form-control" id="title">
+                <span asp-validation-for="@Model.ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+                <button type="submit" class="btn d-block btn-danger">Update Profile</button>
+                <a asp-action="Index" asp-controller="UserTicket" class="btn btn-outline-danger">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

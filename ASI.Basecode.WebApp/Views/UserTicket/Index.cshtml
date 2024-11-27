@@ -1,0 +1,40 @@
+﻿@{
+    ViewData["Title"] = "Ticket Page";
+    Layout = "~/Views/Shared/_LayoutUser.cshtml";
+}
+@model IEnumerable<ASI.Basecode.Services.Dto.TicketDto>
+
+<!-- Main Content -->
+<div class="container content">
+    <div class="row">
+
+        <!-- Filter Options -->
+        <div class="my-4">
+            <div class="btn-group" role="group" aria-label="Filter Tickets">
+                <button type="button" class="btn btn-danger" onclick="filterTickets('all')">All</button>
+                <button type="button" class="btn btn-outline-danger" onclick="filterTickets('open')">Open</button>
+                <button type="button" class="btn btn-outline-danger" onclick="filterTickets('in-progress')">In Progress</button>
+                <button type="button" class="btn btn-outline-danger" onclick="filterTickets('closed')">Closed</button>
+            </div> 
+        </div>
+
+        <h3 class="mb-4"><strong>Submitted Tickets:</strong></h3>
+
+        @foreach (var ticket in Model)
+        {
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Ticket</h5>
+                        <p class="card-text"><strong>Created By: </strong>@ticket.CreatedBy</p>
+                        <p class="card-text"><strong>Issue: </strong>@ticket.Title</p>
+                        <p class="card-text"><strong>Status: </strong> @ticket.StatusName</p>
+                        <p class="card-text"><strong>Priority: </strong>@ticket.PriorityName</p>
+                        <p class="card-text"><strong>Category: </strong>@ticket.CategoryName</p>
+                        <a asp-action="ViewTicket" asp-controller="Ticket" asp-route-id="@ticket.TicketId" class="btn btn-danger">View Details</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

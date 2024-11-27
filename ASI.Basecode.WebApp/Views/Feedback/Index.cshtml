@@ -1,10 +1,11 @@
 ﻿
 @{
     ViewData["Title"] = "Feedbacks Model";
+    Layout = "~/Views/Shared/_LayoutUser.cshtml";
 }
 @model IEnumerable<ASI.Basecode.Services.ServiceModels.FeedbackViewModel>
 
-<div class="content p-4" style="margin-left: 200px;">
+<div class="container content">
     <h3 class="mb-4"><strong>Feedbacks</strong></h3>
 
     <a asp-action="Create" class="btn btn-danger mb-3" id="button-addon2">

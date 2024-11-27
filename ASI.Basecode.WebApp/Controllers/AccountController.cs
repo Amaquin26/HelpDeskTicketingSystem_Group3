@@ -93,7 +93,15 @@ namespace ASI.Basecode.WebApp.Controllers
                 this._session.SetString("Name", user.Name);
                 this._session.SetString("Email", model.Email);
                 this._session.SetString("Role", user.Role.RoleName);
-                return RedirectToAction("Index", "Ticket");
+
+                if(user.RoleId == 4)
+                {
+                    return RedirectToAction("Index", "UserTicket");
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Ticket");
+                }
             }
             else
             {

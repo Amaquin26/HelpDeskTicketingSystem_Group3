@@ -109,7 +109,7 @@
                     <p><strong>Status: </strong><span class="status">@ticket.StatusName</span></p>
                     <p><strong>Priority: </strong><span class="priority">@ticket.PriorityName</span></p>
                     <p><strong>Category: </strong><span class="category">@ticket.CategoryName</span></p>
-                    <form asp-action="Delete" method="post">
+                    <form asp-action="DeleteTicket" method="post">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="TicketId" value="@ticket.TicketId" />
                         <button type="submit" id="delete-confirm-btn" class="btn btn-danger w-100">Delete Ticket</button>
