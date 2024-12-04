@@ -69,6 +69,9 @@ namespace ASI.Basecode.Data.Interfaces
         /// <param name="ticket">The ticket to delete.</param>
         void DeleteTicket(Ticket ticket);
 
+        void AddTicketAttachment(Attachment attachment);
+        void DeleteTicketAttachment(Attachment attachment);
+
         /// <summary>
         /// Save the tickets by calling the UnitOfWork to save changes in the database.
         /// </summary>

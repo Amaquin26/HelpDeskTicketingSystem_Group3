@@ -118,33 +118,38 @@
         if(Model.RoleName != "User")
         {
             <h3 class="mb-4"><strong>Assigned Tickets</strong></h3>
-            <div class="mb-4">
-                <div class="btn-group" role="group" aria-label="Filter Tickets">
-                    <button type="button" class="btn btn-danger">All</button>
-                    <button type="button" class="btn btn-outline-danger">Open</button>
-                    <button type="button" class="btn btn-outline-danger">In Progress</button>
-                    <button type="button" class="btn btn-outline-danger">Closed</button>
-                </div>
+        }
+        else
+        {
+            <h3 class="mb-4"><strong>Submitted Tickets</strong></h3>
+        }
+
+        <div class="mb-4">
+            <div class="btn-group" role="group" aria-label="Filter Tickets">
+                <button type="button" class="btn btn-danger">All</button>
+                <button type="button" class="btn btn-outline-danger">Open</button>
+                <button type="button" class="btn btn-outline-danger">In Progress</button>
+                <button type="button" class="btn btn-outline-danger">Closed</button>
             </div>
-            <div class="row">
-                @foreach (var ticket in Model.Tickets)
-                {
-                    <div class="col-md-4 mb-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Ticket</h5>
-                                <p class="card-text"><strong>Created By: </strong>@ticket.CreatedBy</p>
-                                <p class="card-text"><strong>Issue: </strong>@ticket.Title</p>
-                                <p class="card-text"><strong>Status: </strong> @ticket.StatusName</p>
-                                <p class="card-text"><strong>Priority: </strong>@ticket.PriorityName</p>
-                                <p class="card-text"><strong>Category: </strong>@ticket.CategoryName</p>
-                                <a asp-action="ViewTicket" asp-controller="Ticket" asp-route-id="@ticket.TicketId" class="btn btn-danger">View Details</a>
-                            </div>
+        </div>
+        <div class="row">
+            @foreach (var ticket in Model.Tickets)
+            {
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Ticket</h5>
+                            <p class="card-text"><strong>Created By: </strong>@ticket.CreatedBy</p>
+                            <p class="card-text"><strong>Issue: </strong>@ticket.Title</p>
+                            <p class="card-text"><strong>Status: </strong> @ticket.StatusName</p>
+                            <p class="card-text"><strong>Priority: </strong>@ticket.PriorityName</p>
+                            <p class="card-text"><strong>Category: </strong>@ticket.CategoryName</p>
+                            <a asp-action="ViewTicket" asp-controller="Ticket" asp-route-id="@ticket.TicketId" class="btn btn-danger">View Details</a>
                         </div>
                     </div>
-                }
-            </div>
-        }
+                </div>
+            }
+        </div>
     }
 
 </div>

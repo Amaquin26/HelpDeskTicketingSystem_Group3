@@ -4,11 +4,13 @@ using ASI.Basecode.Data.Repositories;
 using ASI.Basecode.Services.Dto;
 using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
+using EFCore.BulkExtensions.SqlAdapters;
 using LinqKit;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Security.Claims;
@@ -133,7 +135,7 @@ namespace ASI.Basecode.Services.Services
             return _ticketRepository.GetTicketPriorities().ToList();
         }
 
-        public void AddTicket(TicketFormModel model)
+        public async void AddTicket(TicketFormModel model)
         {
             var ticket = new Ticket();
 
@@ -144,13 +146,49 @@ namespace ASI.Basecode.Services.Services
             ticket.StatusId = model.StatusId;
             ticket.PriorityId = model.PriorityId;
             ticket.CategoryId = model.CategoryId;
-            ticket.CreatedTime = DateTime.UtcNow;
+            ticket.CreatedTime = DateTime.Now;
 
             var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             ticket.CreatedBy = userId;
 
             _ticketRepository.AddTicket(ticket);
+
+            // add files
+            //if (model.Files != null && model.Files.Count > 0)
+            //{
+            //    // Ensure the directory exists
+            //    if (!Directory.Exists("UploadedFiles"))
+            //    {
+            //        Directory.CreateDirectory("UploadedFiles");
+            //    }
+
+            //    foreach (var file in model.Files)
+            //    {
+            //        if (file.Length > 0)
+            //        {
+            //            // Save the file
+            //            var fileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(file.FileName);
+            //            var filePath = Path.Combine("UploadedFiles", fileName);
+            //            using (var stream = new FileStream(filePath, FileMode.Create))
+            //            {
+            //                await file.CopyToAsync(stream);
+            //            }
+
+            //            // Save file info to the database
+            //            var attachment = new Attachment
+            //            {
+            //                FileName = fileName,
+            //                FilePath = filePath,
+            //                TicketId = model.TicketId
+            //            };
+
+            //            _ticketRepository.AddTicketAttachment(attachment);
+            //        }
+            //    }
+            //}
+
+            _ticketRepository.SaveTicket();
         }
 
         public void EditTicket(TicketFormModel model)

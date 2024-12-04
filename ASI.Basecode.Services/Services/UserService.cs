@@ -189,12 +189,24 @@ namespace ASI.Basecode.Services.Services
                 return null;
             }
 
-            var tickets = _ticketRepository.GetTickets()
+            var ticketQuery = _ticketRepository.GetTickets()
                 .Include(t => t.Category)
                 .Include(t => t.Status)
-                .Include(t => t.Priority)
-                .Where(t => t.AssigneeId == user.UserId || t.TeamAssignedId == user.TeamId)
-                .ToList();
+                .Include(t => t.Priority);
+
+
+            if (user.RoleName == "User")
+            {
+                // if the user is just a user role, retrieved the submitted tickets
+                ticketQuery = ticketQuery.Where(t => t.CreatedBy == user.UserId);
+            }
+            else
+            {
+                // retrieved tickets assigned for non user roles
+                ticketQuery = ticketQuery.Where(t => t.AssigneeId == user.UserId || t.TeamAssignedId == user.TeamId);
+            }
+
+            var tickets = ticketQuery.ToList();
 
             var ticketIds = tickets.Select(t => t.TicketId).ToList();
 

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -57,6 +58,16 @@ namespace ASI.Basecode.Data.Repositories
         {
             GetDbSet<Ticket>().Remove(ticket);
             SaveTicket();
+        }
+
+        public void AddTicketAttachment(Attachment attachment)
+        {
+            this.GetDbSet<Attachment>().Add(attachment);
+        }
+
+        public void DeleteTicketAttachment(Attachment attachment)
+        {
+            this.GetDbSet<Attachment>().Remove(attachment);
         }
 
         public void SaveTicket()

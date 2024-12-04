@@ -171,7 +171,7 @@ namespace ASI.Basecode.WebApp.Controllers
                 CategoryId = ticketFormModel.CategoryId,
                 StatusId = 1,
                 AssigneeId = ticketFormModel.AssigneeId,
-                Files = ticketFormModel.Files,
+                Files = ticketModel.Files,
             };
 
             _ticketService.AddTicket(ticket);
@@ -184,6 +184,7 @@ namespace ASI.Basecode.WebApp.Controllers
                     UserId=ticket.AssigneeId
                 }
             );
+            TempData["SuccessMessage"] = "Ticket Added";
             return RedirectToAction("Index");
         }
 
@@ -247,6 +248,8 @@ namespace ASI.Basecode.WebApp.Controllers
                     UserId = ticket.AssigneeId
                 }
             );
+
+            TempData["SuccessMessage"] = "Ticket Updated";
             return RedirectToAction("Index");
         }
 
@@ -264,6 +267,7 @@ namespace ASI.Basecode.WebApp.Controllers
             // Delete the ticket
             _ticketService.DeleteTicket(ticketId);
 
+            TempData["SuccessMessage"] = "Ticket Deleted";
             return RedirectToAction("Index");
         }
 
