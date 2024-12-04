@@ -1,5 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor HttpContextAccessor
+@using System.Security.Claims;
 
 <div class="modal-backdrop fade" id="backdrop"></div>
 
@@ -10,21 +11,36 @@
         <label>Resolve.it</label>
     </div>
     <ul>
-        <li class="@(IsActive("Index", "Ticket") ? "active" : "")">
-            <a asp-action="Index" asp-controller="Ticket"><i class="fas fa-ticket-alt"></i> <span>Tickets</span></a>
-        </li>
-        <li class="@(IsActive("Index", "User") ? "active" : "")">
-            <a asp-action="Index" asp-controller="User"><i class="fas fa-users"></i> <span>Users</span></a>
-        </li>
-        <li class="@(IsActive("Index", "Team") ? "active" : "")">
-            <a asp-action="Index" asp-controller="Team"><i class="fas fa-users-cog"></i> <span>Teams</span></a>
-        </li>
-        <li class="@(IsActive("Index", "Notification") ? "active" : "")">
-            <a asp-action="Index" asp-controller="Notification"><i class="fas fa-bell"></i> <span>Notifications</span></a>
-        </li>
-        <li>
-            <a asp-action="SignOutUser" asp-controller="Account"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
-        </li>
+
+        @if (User.FindFirst("Role")?.Value == "Agent")
+        {
+            <li class="@(IsActive("Index", "Ticket") ? "active" : "")">
+                <a asp-action="Index" asp-controller="Ticket"><i class="fas fa-ticket-alt"></i> <span>Tickets</span></a>
+            </li>
+        }
+
+        @if (User.FindFirst("Role")?.Value == "Super Admin" || User.FindFirst("Role")?.Value == "Admin")
+        {
+            <li class="@(IsActive("Index", "Ticket") ? "active" : "")">
+                <a asp-action="Index" asp-controller="Ticket"><i class="fas fa-ticket-alt"></i> <span>Tickets</span></a>
+            </li>
+            <li class="@(IsActive("Index", "User") ? "active" : "")">
+                <a asp-action="Index" asp-controller="User"><i class="fas fa-users"></i> <span>Users</span></a>
+            </li>
+            <li class="@(IsActive("Index", "Team") ? "active" : "")">
+                <a asp-action="Index" asp-controller="Team"><i class="fas fa-users-cog"></i> <span>Teams</span></a>
+            </li>
+        }
+
+        @if (User.Identity.IsAuthenticated)
+        {
+            <li class="@(IsActive("Index", "Notification") ? "active" : "")">
+                <a asp-action="Index" asp-controller="Notification"><i class="fas fa-bell"></i> <span>Notifications</span></a>
+            </li>
+            <li>
+                <a asp-action="SignOutUser" asp-controller="Account"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
+            </li>
+        }
     </ul>
 </div>
 

@@ -8,6 +8,7 @@ using LinqKit;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Net.Sockets;
 using System.Security.Claims;
@@ -32,26 +33,38 @@ namespace ASI.Basecode.Services.Services
 
         public List<TicketDto> GetListOfTickets()
         {
-            var tickets = _ticketRepository.GetTickets().Join(_userRepository.GetUsers(),
-                  ticket => ticket.CreatedBy, 
-                  user => user.UserId,    
-                  (ticket, user) => new TicketDto
-                  {
-                      TicketId = ticket.TicketId,
-                      Title = ticket.Title,
-                      Description = ticket.Description,
-                      TeamAssignedId = ticket.TeamAssignedId,
-                      AssigneeId = ticket.AssigneeId,
-                      CreatedBy = user.Name,
-                      CreatedById = ticket.CreatedBy,
-                      StatusName = ticket.Status.StatusName,
-                      CategoryName = ticket.Category.CategoryName,
-                      PriorityName = ticket.Priority.PriorityName,
-                      DateAdded = ticket.CreatedTime,
-                      CategoryId = ticket.CategoryId,
-                      StatusId = ticket.StatusId,
-                      PriorityId = ticket.PriorityId
-                  })
+            var role = _httpContextAccessor.HttpContext?.User.FindFirst("Role")?.Value;
+            var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var ticketsQuery = _ticketRepository.GetTickets();
+
+            // If not super admin or an admin, only display the tickets that assigned or was created by that user
+            if(!(role == "Super Admin" || role == "Admin"))
+            {
+                ticketsQuery = ticketsQuery.Where(x => x.CreatedBy == userId || x.AssigneeId == userId);
+            }
+
+            var tickets = ticketsQuery.Join(_userRepository.GetUsers(),
+                ticket => ticket.CreatedBy,
+                user => user.UserId,
+                (ticket, user) => new TicketDto
+                {
+                    TicketId = ticket.TicketId,
+                    Title = ticket.Title,
+                    Description = ticket.Description,
+                    TeamAssignedId = ticket.TeamAssignedId,
+                    AssigneeId = ticket.AssigneeId,
+                    CreatedBy = user.Name,
+                    CreatedById = ticket.CreatedBy,
+                    StatusName = ticket.Status.StatusName,
+                    CategoryName = ticket.Category.CategoryName,
+                    PriorityName = ticket.Priority.PriorityName,
+                    DateAdded = ticket.CreatedTime,
+                    CategoryId = ticket.CategoryId,
+                    StatusId = ticket.StatusId,
+                    PriorityId = ticket.PriorityId,
+                    CanEdit = ticket.CreatedBy == userId || ticket.AssigneeId == userId || (role == "Super Admin" || role == "Admin")
+                })
             .ToList();
 
             return tickets;
@@ -59,39 +72,43 @@ namespace ASI.Basecode.Services.Services
 
         public (TicketDto, bool) GetTicketById(int ticketId)
         {
+            var role = _httpContextAccessor.HttpContext?.User.FindFirst("Role")?.Value;
+            var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
             var ticket = (from t in _ticketRepository.GetTickets()
-                          join u in _userRepository.GetUsers()
-                              on t.CreatedBy equals u.UserId into createdUsers
-                          from createdUser in createdUsers.DefaultIfEmpty()
+                join u in _userRepository.GetUsers()
+                    on t.CreatedBy equals u.UserId into createdUsers
+                from createdUser in createdUsers.DefaultIfEmpty()
 
-                          join a in _userRepository.GetUsers()
-                              on t.AssigneeId equals a.UserId into assignedAgents
-                          from assignedAgent in assignedAgents.DefaultIfEmpty()
+                join a in _userRepository.GetUsers()
+                    on t.AssigneeId equals a.UserId into assignedAgents
+                from assignedAgent in assignedAgents.DefaultIfEmpty()
 
-                          join te in _teamRepository.GetTeams()
-                              on t.TeamAssignedId equals te.TeamId into assignedTeams
-                          from assignedTeam in assignedTeams.DefaultIfEmpty()
+                join te in _teamRepository.GetTeams()
+                    on t.TeamAssignedId equals te.TeamId into assignedTeams
+                from assignedTeam in assignedTeams.DefaultIfEmpty()
 
-                          where t.TicketId == ticketId
-                          select new TicketDto
-                          {
-                              TicketId = t.TicketId,
-                              Title = t.Title,
-                              Description = t.Description,
-                              TeamAssignedId = t.TeamAssignedId,
-                              AssigneeId = t.AssigneeId,
-                              CreatedBy = createdUser.Name,
-                              StatusName = t.Status.StatusName,
-                              CategoryName = t.Category.CategoryName,
-                              PriorityName = t.Priority.PriorityName,
-                              DateAdded = t.CreatedTime,
-                              CategoryId = t.CategoryId,
-                              StatusId = t.StatusId,
-                              PriorityId = t.PriorityId,
-                              TeamName = assignedTeam.TeamName,
-                              AgentName = assignedAgent.Name
-                          })
-                        .FirstOrDefault();
+                where t.TicketId == ticketId
+                select new TicketDto
+                {
+                    TicketId = t.TicketId,
+                    Title = t.Title,
+                    Description = t.Description,
+                    TeamAssignedId = t.TeamAssignedId,
+                    AssigneeId = t.AssigneeId,
+                    CreatedBy = createdUser.Name,
+                    StatusName = t.Status.StatusName,
+                    CategoryName = t.Category.CategoryName,
+                    PriorityName = t.Priority.PriorityName,
+                    DateAdded = t.CreatedTime,
+                    CategoryId = t.CategoryId,
+                    StatusId = t.StatusId,
+                    PriorityId = t.PriorityId,
+                    TeamName = assignedTeam.TeamName,
+                    AgentName = assignedAgent.Name,
+                    CanEdit = t.CreatedBy == userId || t.AssigneeId == userId || (role == "Super Admin" || role == "Admin")
+                })
+            .FirstOrDefault();
 
             if (ticket == null)
             {

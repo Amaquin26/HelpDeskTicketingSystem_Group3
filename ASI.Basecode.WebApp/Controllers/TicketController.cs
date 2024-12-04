@@ -21,6 +21,7 @@ namespace ASI.Basecode.WebApp.Controllers
         private readonly IUserService _userService;
         private readonly ITeamService _teamService;
         private readonly INotificationService _notificationService;
+        private readonly IHttpContextAccessor _contextAccessor;
 
         public TicketController(
             IHttpContextAccessor httpContextAccessor,
@@ -30,17 +31,19 @@ namespace ASI.Basecode.WebApp.Controllers
             IUserService userService,
             ITeamService teamService,
             INotificationService notificationService,
+            IHttpContextAccessor contextAccessor,
         IMapper mapper = null) : base(httpContextAccessor, loggerFactory, configuration, mapper)
         {
             _ticketService = ticketService;
             _userService = userService;
             _teamService = teamService;
             _notificationService = notificationService;
+            _contextAccessor = contextAccessor;
         }
 
         [HttpGet]
         public IActionResult Index()
-        {
+        {                
             var tickets = _ticketService.GetListOfTickets();
 
             return View(tickets);

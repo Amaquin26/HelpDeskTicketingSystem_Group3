@@ -17,7 +17,6 @@ namespace ASI.Basecode.Data
         {
         }
 
-        public virtual DbSet<Announcement> Announcements { get; set; }
         public virtual DbSet<Attachment> Attachments { get; set; }
         public virtual DbSet<Feedback> Feedbacks { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
@@ -178,13 +177,6 @@ namespace ASI.Basecode.Data
                 .WithOne(t => t.Priority)
                 .HasForeignKey(t => t.PriorityId)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            // Announcement and User Relationship
-            modelBuilder.Entity<Announcement>()
-                .HasOne(a => a.Creator)                         
-                .WithMany()                                     
-                .HasForeignKey(a => a.CreatedBy)               
-                .OnDelete(DeleteBehavior.Restrict);
 
             OnModelCreatingPartial(modelBuilder);
         }

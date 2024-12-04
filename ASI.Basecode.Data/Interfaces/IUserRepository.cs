@@ -63,5 +63,11 @@ namespace ASI.Basecode.Data.Interfaces
         /// </summary>
         /// <returns>A queryable list of team leader users.</returns>
         IQueryable<User> GetTeamLeaders();
+
+        /// <summary>
+        /// Retrieves the role of the user using its userId
+        /// </summary>
+        /// <returns>The role of the user</returns>
+        Role GetUserRole(string userId);
     }
 }

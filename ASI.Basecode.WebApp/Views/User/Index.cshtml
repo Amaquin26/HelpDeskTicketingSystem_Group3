@@ -1,5 +1,6 @@
 ﻿@model IEnumerable<ASI.Basecode.Data.Models.User>
 @using Microsoft.AspNetCore.Mvc.ModelBinding
+@using System.Security.Claims;
 
 @{
     ViewData["Title"] = "User Management";
@@ -74,9 +75,35 @@
                             <a class="btn btn-outline-danger btn-sm" asp-action="Edit" asp-route-id="@user.UserId">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <button  class="btn btn-outline-danger btn-sm delete-btn" data-bs-toggle="modal" data-bs-target="#deleteUserModal-@user.UserId">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
+                            @{
+                                var canDelete = false;
+
+                                if (User.FindFirst("Role")?.Value == "Super Admin" || User.FindFirst("Role")?.Value == "Admin")
+                                {
+                                    canDelete = true;
+                                }
+
+                                if (user.Role.RoleName == "Super Admin")
+                                {
+                                    canDelete = false;
+                                }
+
+                                if (User.FindFirst("Role")?.Value == user.Role.RoleName)
+                                {
+                                    canDelete = false;
+                                }
+
+                                if (user.UserId == User.FindFirst("UserId")?.Value)
+                                {
+                                    canDelete = false;
+                                }
+                            }
+                            @if (canDelete)
+                            {
+                                <button class="btn btn-outline-danger btn-sm delete-btn" data-bs-toggle="modal" data-bs-target="#deleteUserModal-@user.UserId">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            }
                         </td>
                     </tr>
                 }

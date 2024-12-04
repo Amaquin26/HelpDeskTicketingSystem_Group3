@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using ASI.Basecode.Data.Interfaces;
 using ASI.Basecode.Services.Dto;
 using LinqKit;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 
 namespace ASI.Basecode.WebApp.Controllers
 {
@@ -16,11 +18,13 @@ namespace ASI.Basecode.WebApp.Controllers
     {
         private readonly IUserService _userService;
         private readonly ITeamService _teamService;
-
-        public UserController(IUserService userService, ITeamService teamService)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        
+        public UserController(IUserService userService, ITeamService teamService, IHttpContextAccessor httpContextAccessor)
         {
             _userService = userService;
             _teamService = teamService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         // Displays a list of active users
@@ -50,13 +54,13 @@ namespace ASI.Basecode.WebApp.Controllers
                 usersQuery = usersQuery.Where(u => u.RoleId == searchRoleId.Value);
             }
 
-            var users = usersQuery.Where(user => user.IsActive).ToList();
+            var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var users = usersQuery.Where(user => user.IsActive && user.UserId != userId).ToList();
 
             // Pass the filtered user list to the view
             return View(users);
         }
-
-
 
         // Loads the Create User form
         public IActionResult Create()

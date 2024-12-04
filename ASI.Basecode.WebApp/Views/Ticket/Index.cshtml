@@ -1,6 +1,7 @@
 ﻿@{
     ViewData["Title"] = "Ticket Page";
 }
+@using System.Security.Claims;
 
 @model IEnumerable<ASI.Basecode.Services.Dto.TicketDto>
 
@@ -78,12 +79,18 @@
                         <td>@ticket.DateAdded</td>
                         <td class="text-center">
                             <a asp-action="ViewTicket" asp-route-id="@ticket.TicketId"  class="edit btn btn-outline-primary btn-sm text-center"><i class="fas fa-eye"></i></a>
-                            <a asp-action="EditTicket" asp-route-id="@ticket.TicketId" asp- class="btn btn-outline-danger btn-sm text-center">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <button type="button" class="btn btn-outline-danger btn-sm delete-btn text-center" data-bs-toggle="modal" data-bs-target="#deleteTicketModal-@ticket.TicketId">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
+                            @if (ticket.CanEdit)
+                            {
+                                <a asp-action="EditTicket" asp-route-id="@ticket.TicketId" asp- class="btn btn-outline-danger btn-sm text-center">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            }
+                            @if (User.FindFirst("Role")?.Value == "Super Admin" || User.FindFirst("Role")?.Value == "Admin")
+                            {
+                                <button type="button" class="btn btn-outline-danger btn-sm delete-btn text-center" data-bs-toggle="modal" data-bs-target="#deleteTicketModal-@ticket.TicketId">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            }
                         </td>
                     </tr>
                 }

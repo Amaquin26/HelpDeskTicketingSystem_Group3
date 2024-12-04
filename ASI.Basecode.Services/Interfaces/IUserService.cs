@@ -70,5 +70,7 @@ namespace ASI.Basecode.Services.Interfaces
         UserDetailsDto? GetUserDetails(string id);
         User? GetMyProfile();
         void UpdateProfile(UpdateUserViewModel user);
+
+        Role GetUserRole(string userId);
     }
 }

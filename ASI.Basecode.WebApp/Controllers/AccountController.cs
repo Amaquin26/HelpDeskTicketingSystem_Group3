@@ -1,4 +1,5 @@
 ﻿using ASI.Basecode.Data.Models;
+using ASI.Basecode.Resources.Constants;
 using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.Manager;
 using ASI.Basecode.Services.ServiceModels;
@@ -6,13 +7,16 @@ using ASI.Basecode.WebApp.Authentication;
 using ASI.Basecode.WebApp.Models;
 using ASI.Basecode.WebApp.Mvc;
 using AutoMapper;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using static ASI.Basecode.Resources.Constants.Enums;
 
@@ -88,13 +92,14 @@ namespace ASI.Basecode.WebApp.Controllers
             var loginResult = _userService.AuthenticateUser(model.Email, model.Password, ref user);
             if (loginResult == LoginResult.Success)
             {
+
                 // 認証OK
                 await this._signInManager.SignInAsync(user);
                 this._session.SetString("Name", user.Name);
-                this._session.SetString("Email", model.Email);
-                this._session.SetString("Role", user.Role.RoleName);
+                this._session.SetString("Email", user.Email);
+                this._session.SetString("Role", user.RoleId.ToString());
 
-                if(user.RoleId == 4)
+                if (user.RoleId == 4)
                 {
                     return RedirectToAction("Index", "UserTicket");
                 }

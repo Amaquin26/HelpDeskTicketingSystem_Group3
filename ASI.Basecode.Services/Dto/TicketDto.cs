@@ -26,5 +26,6 @@ namespace ASI.Basecode.Services.Dto
         public string? AgentName { get; set; }
         public string? TeamName { get; set; }
         public DateTime DateAdded { get; set; }
+        public bool CanEdit { get; set; } = false;
     }
 }

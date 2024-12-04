@@ -40,7 +40,7 @@ namespace ASI.Basecode.Services.Services
         {
             user = new User();
             var passwordKey = PasswordManager.EncryptPassword(password);
-            user = _repository.GetUsers().Where(x => x.Email == email &&
+            user = _repository.GetUsers().Include(x => x.Role).Where(x => x.Email == email &&
                                                      x.Password == passwordKey).FirstOrDefault();
 
             return user != null ? LoginResult.Success : LoginResult.Failed;
@@ -261,6 +261,11 @@ namespace ASI.Basecode.Services.Services
         {
             var id = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             return _repository.GetUsers().FirstOrDefault(x => x.UserId == id);
+        }
+
+        public Role GetUserRole(string userId)
+        {
+            return _repository.GetUserRole(userId);
         }
     }
 }
