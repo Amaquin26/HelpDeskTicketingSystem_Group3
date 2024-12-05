@@ -12,7 +12,7 @@
 
     <div class="d-flex justify-content-between mb-4">
         <!-- Add Ticket Button (aligned to the left) -->
-        <a asp-action="Create" class="btn btn-success" id="button-addon2">
+        <a asp-action="Create" class="btn btn-dark" id="button-addon2">
             <i class="fas fa-plus"></i>
             Add User
         </a>
@@ -21,7 +21,7 @@
         <form method="get" asp-action="Index" id="searchForm">
             <div class="input-group">
                 <input type="text" class="form-control" name="searchQuery" value="@Context.Request.Query["searchQuery"]" placeholder="Search User" aria-label="Search User" aria-describedby="button-addon2">
-                <button class="btn btn-secondary" type="submit" id="button-addon2">Search</button>
+                <button class="btn btn-dark" type="submit" id="button-addon2">Search</button>
             </div>
         </form>
     </div>
@@ -59,23 +59,23 @@
                             <td>
                                 @if (user.RoleId == 1)
                                 {
-                                    <span class="badge rounded-pill bg-danger">Super Admin</span>
+                                    <span class="badge pill bg-danger">Super Admin</span>
                                 }
                                 else if (user.RoleId == 2)
                                 {
-                                    <span class="badge rounded-pill border border-danger text-danger">Admin</span>
+                                    <span class="badge pill border border-danger text-danger">Admin</span>
                                 }
                                 else if (user.RoleId == 3)
                                 {
-                                    <span class="badge rounded-pill bg-dark text-white">Agent</span>
+                                    <span class="badge pill bg-dark text-white">Agent</span>
                                 }
                                 else if (user.RoleId == 4)
                                 {
-                                    <span class="badge rounded-pill border border-dark text-dark">User</span>
+                                    <span class="badge pill border border-dark text-dark">User</span>
                                 }
                                 else
                                 {
-                                    <span class="badge rounded-pill border border-light">User</span>
+                                    <span class="badge pill border border-light">User</span>
                                 }
                             </td>
                             <td class="text-center">
@@ -130,17 +130,17 @@
     <div class="pagination d-flex justify-content-center gap-2">
         @if (Model.CurrentPage > 1)
         {
-            <a href="@Url.Action("Index", new { page = Model.CurrentPage - 1, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-secondary">Previous</a>
+            <a href="@Url.Action("Index", new { page = Model.CurrentPage - 1, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-dark">Previous</a>
         }
 
         @for (var i = 1; i <= Model.TotalPages; i++)
         {
-            <a href="@Url.Action("Index", new { page = i, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-secondary @((i == Model.CurrentPage) ? "active" : "")">@i</a>
+            <a href="@Url.Action("Index", new { page = i, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-dark @((i == Model.CurrentPage) ? "active" : "")">@i</a>
         }
 
         @if (Model.CurrentPage < Model.TotalPages)
         {
-            <a href="@Url.Action("Index", new { page = Model.CurrentPage + 1, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-secondary">Next</a>
+            <a href="@Url.Action("Index", new { page = Model.CurrentPage + 1, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-dark">Next</a>
         }
     </div> 
 </div>

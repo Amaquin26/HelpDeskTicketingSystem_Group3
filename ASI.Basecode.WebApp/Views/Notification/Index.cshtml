@@ -17,12 +17,12 @@
 <div class="@containerClass" style="@containerStyle">
     <div class="row">
 
-    <h2 class="mb-4">Notifications</h2>
+    <h3 class="mb-4"><strong>Notifications</strong></h3>
 
     <!-- Ticket Notifications Section -->
     @foreach (var notif in Model)
     {
-        <div id="ticketNotifications" class="notification-section mb-5">
+        <div id="ticketNotifications" class="notification-section">
             <div class="card notification-card mb-3 position-relative">
                 <div class="card-body">
                     <h5 class="card-title">@notif.Title</h5>

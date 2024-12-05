@@ -27,21 +27,39 @@ namespace ASI.Basecode.WebApp.Controllers
             _notificationService = notificationService;
         }
 
-        public IActionResult Index(string searchQuery, int page = 1, int pageSize = 5)
+        [HttpGet]
+        [Route("UserTicket/Index")]
+        public IActionResult Index(string searchQuery, string filter = null, int page = 1, int pageSize = 5)
         {
             var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
+            // Fetch all tickets for the current user
             var tickets = _ticketService.GetListOfTickets().Where(t => t.CreatedById == userId).ToList();
 
+            // Convert filter parameter to an integer if it is not null or empty
+            int? filterValue = null;
+            if (!string.IsNullOrEmpty(filter) && int.TryParse(filter, out var parsedFilter))
+            {
+                filterValue = parsedFilter;
+            }
+
+            // If filter is not 0, apply the filter by StatusId
+            if (filterValue.HasValue && filterValue.Value != 0)
+            {
+                tickets = tickets.Where(t => t.StatusId == filterValue.Value).ToList();
+            }
+
+            // Search functionality
             if (!string.IsNullOrEmpty(searchQuery))
             {
                 tickets = tickets.Where(t => t.Title.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
-                t.CreatedBy.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
-                t.CategoryName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
-                t.StatusName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
-                t.PriorityName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
+                                              t.CreatedBy.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                                              t.CategoryName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                                              t.StatusName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                                              t.PriorityName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
+            // Pagination logic
             var pagedTickets = tickets.Skip((page - 1) * pageSize).Take(pageSize).ToList();
             var totalPages = (int)Math.Ceiling(tickets.Count / (double)pageSize);
 
@@ -51,10 +69,13 @@ namespace ASI.Basecode.WebApp.Controllers
                 CurrentPage = page,
                 TotalPages = totalPages,
                 SearchQuery = searchQuery,
+                Filter = filterValue ?? 0 // Store the current filter for use in the view
             };
 
             return View(viewModel);
         }
+
+
 
         [HttpGet]
         public IActionResult Create()

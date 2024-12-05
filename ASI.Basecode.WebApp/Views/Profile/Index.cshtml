@@ -8,7 +8,7 @@
 <div class="content p-4" style="margin-left: 200px;">
     <h3 class="mb-4"><strong>Your Details</strong></h3>
 
-    <a asp-action="UpdateProfile" asp-controller="User" class="btn btn-danger mb-3" id="button-addon2">
+    <a asp-action="UpdateProfile" asp-controller="User" class="btn btn-dark mb-3" id="button-addon2">
         Update Profile
     </a>
 
@@ -30,7 +30,10 @@
                     if (Model.RoleName != "User")
                     {
                         <div class="col-md-4">
-                            <p class="mb-0"><strong>Customer Satisfaction Rating:</strong> @Model.CustomerRating.ToString("F2") /5</p>
+                            <div class="d-flex align-items-center">
+                                <strong class="me-2">Customer Satisfaction Rating:</strong>
+                                <div class="star-rating" id="star-rating-@Model.Email"></div>
+                            </div>
                         </div>
                     }
                 }
@@ -76,25 +79,42 @@
 
         <div class="mb-4">
             <div class="btn-group" role="group" aria-label="Filter Tickets">
-                <button type="button" class="btn btn-danger">All</button>
-                <button type="button" class="btn btn-outline-danger">Open</button>
-                <button type="button" class="btn btn-outline-danger">In Progress</button>
-                <button type="button" class="btn btn-outline-danger">Closed</button>
+                <button type="button" class="btn btn-dark">All</button>
+                <button type="button" class="btn btn-dark">Open</button>
+                <button type="button" class="btn btn-dark">In Progress</button>
+                <button type="button" class="btn btn-dark">Closed</button>
             </div>
         </div>
         <div class="row">
             @foreach (var ticket in Model.Tickets)
             {
-                <div class="col-md-4 mb-3">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Ticket</h5>
-                            <p class="card-text"><strong>Created By: </strong>@ticket.CreatedBy</p>
-                            <p class="card-text"><strong>Issue: </strong>@ticket.Title</p>
-                            <p class="card-text"><strong>Status: </strong> @ticket.StatusName</p>
-                            <p class="card-text"><strong>Priority: </strong>@ticket.PriorityName</p>
-                            <p class="card-text"><strong>Category: </strong>@ticket.CategoryName</p>
-                            <a asp-action="ViewTicket" asp-controller="Ticket" asp-route-id="@ticket.TicketId" class="btn btn-danger">View Details</a>
+                <div class="col-md-4 mb-4">
+                    <div class="card border h-100">
+                        <div class="card-body d-flex flex-column">
+                            <!-- Title -->
+                            <h5 class="card-title text-dark fw-bold">@ticket.Title</h5>
+
+                            <div class="mt-auto border-top pt-3">
+                                <!-- Date Added -->
+                                <p class="card-text small text-muted">
+                                    <strong>Date Created:</strong> @ticket.DateAdded.ToString("MMMM dd, yyyy")
+                                </p>
+
+                                <!-- Status -->
+                                <p class="card-text small text-muted">
+                                    <strong>Status:</strong> <span class="badge bg-@GetStatusBadgeClass(ticket.StatusName) text-uppercase">@ticket.StatusName</span>
+                                </p>
+
+                                <!-- Category -->
+                                <p class="card-text small text-muted">
+                                    <strong>Category:</strong> @ticket.CategoryName
+                                </p>
+
+                                <!-- View Details Button -->
+                                <a asp-action="ViewTicket" asp-controller="Ticket" asp-route-id="@ticket.TicketId" class="btn btn-dark w-100">
+                                    View Details
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -148,3 +168,56 @@
         </div>
     </div>
 </div>
+
+@functions {
+    public string GetStatusBadgeClass(string status)
+    {
+        return status.ToLower() switch
+        {
+            "open" => "primary",
+            "in progress" => "warning",
+            "resolved" => "success",
+            "closed" => "danger",
+            "on hold" => "secondary",
+            _ => "dark" // Fallback for unexpected values
+        };
+    }
+
+    public string GetPriorityBadgeClass(string priority)
+    {
+        return priority.ToLower() switch
+        {
+            "high" => "danger",
+            "medium" => "warning",
+            "low" => "success",
+            _ => "secondary"
+        };
+    }
+}
+
+<script>
+    // Function to render star ratings
+    function renderStarRating(rating) {
+        const totalStars = 5; // Max rating is 5 stars
+        let starsHtml = '';
+
+        // Create filled stars
+        for (let i = 0; i < rating; i++) {
+            starsHtml += '<i class="fas fa-star text-warning"></i>';
+        }
+
+        // Create empty stars
+        for (let i = rating; i < totalStars; i++) {
+            starsHtml += '<i class="far fa-star"></i>';
+        }
+
+        return starsHtml;
+    }
+
+    // Call the function to render stars based on the CustomerRating
+    document.addEventListener("DOMContentLoaded", function () {
+        const rating = @Model.CustomerRating; // Assuming the value is a float (e.g., 3.50)
+        const starContainer = document.getElementById(`star-rating-@Model.Email`);
+        starContainer.innerHTML = renderStarRating(Math.round(rating)); // Rounding the rating to nearest whole number
+    });
+</script>
