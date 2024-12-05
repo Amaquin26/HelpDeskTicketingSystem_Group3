@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ASI.Basecode.Services.ServiceModels.TeamViewModel>
+﻿@model ASI.Basecode.Services.ServiceModels.TeamListViewModel
 
 @{
     ViewData["Title"] = "Team Management";
@@ -7,63 +7,96 @@
 <div class="content p-4" style="margin-left: 200px;">
     <h3 class="mb-4"><strong>Team Management</strong></h3>
 
-    <a class="btn btn-danger mb-3" asp-action="Create" id="button-addon2">
-        <i class="fas fa-plus"></i>
-        Add Team
-    </a>
+    <div class="d-flex justify-content-between mb-4">
+        <a class="btn btn-success" asp-action="Create">
+            <i class="fas fa-plus"></i>
+            Add Team
+        </a>
 
-    <div class="input-group mb-3">
-        <input type="text" class="form-control" placeholder="Search Team" aria-label="Recipient's username" aria-describedby="button-addon2">
-        <button class="btn btn-outline-danger" type="button" id="button-addon2">Search</button>
+        <form method="get" asp-action="Index" id="searchForm">
+            <div class="input-group">
+                <input type="text" name="searchQuery" value="@Model.SearchQuery" class="form-control" placeholder="Search Team" />
+                <button type="submit" class="btn btn-secondary">Search</button>
+            </div>
+        </form>
     </div>
 
     <div class="table-responsive">
         <table class="table table-bordered table-hover">
             <thead>
                 <tr>
-                    <th scope="col">Team Name</th>
-                    <th scope="col">Team Leader</th>
-                    <th scope="col">Specialization</th>
-                    <th class="action-column">Actions</th>
+                    <th>Team Name</th>
+                    <th>Team Leader</th>
+                    <th>Specialization</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
-            <tbody id="userItems">
-                @foreach (var team in Model)
+            <tbody>
+                @if (Model.Teams == null || !Model.Teams.Any())
                 {
                     <tr>
-                        <td class="text-capitalize">@team.TeamName</td>
-                        <td class="text-lowercase">@team.TeamLeaderName</td>
-                        <td>@team.TeamSpecialization</td>
-                        <td class="text-center">
-                            <a asp-action="TeamDetails" asp-route-id="@team.TeamId" class="edit btn btn-outline-primary btn-sm text-center"><i class="fas fa-eye"></i></a>
-                            <a asp-action="Edit" asp-route-id="@team.TeamId" class="btn btn-outline-danger btn-sm">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <button type="button" class="btn btn-outline-danger btn-sm delete-btn" data-bs-toggle="modal" data-bs-target="#deleteTeamModal-@team.TeamId">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </td>
+                        <td colspan="4" class="text-center">No teams found.</td>
                     </tr>
+                }
+                else
+                {
+                    @foreach (var team in Model.Teams)
+                    {
+                        <tr>
+                            <td class="text-capitalize">@team.TeamName</td>
+                            <td class="text-lowercase">@team.TeamLeaderName</td>
+                            <td>@team.TeamSpecialization</td>
+                            <td class="text-center">
+                                <a asp-action="TeamDetails" asp-route-id="@team.TeamId" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@team.TeamId" class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteTeamModal-@team.TeamId">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
                 }
             </tbody>
         </table>
     </div>
 
-    <!-- Delete Team Modal -->
-    @foreach (var team in Model)
+    <!-- Pagination -->
+    <div class="pagination d-flex justify-content-center gap-2">
+        @if (Model.CurrentPage > 1)
+        {
+            <a href="@Url.Action("Index", new { page = Model.CurrentPage - 1, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-secondary">Previous</a>
+        }
+
+        @for (var i = 1; i <= Model.TotalPages; i++)
+        {
+            <a href="@Url.Action("Index", new { page = i, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-secondary @((i == Model.CurrentPage) ? "active" : "")">@i</a>
+        }
+
+        @if (Model.CurrentPage < Model.TotalPages)
+        {
+            <a href="@Url.Action("Index", new { page = Model.CurrentPage + 1, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-secondary">Next</a>
+        }
+    </div>
+
+    <!-- Delete Modal -->
+    @foreach (var team in Model.Teams)
     {
         <div class="modal fade" id="deleteTeamModal-@team.TeamId" tabindex="-1" aria-labelledby="deleteTeamModal-@team.TeamId" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="deleteTeamModalLabel">Delete Team</h5>
+                        <h5 class="modal-title">Delete Team</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <p>Are you sure you want to delete this user?</p>
-                        <p><strong>Team Name: </strong>@team.TeamName</p>
-                        <p><strong>Team Leader: </strong>@team.TeamLeaderName</p>
-                        <form asp-action="Delete" asp-controller="Team" method="post">
+                        <p>Are you sure you want to delete this team?</p>
+                        <p><strong>Team Name:</strong> @team.TeamName</p>
+                        <p><strong>Team Leader:</strong> @team.TeamLeaderName</p>
+                        <form asp-action="Delete" method="post">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="TeamId" value="@team.TeamId" />
                             <button type="submit" class="btn btn-danger">Delete</button>
@@ -73,5 +106,4 @@
             </div>
         </div>
     }
-    
 </div>

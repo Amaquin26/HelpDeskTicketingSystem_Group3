@@ -21,6 +21,17 @@ namespace ASI.Basecode.Data
             _configuration = configuration;
         }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                // Load connection string from configuration if DI is not used
+                var connectionString = _configuration?.GetConnectionString("DefaultConnection")
+                                       ?? "Server=(localdb)\\MSSQLLocalDB;Database=HelpDeskTicketingDB;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True";
+                optionsBuilder.UseSqlServer(connectionString);
+            }
+        }
+
         public virtual DbSet<Attachment> Attachments { get; set; }
         public virtual DbSet<Feedback> Feedbacks { get; set; }
         public virtual DbSet<Role> Roles { get; set; }

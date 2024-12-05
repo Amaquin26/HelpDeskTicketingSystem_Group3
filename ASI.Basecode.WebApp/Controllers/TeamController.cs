@@ -20,11 +20,34 @@ namespace ASI.Basecode.WebApp.Controllers
             _userService = userService;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string searchQuery, int page = 1, int pageSize = 2)
         {
             var teams = _teamService.GetListOfTeams();
-            return View(teams);
+
+            // Filter by search query
+            if (!string.IsNullOrEmpty(searchQuery))
+            {
+                teams = teams.Where(t => t.TeamName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                                         t.TeamLeaderName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                                         t.TeamSpecialization.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            // Paginate the teams
+            var pagedTeams = teams.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            var totalPages = (int)Math.Ceiling(teams.Count / (double)pageSize);
+
+            // Build the view model
+            var viewModel = new TeamListViewModel
+            {
+                Teams = pagedTeams,
+                CurrentPage = page,
+                TotalPages = totalPages,
+                SearchQuery = searchQuery
+            };
+
+            return View(viewModel);
         }
+
 
         [HttpGet]
         public IActionResult Create()
