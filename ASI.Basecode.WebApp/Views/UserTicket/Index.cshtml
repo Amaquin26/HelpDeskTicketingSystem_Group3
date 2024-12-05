@@ -8,24 +8,28 @@
 <div class="container content">
     <div class="row">
 
-        <h3 class=""><strong>Submitted Tickets:</strong></h3>
+        <h3 class="mb-4"><strong>Submitted Tickets:</strong></h3>
 
         <div class="d-flex justify-content-between mb-4">
-            <div>
+            <!-- Filter Options -->
+            <div class="mb-4">
                 <div class="btn-group" role="group" aria-label="Filter Tickets">
-                    <button type="button" class="btn btn-danger" onclick="filterTickets('all')">All</button>
-                    <button type="button" class="btn btn-outline-danger" onclick="filterTickets('open')">Open</button>
-                    <button type="button" class="btn btn-outline-danger" onclick="filterTickets('in-progress')">In Progress</button>
-                    <button type="button" class="btn btn-outline-danger" onclick="filterTickets('closed')">Closed</button>
+                    <button type="button" class="btn btn-outline-dark @((Model.Filter == 0) ? "active" : "")" onclick="filterTickets('0')">All</button>
+                    <button type="button" class="btn btn-outline-dark @((Model.Filter == 1) ? "active" : "")" onclick="filterTickets('1')">Open</button>
+                    <button type="button" class="btn btn-outline-dark @((Model.Filter == 2) ? "active" : "")" onclick="filterTickets('2')">In Progress</button>
+                    <button type="button" class="btn btn-outline-dark @((Model.Filter == 3) ? "active" : "")" onclick="filterTickets('3')">Resolved</button>
+                    <button type="button" class="btn btn-outline-dark @((Model.Filter == 4) ? "active" : "")" onclick="filterTickets('4')">Closed</button>
+                    <button type="button" class="btn btn-outline-dark @((Model.Filter == 5) ? "active" : "")" onclick="filterTickets('5')">On Hold</button>
                 </div>
             </div>
 
             <form method="get" asp-action="Index" id="searchForm">
                 <div class="input-group">
-                    <input type="text" class="form-control" name="searchQuery" value="@Context.Request.Query["searchQuery"]" placeholder="Search Ticket" aria-label="Search Ticket" aria-describedby="button-addon2">
-                    <button class="btn btn-secondary" type="submit" id="button-addon2">Search</button>
+                    <input type="text" class="form-control" id="searchQuery" name="searchQuery" value="@Context.Request.Query["searchQuery"]" placeholder="Search Ticket" aria-label="Search Ticket" aria-describedby="button-addon2">
+                    <button class="btn btn-dark" type="submit" id="button-addon2">Search</button>
                 </div>
             </form>
+
         </div>
 
         <!-- Filter Options -->
@@ -33,41 +37,111 @@
         {
             @foreach (var ticket in Model.Tickets)
             {
-                <div class="col-md-4 mb-3">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Ticket</h5>
-                            <p class="card-text"><strong>Created By: </strong>@ticket.CreatedBy</p>
-                            <p class="card-text"><strong>Issue: </strong>@ticket.Title</p>
-                            <p class="card-text"><strong>Status: </strong> @ticket.StatusName</p>
-                            <p class="card-text"><strong>Priority: </strong>@ticket.PriorityName</p>
-                            <p class="card-text"><strong>Category: </strong>@ticket.CategoryName</p>
-                            <a asp-action="ViewTicket" asp-controller="Ticket" asp-route-id="@ticket.TicketId" class="btn btn-danger">View Details</a>
+                <div class="col-md-4 mb-4">
+                    <div class="card border h-100">
+                        <div class="card-body d-flex flex-column">
+                            <!-- Title -->
+                            <h5 class="card-title text-dark fw-bold">@ticket.Title</h5>
+
+                            <!-- Description -->
+                            <p class="card-text text-muted small">@ticket.Description</p>
+                            <div class="mt-auto border-top pt-3">
+                                <!-- Date Added -->
+                                <p class="card-text small text-muted">
+                                    <strong>Date Created:</strong> @ticket.DateAdded.ToString("MMMM dd, yyyy")
+                                </p>
+
+                                <!-- Status -->
+                                <p class="card-text small text-muted">
+                                    <strong>Status:</strong> <span class="badge bg-@GetStatusBadgeClass(ticket.StatusName) text-uppercase">@ticket.StatusName</span>
+                                </p>
+
+                                <!-- Category -->
+                                <p class="card-text small text-muted">
+                                    <strong>Category:</strong> @ticket.CategoryName
+                                </p>
+
+                                <!-- View Details Button -->
+                                <a asp-action="ViewTicket" asp-controller="Ticket" asp-route-id="@ticket.TicketId" class="btn btn-dark w-100">
+                                    View Details
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
             }
-        }else
+        }
+        else
         {
-            <h4>No tickets found.</h4>
+            <h4 class="text-center">No tickets found.</h4>
         }
 
         <!-- Pagination Controls -->
         <div class="pagination d-flex justify-content-center gap-2">
             @if (Model.CurrentPage > 1)
             {
-                <a href="@Url.Action("Index", new { page = Model.CurrentPage - 1, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-secondary">Previous</a>
+                <a href="@Url.Action("Index", new { page = Model.CurrentPage - 1, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-dark">Previous</a>
             }
 
             @for (var i = 1; i <= Model.TotalPages; i++)
             {
-                <a href="@Url.Action("Index", new { page = i, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-secondary @((i == Model.CurrentPage) ? "active" : "")">@i</a>
+                <a href="@Url.Action("Index", new { page = i, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-dark @((i == Model.CurrentPage) ? "active" : "")">@i</a>
             }
 
             @if (Model.CurrentPage < Model.TotalPages)
             {
-                <a href="@Url.Action("Index", new { page = Model.CurrentPage + 1, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-secondary">Next</a>
+                <a href="@Url.Action("Index", new { page = Model.CurrentPage + 1, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-dark">Next</a>
             }
         </div>
     </div>
 </div>
+
+@functions {
+    public string GetStatusBadgeClass(string status)
+    {
+        return status.ToLower() switch
+        {
+            "open" => "primary",
+            "in progress" => "warning",
+            "resolved" => "success",
+            "closed" => "danger",
+            "on hold" => "secondary",
+            _ => "dark" // Fallback for unexpected values
+        };
+    }
+
+    public string GetPriorityBadgeClass(string priority)
+    {
+        return priority.ToLower() switch
+        {
+            "high" => "danger",
+            "medium" => "warning",
+            "low" => "success",
+            _ => "secondary"
+        };
+    }
+}
+
+<script>
+    function filterTickets(statusId) {
+        let url = new URL(window.location.href);
+        let searchParams = url.searchParams;
+
+        // If no filter is selected or 'All' is clicked, reset the filter
+        if (statusId !== undefined) {
+            searchParams.set('filter', statusId);  // 0 for "All"
+        }
+
+        // Optionally, you can preserve the current search query
+        let searchQuery = document.getElementById('searchQuery').value;
+        if (searchQuery) {
+            searchParams.set('searchQuery', searchQuery);
+        }
+
+        // Update the URL without reloading the page (optional, for SPA behavior)
+        window.history.pushState({}, '', url.toString());
+
+        // Submit the form or trigger a page reload
+        window.location.href = url.toString();  // Or use AJAX for dynamic content loading
+    }
+</script>

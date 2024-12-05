@@ -16,17 +16,18 @@
 }
 
 <div class="@containerClass" style="@containerStyle">
-    <div class="d-flex justify-content-between mb-3">
+    <div class="d-flex justify-content-between mb-4">
+
         <!-- Back Button on the Left -->
         @if (User.FindFirst("Role")?.Value == "User")
         {
-            <a asp-action="Index" asp-controller="UserTicket" class="btn">
+            <a asp-action="Index" asp-controller="UserTicket" class="btn btn-dark">
                 <i class="fas fa-arrow-left"></i> Back
             </a>
         }
         else
         {
-            <a asp-action="Index" class="btn">
+            <a asp-action="Index" class="btn btn-dark">
                 <i class="fas fa-arrow-left"></i> Back
             </a>
         }
@@ -35,14 +36,14 @@
         <div>
             @if (Model.CanEdit)
             {
-                <a asp-action="EditTicket" asp-route-id="@Model.TicketId" class="edit btn btn-outline-danger me-2">
+                <a asp-action="EditTicket" asp-route-id="@Model.TicketId" class="edit btn btn-dark">
                     <i class="fas fa-edit"></i> Edit
                 </a>
             }
            
             @if(User.FindFirst("Role")?.Value == "Super Admin" || User.FindFirst("Role")?.Value == "Admin")
             {
-                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteTicketModal-@Model.TicketId">
+                <button type="button" class="btn btn-danger ms-2" data-bs-toggle="modal" data-bs-target="#deleteTicketModal-@Model.TicketId">
                     <i class="fas fa-trash-alt"></i> Delete
                 </button>
             }

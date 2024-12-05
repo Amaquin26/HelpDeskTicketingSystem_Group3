@@ -51,7 +51,7 @@
 
     <div class="d-flex justify-content-between mb-4">
         <!-- Add Ticket Button (aligned to the left) -->
-        <a asp-action="AddTicket" asp-controller="Ticket" class="btn btn-success" id="button-addon2">
+        <a asp-action="AddTicket" asp-controller="Ticket" class="btn btn-dark" id="button-addon2">
             <i class="fas fa-plus"></i> Add Ticket
         </a>
 
@@ -59,7 +59,7 @@
         <form method="get" asp-action="Index" id="searchForm">
             <div class="input-group">
                 <input type="text" class="form-control" name="searchQuery" value="@Context.Request.Query["searchQuery"]" placeholder="Search Ticket" aria-label="Search Ticket" aria-describedby="button-addon2">
-                <button class="btn btn-secondary" type="submit" id="button-addon2">Search</button>
+                <button class="btn btn-dark" type="submit" id="button-addon2">Search</button>
             </div>
         </form>
     </div>
@@ -88,47 +88,17 @@
                             <td>@ticket.CreatedBy</td>
                             <td>@ticket.CategoryName</td>
                             <td>
-                                @{
-                                    if (ticket.PriorityName == "Low")
-                                    {
-                                        <span class="badge rounded-pill bg-success">Low Priority</span>
-                                    }
-                                    if (ticket.PriorityName == "Medium")
-                                    {
-                                        <span class="badge rounded-pill bg-warning">Medium</span>
-                                    }
-                                    if (ticket.PriorityName == "High")
-                                    {
-                                        <span class="badge rounded-pill bg-danger">High</span>
-                                    }
-                                }
+                                <span class="badge text-@GetPriorityBadgeClass(ticket.PriorityName) text-uppercase">@ticket.PriorityName</span>
                             </td>
                             <td>
-                                @{
-                                    if (ticket.StatusName == "Open")
-                                    {
-                                        <span class="text-warning">@ticket.StatusName</span>
-                                    }
-                                    if (ticket.StatusName == "In Progress")
-                                    {
-                                        <span class="text-primary">@ticket.StatusName</span>
-                                    }
-                                    if (ticket.StatusName == "Resolved")
-                                    {
-                                        <span class="text-success">@ticket.StatusName</span>
-                                    }
-                                    if (ticket.StatusName == "Closed")
-                                    {
-                                        <span class="text-muted">@ticket.StatusName</span>
-                                    }
-                                }
+                                <span class="badge bg-@GetStatusBadgeClass(ticket.StatusName) text-uppercase">@ticket.StatusName</span>
                             </td>
                             <td>@ticket.DateAdded</td>
                             <td class="text-center">
-                                <a asp-action="ViewTicket" asp-route-id="@ticket.TicketId" class="edit btn btn-outline-primary btn-sm text-center"><i class="fas fa-eye"></i></a>
+                                <a asp-action="ViewTicket" asp-route-id="@ticket.TicketId" class="edit btn btn-outline-secondary btn-sm text-center"><i class="fas fa-eye"></i></a>
                                 @if (ticket.CanEdit)
                                 {
-                                    <a asp-action="EditTicket" asp-route-id="@ticket.TicketId" asp- class="btn btn-outline-danger btn-sm text-center">
+                                    <a asp-action="EditTicket" asp-route-id="@ticket.TicketId" asp- class="btn btn-outline-dark btn-sm text-center">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                 }
@@ -156,17 +126,17 @@
     <div class="pagination d-flex justify-content-center gap-2">
         @if (Model.CurrentPage > 1)
         {
-            <a href="@Url.Action("Index", new { page = Model.CurrentPage - 1, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-secondary">Previous</a>
+            <a href="@Url.Action("Index", new { page = Model.CurrentPage - 1, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-dark">Previous</a>
         }
 
         @for (var i = 1; i <= Model.TotalPages; i++)
         {
-            <a href="@Url.Action("Index", new { page = i, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-secondary @((i == Model.CurrentPage) ? "active" : "")">@i</a>
+            <a href="@Url.Action("Index", new { page = i, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-dark @((i == Model.CurrentPage) ? "active" : "")">@i</a>
         }
 
         @if (Model.CurrentPage < Model.TotalPages)
         {
-            <a href="@Url.Action("Index", new { page = Model.CurrentPage + 1, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-secondary">Next</a>
+            <a href="@Url.Action("Index", new { page = Model.CurrentPage + 1, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-dark">Next</a>
         }
     </div>
 </div>
@@ -199,6 +169,32 @@
     </div>
 }
 
+@functions {
+    public string GetStatusBadgeClass(string status)
+    {
+        return status.ToLower() switch
+        {
+            "open" => "primary",
+            "in progress" => "warning",
+            "resolved" => "success",
+            "closed" => "danger",
+            "on hold" => "secondary",
+            _ => "dark" // Fallback for unexpected values
+        };
+    }
+
+    public string GetPriorityBadgeClass(string priority)
+    {
+        return priority.ToLower() switch
+        {
+            "high" => "danger",
+            "medium" => "warning",
+            "low" => "success",
+            _ => "secondary"
+        };
+    }
+}
+
 @section scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="text/javascript">
@@ -216,17 +212,17 @@
         var priorityCounts = ticketsByPriority.map(item => item.count);
         // Example of how you would use this mapped data in a Chart.js chart
         new Chart(document.getElementById("categoryChart"), {
-            type: 'pie',  // You can choose 'bar', 'pie', 'line', etc.
+            type: 'doughnut',  // You can choose 'bar', 'pie', 'line', etc.
             data: {
                 labels: categoryLabels,  // Labels for each section (e.g., "Bug", "Support")
                 datasets: [{
                     data: categoryCounts,  // Corresponding data for each label (e.g., [1, 2])
-                    backgroundColor: [ // Optional color options
-                        '#ffcfd4',   // Light red shade
-                        '#fd838e',   // Medium red shade
-                        '#dc3545',   // Standard red
-                        '#c41c25',   // Darker red
-                        '#b30000'    // Very dark red
+                    backgroundColor: [
+                        'rgba(220, 53, 69, 0.7)',   // Red with 70% opacity
+                        'rgba(23, 162, 184, 0.7)',  // Blue with 70% opacity
+                        'rgba(108, 117, 125, 0.7)', // Gray with 70% opacity
+                        'rgba(0, 123, 255, 0.7)',   // Blue with 70% opacity
+                        'rgba(255, 193, 7, 0.7)'    // Yellow with 70% opacity
                     ]
                 }]
             },
@@ -250,12 +246,12 @@
                 labels: statusLabels,  // Labels for each status ("Open", "Resolved")
                 datasets: [{
                     data: statusCounts,  // Corresponding data
-                    backgroundColor: [ // Optional color options
-                        '#ffcfd4',   // Light red shade
-                        '#fd838e',   // Medium red shade
-                        '#dc3545',   // Standard red
-                        '#c41c25',   // Darker red
-                        '#b30000'    // Very dark red
+                    backgroundColor: [
+                        'rgba(0, 123, 255, 0.7)',   // Blue with 70% opacity
+                        'rgba(255, 193, 7, 0.7)',    // Yellow with 70% opacity
+                        'rgba(40, 167, 69, 0.7)',    // Green with 70% opacity
+                        'rgba(220, 53, 69, 0.7)',    // Red with 70% opacity
+                        'rgba(108, 117, 125, 0.7)'   // Gray with 70% opacity
                     ]
                 }]
             },
@@ -274,17 +270,16 @@
             }
         });
         new Chart(document.getElementById("priorityChart"), {
-            type: 'pie',
+            type: 'bar',
             data: {
                 labels: priorityLabels,  // Labels for each priority ("Low")
                 datasets: [{
                     data: priorityCounts,  // Corresponding data
-                    backgroundColor: [ // Optional color options
-                        '#ffcfd4',   // Light red shade
-                        '#fd838e',   // Medium red shade
-                        '#dc3545',   // Standard red
-                        '#c41c25',   // Darker red
-                        '#b30000'    // Very dark red
+                    backgroundColor: [
+                        'rgba(40, 167, 69, 0.7)',    // Green with 70% opacity
+                        'rgba(255, 193, 7, 0.7)',    // Yellow with 70% opacity
+                        'rgba(220, 53, 69, 0.7)',    // Red with 70% opacity
+                        'rgba(108, 117, 125, 0.7)'   // Gray with 70% opacity
                     ]
                 }]
             },

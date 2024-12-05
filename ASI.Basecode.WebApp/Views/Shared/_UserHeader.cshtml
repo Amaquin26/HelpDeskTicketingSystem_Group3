@@ -2,7 +2,7 @@
 @inject IHttpContextAccessor HttpContextAccessor
 
 <!-- Sidebar -->
-<nav class="@((ViewBag.LoginView == true) ? "d-hidden" : "navbar navbar-expand-lg bg-danger")">
+<nav class="@((ViewBag.LoginView == true) ? "d-hidden" : "navbar navbar-expand-lg bg-danger px-4 mb-5")">
     <a class="navbar-brand d-flex align-items-center" href="#">
         <img src="~/img/icon-white.png" alt="Logo">
         <strong class="text-white">Resolve.it</strong>
@@ -11,7 +11,7 @@
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav mx-auto my-2"> 
+        <ul class="navbar-nav mx-auto my-2">
             <li class="nav-item">
                 <a asp-action="Create" asp-controller="UserTicket" class="@(IsActive("Create", "UserTicket") ? "nav-link active text-white" : "nav-link")">
                     Create
@@ -23,7 +23,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a asp-action="Index" asp-controller="Notification" class="@(IsActive("Index", "UserNotification") ? "nav-link active text-white" : "nav-link")">
+                <a asp-action="Index" asp-controller="Notification" class="@(IsActive("Index", "Notification") ? "nav-link active text-white" : "nav-link")">
                     Notifications
                 </a>
             </li>
@@ -40,7 +40,7 @@
         </ul>
     </div>
     <div class="d-flex">
-        <a asp-action="SignOutUser" asp-controller="Account" class="text-white text-decoration-none"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
+        <a asp-action="SignOutUser" asp-controller="Account" class="text-white text-decoration-none"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
     </div>
 </nav>
 

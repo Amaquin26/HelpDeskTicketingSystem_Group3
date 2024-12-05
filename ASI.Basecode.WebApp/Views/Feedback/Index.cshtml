@@ -21,7 +21,7 @@
     <div class="d-flex justify-content-between mb-4">
         @if (User.FindFirst("Role")?.Value == "User")
         {
-            <a asp-action="Create" class="btn btn-success" id="button-addon2">
+            <a asp-action="Create" class="btn btn-dark" id="button-addon2">
                 <i class="fas fa-plus"></i>
                 Add Feedback
             </a>
@@ -30,11 +30,12 @@
         <form method="get" asp-action="Index" id="searchForm">
             <div class="input-group">
                 <input type="text" class="form-control" id="searchQuery" name="searchQuery" placeholder="Search Feedbacks" value="@Model.SearchQuery">
-                <button class="btn btn-secondary" type="submit" id="button-addon2">Search</button>
+                <button class="btn btn-dark" type="submit" id="button-addon2">Search</button>
             </div>
         </form>
     </div>
 
+    <div class="row">
     @foreach (var feedback in Model.Feedbacks)
     {
         <div class="col-md-4 mb-4">
@@ -43,7 +44,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <p class="card-text mb-0 small">
-                                <i class="fas fa-user-circle text-muted"></i> <strong>@feedback.CreatedBy</strong>
+                                <strong>@feedback.CreatedBy</strong>
                             </p>
                             <p class="card-text mb-0 text-muted small">@feedback.CreatedTime</p>
                         </div>
@@ -52,7 +53,7 @@
                             <div>
                                 @if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == feedback.UserId)
                                 {
-                                    <a asp-action="Edit" asp-route-id="@feedback.FeedbackId" class="btn btn-sm btn-outline-danger me-1">
+                                    <a asp-action="Edit" asp-route-id="@feedback.FeedbackId" class="btn btn-sm btn-outline-dark me-1">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                 }
@@ -63,12 +64,14 @@
                         }
                     </div>
                     <hr />
-                    <p class="card-text fw-bold">@feedback.Rating</p>
+                    <!-- Star Rating -->
+                    <div class="star-rating mb-2" id="star-rating-@feedback.FeedbackId"></div>
                     <p class="card-text flex-grow-1">@feedback.Comment</p>
                 </div>
             </div>
         </div>
     }
+    </div>
 
     <!-- Delete Feedback Modal -->
     @foreach (var feedback in Model.Feedbacks)
@@ -99,17 +102,51 @@
     <div class="pagination d-flex justify-content-center gap-2">
         @if (Model.CurrentPage > 1)
         {
-            <a href="@Url.Action("Index", new { page = Model.CurrentPage - 1, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-secondary">Previous</a>
+            <a href="@Url.Action("Index", new { page = Model.CurrentPage - 1, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-dark">Previous</a>
         }
 
         @for (var i = 1; i <= Model.TotalPages; i++)
         {
-            <a href="@Url.Action("Index", new { page = i, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-secondary @((i == Model.CurrentPage) ? "active" : "")">@i</a>
+            <a href="@Url.Action("Index", new { page = i, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-dark @((i == Model.CurrentPage) ? "active" : "")">@i</a>
         }
 
         @if (Model.CurrentPage < Model.TotalPages)
         {
-            <a href="@Url.Action("Index", new { page = Model.CurrentPage + 1, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-secondary">Next</a>
+            <a href="@Url.Action("Index", new { page = Model.CurrentPage + 1, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-dark">Next</a>
         }
     </div>
 </div>
+
+<script>
+    // JavaScript function to render stars
+    function renderStars(rating, elementId) {
+        const starContainer = document.getElementById(elementId);
+        let starsHtml = '';
+
+        // Add full stars
+        for (let i = 0; i < Math.floor(rating); i++) {
+            starsHtml += '<i class="fas fa-star text-warning"></i>';
+        }
+
+        // Add half star if rating is a decimal
+        if (rating % 1 !== 0) {
+            starsHtml += '<i class="fas fa-star-half-alt text-warning"></i>';
+        }
+
+        // Add empty stars
+        for (let i = Math.ceil(rating); i < 5; i++) {
+            starsHtml += '<i class="far fa-star"></i>';
+        }
+
+        // Set the stars HTML to the element
+        starContainer.innerHTML = starsHtml;
+    }
+
+    // Render stars for each feedback
+    @foreach (var feedback in Model.Feedbacks)
+    {
+        <text>
+            renderStars(@feedback.Rating, 'star-rating-@feedback.FeedbackId');
+        </text>
+    }
+</script>
