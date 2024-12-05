@@ -2,6 +2,7 @@
 using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -16,11 +17,31 @@ public class FeedbackController : Controller
         _ticketService = ticketService;
     }
 
-    public IActionResult Index()
+    public IActionResult Index(string searchQuery, int page = 1, int pageSize = 5)
     {
         var feedbacks = _feedbackService.GetListOfFeedbacks();
-        return View(feedbacks);
+
+        // Apply search filter
+        if (!string.IsNullOrEmpty(searchQuery))
+        {
+            feedbacks = feedbacks.Where(f => f.CreatedBy.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                                             f.Comment.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
+        var pagedFeedbacks = feedbacks.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+        var totalPages = (int)Math.Ceiling(feedbacks.Count / (double)pageSize);
+
+        var viewModel = new FeedbackListViewModel
+        {
+            Feedbacks = pagedFeedbacks,
+            TotalPages = totalPages,
+            CurrentPage = page,
+            SearchQuery = searchQuery
+        };
+
+        return View(viewModel);
     }
+
 
     [HttpGet]
     public IActionResult Create()

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ASI.Basecode.Services.ServiceModels.FeedbackViewModel>
+﻿@model ASI.Basecode.Services.ServiceModels.FeedbackListViewModel
 @using System.Security.Claims;
 @{
     ViewData["Title"] = "Feedbacks Model";
@@ -18,20 +18,24 @@
 <div class="@containerClass" style="@containerStyle">
     <h3 class="mb-4"><strong>Feedbacks</strong></h3>
 
-    @if (User.FindFirst("Role")?.Value == "User")
-    {
-        <a asp-action="Create" class="btn btn-danger mb-3" id="button-addon2">
-            <i class="fas fa-plus"></i>
-            Add Feedback
-        </a>
-    }
+    <div class="d-flex justify-content-between mb-4">
+        @if (User.FindFirst("Role")?.Value == "User")
+        {
+            <a asp-action="Create" class="btn btn-success" id="button-addon2">
+                <i class="fas fa-plus"></i>
+                Add Feedback
+            </a>
+        }
 
-    <div class="input-group mb-3">
-        <input type="text" class="form-control" id="searchInput" placeholder="Search Feedbacks">
-        <button class="btn btn-outline-danger" type="button" id="button-addon2">Search</button>
+        <form method="get" asp-action="Index" id="searchForm">
+            <div class="input-group">
+                <input type="text" class="form-control" id="searchQuery" name="searchQuery" placeholder="Search Feedbacks" value="@Model.SearchQuery">
+                <button class="btn btn-secondary" type="submit" id="button-addon2">Search</button>
+            </div>
+        </form>
     </div>
 
-    @foreach (var feedback in Model)
+    @foreach (var feedback in Model.Feedbacks)
     {
         <div class="col-md-4 mb-4">
             <div class="card h-100">
@@ -66,9 +70,8 @@
         </div>
     }
 
-
     <!-- Delete Feedback Modal -->
-    @foreach (var feedback in Model)
+    @foreach (var feedback in Model.Feedbacks)
     {
         <div class="modal fade" id="deleteConfirmationModal-@feedback.FeedbackId" tabindex="-1" aria-labelledby="deleteConfirmationModal-@feedback.FeedbackId" aria-hidden="true">
             <div class="modal-dialog">
@@ -91,4 +94,22 @@
             </div>
         </div>
     }
+
+    <!-- Pagination Controls -->
+    <div class="pagination d-flex justify-content-center gap-2">
+        @if (Model.CurrentPage > 1)
+        {
+            <a href="@Url.Action("Index", new { page = Model.CurrentPage - 1, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-secondary">Previous</a>
+        }
+
+        @for (var i = 1; i <= Model.TotalPages; i++)
+        {
+            <a href="@Url.Action("Index", new { page = i, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-secondary @((i == Model.CurrentPage) ? "active" : "")">@i</a>
+        }
+
+        @if (Model.CurrentPage < Model.TotalPages)
+        {
+            <a href="@Url.Action("Index", new { page = Model.CurrentPage + 1, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-secondary">Next</a>
+        }
+    </div>
 </div>
