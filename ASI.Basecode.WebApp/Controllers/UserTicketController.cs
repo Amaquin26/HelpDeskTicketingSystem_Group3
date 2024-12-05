@@ -4,6 +4,7 @@ using ASI.Basecode.Services.ServiceModels;
 using ASI.Basecode.Services.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Linq;
 using System.Security.Claims;
 
@@ -26,15 +27,33 @@ namespace ASI.Basecode.WebApp.Controllers
             _notificationService = notificationService;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string searchQuery, int page = 1, int pageSize = 5)
         {
             var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            var tickets = _ticketService.GetListOfTickets();
+            var tickets = _ticketService.GetListOfTickets().Where(t => t.CreatedById == userId).ToList();
 
-            var user_tickets = tickets.Where(t => t.CreatedById == userId).ToList();
+            if (!string.IsNullOrEmpty(searchQuery))
+            {
+                tickets = tickets.Where(t => t.Title.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                t.CreatedBy.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                t.CategoryName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                t.StatusName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                t.PriorityName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
 
-           return View(user_tickets);
+            var pagedTickets = tickets.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            var totalPages = (int)Math.Ceiling(tickets.Count / (double)pageSize);
+
+            var viewModel = new UserTicketListViewModel
+            {
+                Tickets = pagedTickets,
+                CurrentPage = page,
+                TotalPages = totalPages,
+                SearchQuery = searchQuery,
+            };
+
+            return View(viewModel);
         }
 
         [HttpGet]

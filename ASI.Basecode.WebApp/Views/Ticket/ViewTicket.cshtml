@@ -1,15 +1,35 @@
 ﻿@model ASI.Basecode.Services.Dto.TicketDto
+@using System.Security.Claims;
 @{
     ViewData["Title"] = "Ticket Details Page";
-}
-@using System.Security.Claims;
+    if (User.FindFirst("Role")?.Value == "User")
+    {
+        Layout = "~/Views/Shared/_LayoutUser.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
 
-<div class="content p-4" style="margin-left: 200px;">
+    var containerStyle = User.FindFirst("Role")?.Value != "User" ? "margin-left: 200px;" : "";
+    var containerClass = User.FindFirst("Role")?.Value != "User" ? "container content  p-4" : "container content";
+}
+
+<div class="@containerClass" style="@containerStyle">
     <div class="d-flex justify-content-between mb-3">
         <!-- Back Button on the Left -->
-        <a asp-action="Index" class="btn">
-            <i class="fas fa-arrow-left"></i> Back
-        </a>
+        @if (User.FindFirst("Role")?.Value == "User")
+        {
+            <a asp-action="Index" asp-controller="UserTicket" class="btn">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+        }
+        else
+        {
+            <a asp-action="Index" class="btn">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+        }
 
         <!-- Edit and Delete Buttons on the Right -->
         <div>
