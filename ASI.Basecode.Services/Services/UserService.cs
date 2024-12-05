@@ -97,7 +97,7 @@ namespace ASI.Basecode.Services.Services
         }
         public List<User> GetUsers()
         {
-            return _repository.GetUsers().Where(u => u.IsActive).ToList();
+            return _repository.GetUsers().Include(x => x.Role).Where(u => u.IsActive).ToList();
         }
         public void DeleteUser(User user)
         {
@@ -135,6 +135,15 @@ namespace ASI.Basecode.Services.Services
             {
                 existingUser.Name = user.Name ?? existingUser.Name;
                 existingUser.Email = user.Email ?? existingUser.Email;
+
+                if (existingUser.Email != user.Email) 
+                {
+                    if (_repository.EmailExists(user.Email))
+                    {
+                        throw new Exception("Email already exist");
+                    }
+                }
+
                 if (!string.IsNullOrEmpty(user.Password))
                 {
                     existingUser.Password = PasswordManager.EncryptPassword(user.Password); // Optional: Encrypt password if necessary
@@ -146,14 +155,6 @@ namespace ASI.Basecode.Services.Services
             }
         }
 
-        public IQueryable<User> GetUser(bool onlyAgents)
-        {
-            if (onlyAgents)
-            {
-                return _repository.GetAgents().Include(x => x.Role).Where(x => x.RoleId == 3); // Return only agents
-            }
-            return _repository.GetUsers().Include(x => x.Role); // Return all active users
-        }
         public IQueryable<User> GetAgents()
         {
             return _repository.GetAgents(); // Call the repository method to get agents

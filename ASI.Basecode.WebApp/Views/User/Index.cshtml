@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ASI.Basecode.Data.Models.User>
+﻿@model ASI.Basecode.Services.ServiceModels.UserListViewModel
 @using Microsoft.AspNetCore.Mvc.ModelBinding
 @using System.Security.Claims;
 
@@ -10,14 +10,20 @@
 <div class="content p-4" style="margin-left: 200px;">
     <h3 class="mb-4"><strong>User Management</strong></h3>
 
-    <a class="btn btn-danger mb-3" asp-action="Create" id="button-addon2">
-        <i class="fas fa-plus"></i>
-        Add User
-    </a>
+    <div class="d-flex justify-content-between mb-4">
+        <!-- Add Ticket Button (aligned to the left) -->
+        <a asp-action="Create" class="btn btn-success" id="button-addon2">
+            <i class="fas fa-plus"></i>
+            Add User
+        </a>
 
-    <div class="input-group mb-3">
-        <input type="text" class="form-control" placeholder="Search User" aria-label="Search User" aria-describedby="button-addon2">
-        <button class="btn btn-outline-danger" type="button" id="button-addon2">Search</button>
+        <!-- Search Form (aligned to the right) -->
+        <form method="get" asp-action="Index" id="searchForm">
+            <div class="input-group">
+                <input type="text" class="form-control" name="searchQuery" value="@Context.Request.Query["searchQuery"]" placeholder="Search User" aria-label="Search User" aria-describedby="button-addon2">
+                <button class="btn btn-secondary" type="submit" id="button-addon2">Search</button>
+            </div>
+        </form>
     </div>
 
     @if (!ViewData.ModelState.IsValid)
@@ -43,122 +49,149 @@
                 </tr>
             </thead>
             <tbody id="userItems">
-                @foreach (var user in Model)
+                @if (Model.Users != null && Model.Users.Any())
+                {
+                    @foreach (var user in Model.Users)
+                    {
+                        <tr>
+                            <td class="text-capitalize">@user.Name</td>
+                            <td class="text-lowercase">@user.Email</td>
+                            <td>
+                                @if (user.RoleId == 1)
+                                {
+                                    <span class="badge rounded-pill bg-danger">Super Admin</span>
+                                }
+                                else if (user.RoleId == 2)
+                                {
+                                    <span class="badge rounded-pill border border-danger text-danger">Admin</span>
+                                }
+                                else if (user.RoleId == 3)
+                                {
+                                    <span class="badge rounded-pill bg-dark text-white">Agent</span>
+                                }
+                                else if (user.RoleId == 4)
+                                {
+                                    <span class="badge rounded-pill border border-dark text-dark">User</span>
+                                }
+                                else
+                                {
+                                    <span class="badge rounded-pill border border-light">User</span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                @{
+                                    var canEditDelete = false;
+
+                                    if (User.FindFirst("Role")?.Value == "Super Admin" || User.FindFirst("Role")?.Value == "Admin")
+                                    {
+                                        canEditDelete = true;
+                                    }
+
+                                    if (user.Role.RoleName == "Super Admin")
+                                    {
+                                        canEditDelete = false;
+                                    }
+
+                                    if (User.FindFirst("Role")?.Value == user.Role.RoleName)
+                                    {
+                                        canEditDelete = false;
+                                    }
+
+                                    if (user.UserId == User.FindFirst("UserId")?.Value)
+                                    {
+                                        canEditDelete = false;
+                                    }
+                                }
+                                <a asp-action="UserDetails" asp-route-id="@user.UserId" class="edit btn btn-outline-primary btn-sm text-center"><i class="fas fa-eye"></i></a>
+                                @if (canEditDelete)
+                                {
+                                    <a class="btn btn-outline-danger btn-sm" asp-action="Edit" asp-route-id="@user.UserId">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button class="btn btn-outline-danger btn-sm delete-btn" data-bs-toggle="modal" data-bs-target="#deleteUserModal-@user.UserId">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
                 {
                     <tr>
-                        <td class="text-capitalize">@user.Name</td>
-                        <td class="text-lowercase">@user.Email</td>
-                        <td>
-                            @if (user.RoleId == 1)
-                            {
-                                <span class="badge rounded-pill bg-danger">Super Admin</span>
-                            }
-                            else if (user.RoleId == 2)
-                            {
-                                <span class="badge rounded-pill border border-danger text-danger">Admin</span>
-                            }
-                            else if (user.RoleId == 3)
-                            {
-                                <span class="badge rounded-pill bg-dark text-white">Agent</span>
-                            }
-                            else if (user.RoleId == 4)
-                            {
-                                <span class="badge rounded-pill border border-dark text-dark">User</span>
-                            }
-                            else
-                            {
-                                <span class="badge rounded-pill border border-light">User</span>
-                            }
-                        </td>
-                        <td class="text-center">
-                            @{
-                                var canEditDelete = false;
-
-                                if (User.FindFirst("Role")?.Value == "Super Admin" || User.FindFirst("Role")?.Value == "Admin")
-                                {
-                                    canEditDelete = true;
-                                }
-
-                                if (user.Role.RoleName == "Super Admin")
-                                {
-                                    canEditDelete = false;
-                                }
-
-                                if (User.FindFirst("Role")?.Value == user.Role.RoleName)
-                                {
-                                    canEditDelete = false;
-                                }
-
-                                if (user.UserId == User.FindFirst("UserId")?.Value)
-                                {
-                                    canEditDelete = false;
-                                }
-                            }
-                            <a asp-action="UserDetails" asp-route-id="@user.UserId" class="edit btn btn-outline-primary btn-sm text-center"><i class="fas fa-eye"></i></a>                       
-                            @if (canEditDelete)
-                            {
-                                <a class="btn btn-outline-danger btn-sm" asp-action="Edit" asp-route-id="@user.UserId">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <button class="btn btn-outline-danger btn-sm delete-btn" data-bs-toggle="modal" data-bs-target="#deleteUserModal-@user.UserId">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            }
-                        </td>
+                        <td colspan="4" class="text-center">No users found.</td>
                     </tr>
-                }
+                }          
             </tbody>
         </table>
     </div>
 
-    <!-- Delete User Modal -->
-    @foreach (var user in Model)
-    {
-        <div class="modal fade" id="deleteUserModal-@user.UserId" tabindex="-1" aria-labelledby="deleteUserModalLabel-@user.UserId" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="deleteUserModalLabel">Delete User</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p>Are you sure you want to delete this user?</p>
-                        <p><strong>Name: </strong>@user.Name</p>
-                        <p><strong>Email: </strong>@user.Email</p>
-                        <p><strong>Role: </strong>
-                            @if (user.RoleId == 1)
-                            {
-                                <span>Super Admin</span>
-                            }
-                            else if (user.RoleId == 2)
-                            {
-                                <span>Admin</span>
-                            }
-                            else if (user.RoleId == 3)
-                            {
-                                <span>Agent</span>
-                            }
-                            else if (user.RoleId == 4)
-                            {
-                                <span>User</span>
-                            }
-                            else
-                            {
-                                <span>User</span>
-                            }
-                        </p>
-                        <form asp-action="Delete" method="post">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="UserId" value="@user.UserId" />
-                            <button type="submit" class="btn btn-danger">Delete</button>
-                        </form>
-                    </div>
+    <!-- Pagination Controls -->
+    <div class="pagination d-flex justify-content-center gap-2">
+        @if (Model.CurrentPage > 1)
+        {
+            <a href="@Url.Action("Index", new { page = Model.CurrentPage - 1, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-secondary">Previous</a>
+        }
+
+        @for (var i = 1; i <= Model.TotalPages; i++)
+        {
+            <a href="@Url.Action("Index", new { page = i, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-secondary @((i == Model.CurrentPage) ? "active" : "")">@i</a>
+        }
+
+        @if (Model.CurrentPage < Model.TotalPages)
+        {
+            <a href="@Url.Action("Index", new { page = Model.CurrentPage + 1, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-secondary">Next</a>
+        }
+    </div> 
+</div>
+
+<!-- Delete User Modal -->
+@foreach (var user in Model.Users)
+{
+    <div class="modal fade" id="deleteUserModal-@user.UserId" tabindex="-1" aria-labelledby="deleteUserModalLabel-@user.UserId" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteUserModalLabel">Delete User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this user?</p>
+                    <p><strong>Name: </strong>@user.Name</p>
+                    <p><strong>Email: </strong>@user.Email</p>
+                    <p>
+                        <strong>Role: </strong>
+                        @if (user.RoleId == 1)
+                        {
+                            <span>Super Admin</span>
+                        }
+                        else if (user.RoleId == 2)
+                        {
+                            <span>Admin</span>
+                        }
+                        else if (user.RoleId == 3)
+                        {
+                            <span>Agent</span>
+                        }
+                        else if (user.RoleId == 4)
+                        {
+                            <span>User</span>
+                        }
+                        else
+                        {
+                            <span>User</span>
+                        }
+                    </p>
+                    <form asp-action="Delete" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="UserId" value="@user.UserId" />
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
                 </div>
             </div>
         </div>
-    }
-
-</div>
+    </div>
+}
 
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

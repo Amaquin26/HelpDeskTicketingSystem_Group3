@@ -32,13 +32,6 @@ namespace ASI.Basecode.Services.Interfaces
         List<User> GetUsers();
 
         /// <summary>
-        /// Retrieves a queryable collection of users, optionally filtered to only include agents.
-        /// </summary>
-        /// <param name="onlyAgents">If true, only returns users with the "Agent" role.</param>
-        /// <returns>A queryable list of users based on the filter.</returns>
-        IQueryable<User> GetUser(bool onlyAgents);
-
-        /// <summary>
         /// Adds a new user to the system.
         /// </summary>
         /// <param name="user">The user object to add.</param>

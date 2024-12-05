@@ -28,38 +28,34 @@ namespace ASI.Basecode.WebApp.Controllers
         }
 
         // Displays a list of active users
-        public IActionResult Index(bool onlyAgents = false, string searchName = null, string searchEmail = null, int? searchRoleId = null)
+        public IActionResult Index(string searchQuery, int page = 1, int pageSize = 5)
         {
             // Retrieve users based on the onlyAgents flag
-            var usersQuery = _userService.GetUser(onlyAgents = false);
+            var users = _userService.GetUsers();
 
-            // Apply search filter by Name
-            if (!string.IsNullOrEmpty(searchName))
+            if (!string.IsNullOrEmpty(searchQuery))
             {
-                // To perform a case-insensitive search, convert both the property and the search term to lower case
-                usersQuery = usersQuery.Where(u => u.Name != null &&
-                                                    u.Name.ToLower().Contains(searchName.ToLower()));
-            }
-
-            // Apply search filter by Email
-            if (!string.IsNullOrEmpty(searchEmail))
-            {
-                usersQuery = usersQuery.Where(u => u.Email != null &&
-                                                    u.Email.ToLower().Contains(searchEmail.ToLower()));
-            }
-
-            // Apply filter by RoleId
-            if (searchRoleId.HasValue)
-            {
-                usersQuery = usersQuery.Where(u => u.RoleId == searchRoleId.Value);
+                users = users.Where(u => u.Name.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                u.Role.RoleName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                u.Email.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
             var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            users = users.Where(user => user.UserId != userId).ToList();
 
-            var users = usersQuery.Where(user => user.IsActive && user.UserId != userId).ToList();
+            var pagedUsers = users.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            var totalPages = (int)Math.Ceiling(users.Count / (double)pageSize);
+
+            var viewModel = new UserListViewModel
+            {
+                Users = pagedUsers,
+                TotalPages = totalPages,
+                CurrentPage = page,
+                SearchQuery = searchQuery,
+            };
 
             // Pass the filtered user list to the view
-            return View(users);
+            return View(viewModel);
         }
 
         // Loads the Create User form
@@ -189,13 +185,31 @@ namespace ASI.Basecode.WebApp.Controllers
         [HttpPost]
         public IActionResult UpdateProfile(UpdateUserViewModel user)
         {
-            if (user != null)
+            if (!ModelState.IsValid)
+            {
+                return View(user);
+            }
+
+            try
             {
                 _userService.UpdateProfile(user);
                 TempData["SuccessMessage"] = "User has been edited";
             }
+            catch(Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
 
-            return RedirectToAction("Index", "UserTicket");
+            var role = _httpContextAccessor.HttpContext?.User.FindFirst("Role")?.Value;
+
+            if (role == "User")
+            {
+                return RedirectToAction("Index", "UserTicket");
+            }
+            else
+            {
+                return RedirectToAction("Index", "Profile");
+            }
         }
     }
 }

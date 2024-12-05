@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using System.Configuration;
 using System.Linq;
 using System.Security.Claims;
+using System;
 
 namespace ASI.Basecode.WebApp.Controllers
 {
@@ -42,11 +43,52 @@ namespace ASI.Basecode.WebApp.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public IActionResult Index(string searchQuery, int page = 1, int pageSize = 5)
         {                
             var tickets = _ticketService.GetListOfTickets();
 
-            return View(tickets);
+            // Generate chart data for Tickets by Category, Status, and Priority
+            var ticketsByCategory = tickets
+                .GroupBy(t => t.CategoryName)
+                .Select(g => new TicketCategoryCount { Category = g.Key, Count = g.Count() })
+                .ToList();
+
+            var ticketsByStatus = tickets
+                .GroupBy(t => t.StatusName)
+                .Select(g => new TicketStatusCount { Status = g.Key, Count = g.Count() })
+                .ToList();
+
+            var ticketsByPriority = tickets
+                .GroupBy(t => t.PriorityName)
+                .Select(g => new TicketPriorityCount { Priority = g.Key, Count = g.Count() })
+                .ToList();
+
+            if (!string.IsNullOrEmpty(searchQuery))
+            {
+                tickets = tickets.Where(t => t.Title.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                t.CreatedBy.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                t.AgentName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                t.CategoryName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                t.StatusName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                t.PriorityName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            // Paginate the tickets
+            var pagedTickets = tickets.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            var totalPages = (int)Math.Ceiling(tickets.Count / (double)pageSize);
+
+            var viewModel = new TicketListViewModel
+            {
+                Tickets = pagedTickets,
+                CurrentPage = page,
+                TotalPages = totalPages,
+                SearchQuery = searchQuery,
+                TicketsByCategory = ticketsByCategory,
+                TicketsByStatus = ticketsByStatus,
+                TicketsByPriority = ticketsByPriority
+            };
+
+            return View(viewModel);
         }
 
         [HttpGet]

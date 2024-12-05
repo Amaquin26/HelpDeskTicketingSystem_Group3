@@ -1,4 +1,5 @@
 ﻿@model ASI.Basecode.Services.ServiceModels.UpdateUserViewModel
+@using System.Security.Claims;
 @{
     ViewData["Title"] = "Update Profile Page";
     if (User.FindFirst("Role")?.Value == "User")
@@ -42,7 +43,14 @@
 
             <div class="d-flex justify-content-end gap-2">
                 <button type="submit" class="btn d-block btn-danger">Update Profile</button>
-                <a asp-action="Index" asp-controller="UserTicket" class="btn btn-outline-danger">Cancel</a>
+                @if (User.FindFirst("Role")?.Value == "User")
+                {
+                    <a asp-action="Index" asp-controller="UserTicket" class="btn btn-outline-danger">Cancel</a>
+                }
+                else
+                {
+                    <a asp-action="Index" asp-controller="Profile" class="btn btn-outline-danger">Cancel</a>
+                }             
             </div>
         </form>
     </div>
