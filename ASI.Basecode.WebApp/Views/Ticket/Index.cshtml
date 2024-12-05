@@ -1,22 +1,68 @@
 ﻿@{
     ViewData["Title"] = "Ticket Page";
 }
-@using System.Security.Claims;
 
-@model IEnumerable<ASI.Basecode.Services.Dto.TicketDto>
+@using System.Security.Claims;
+@model ASI.Basecode.Services.ServiceModels.TicketListViewModel
 
 <!-- Main Content -->
 <div class="content p-4" style="margin-left: 200px;">
+    <!-- Charts Section -->
+    <div class="row">
+        <h3 class="mb-4"><strong>Ticket Summary</strong></h3>
+
+        <!-- Tickets by Category -->
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Tickets by Category</h5>
+                    <div class="chart-container">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tickets by Status -->
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Tickets by Status</h5>
+                    <div class="chart-container">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tickets by Priority -->
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Tickets by Priority</h5>
+                    <div class="chart-container">
+                        <canvas id="priorityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <h3 class="mb-4"><strong>Ticket Management</strong></h3>
 
-    <a asp-action="AddTicket" asp-controller="Ticket" class="btn btn-danger mb-3" id="button-addon2">
-        <i class="fas fa-plus"></i>
-        Add Ticket
-    </a>
+    <div class="d-flex justify-content-between mb-4">
+        <!-- Add Ticket Button (aligned to the left) -->
+        <a asp-action="AddTicket" asp-controller="Ticket" class="btn btn-success" id="button-addon2">
+            <i class="fas fa-plus"></i> Add Ticket
+        </a>
 
-    <div class="input-group mb-3">
-        <input type="text" class="form-control" id="searchInput" placeholder="Search Ticket" aria-label="Recipient's username" aria-describedby="button-addon2">
-        <button class="btn btn-outline-danger" type="button" id="button-addon2">Search</button>
+        <!-- Search Form (aligned to the right) -->
+        <form method="get" asp-action="Index" id="searchForm">
+            <div class="input-group">
+                <input type="text" class="form-control" name="searchQuery" value="@Context.Request.Query["searchQuery"]" placeholder="Search Ticket" aria-label="Search Ticket" aria-describedby="button-addon2">
+                <button class="btn btn-secondary" type="submit" id="button-addon2">Search</button>
+            </div>
+        </form>
     </div>
 
     <!-- Dynamic Tickets List Table -->
@@ -26,82 +72,97 @@
                 <tr>
                     <th scope="col">Issue</th>
                     <th scope="col">Created By</th>
+                    <th scope="col">Date Created</th>
                     <th scope="col">Category</th>
                     <th scope="col">Priority</th>
                     <th scope="col">Status</th>
-                    <th scope="col">Date Created</th>
                     <th scope="col" class="text-center">Actions</th>
                 </tr>
             </thead>
             <tbody id="ticketItems">
-                @foreach (var ticket in Model)
+                @if (Model.Tickets != null && Model.Tickets.Any())
+                {
+                    foreach (var ticket in Model.Tickets)
+                    {
+                        <tr>
+                            <td>@ticket.Title</td>
+                            <td>@ticket.CreatedBy</td>
+                            <td>@ticket.DateAdded.ToString("MM/dd/yyyy")</td>
+                            <td>@ticket.CategoryName</td>
+                            <td>
+                                @if (ticket.PriorityName == "Low")
+                                {
+                                    <span class="badge pill text-success">Low</span>
+                                }
+                                else if (ticket.PriorityName == "Medium")
+                                {
+                                    <span class="badge pill text-warning">Medium</span>
+                                }
+                                else if (ticket.PriorityName == "High")
+                                {
+                                    <span class="badge pill text-danger">High</span>
+                                }
+                            </td>
+                            <td>
+                                @if (ticket.StatusName == "Open")
+                                {
+                                    <span class="badge pill bg-primary">@ticket.StatusName</span>
+                                }
+                                else if (ticket.StatusName == "In Progress")
+                                {
+                                    <span class="badge pill bg-warning">@ticket.StatusName</span>
+                                }
+                                else if (ticket.StatusName == "Resolved")
+                                {
+                                    <span class="badge pill bg-success">@ticket.StatusName</span>
+                                }
+                                else if (ticket.StatusName == "Closed")
+                                {
+                                    <span class="badge pill bg-danger">@ticket.StatusName</span>
+                                }
+                                else
+                                {
+                                    <span class="badge pill bg-secondary">@ticket.StatusName</span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                <a href="@Url.Action("EditTicket", "Ticket", new { id = ticket.TicketId })" class="btn btn-sm btn-secondary">Edit</a>
+                                <a href="@Url.Action("DeleteTicket", "Ticket", new { ticketId = ticket.TicketId })" class="btn btn-sm btn-outline-danger">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
                 {
                     <tr>
-                        <td>@ticket.Title</td>
-                        <td>@ticket.CreatedBy</td>
-                        <td>@ticket.CategoryName</td>
-                        <td>
-                        @{
-                            if (ticket.PriorityName == "Low")
-                            {
-                                <span class="badge rounded-pill bg-success">Low Priority</span>
-                            }
-                            if (ticket.PriorityName == "Medium")
-                            {
-                                <span class="badge rounded-pill bg-warning">Medium</span>
-                            }
-                            if (ticket.PriorityName == "High")
-                            {
-                                <span class="badge rounded-pill bg-danger">High</span>
-                            }
-                        }
-                        </td>
-                        <td>
-                            @{
-                                if(ticket.StatusName == "Open")
-                                {
-                                    <span class="text-warning">@ticket.StatusName</span>
-                                }
-                                if(ticket.StatusName == "In Progress")
-                                {
-                                    <span class="text-primary">@ticket.StatusName</span>
-                                }
-                                if (ticket.StatusName == "Resolved")
-                                {
-                                    <span class="text-success">@ticket.StatusName</span>
-                                }
-                                if (ticket.StatusName == "Closed")
-                                {
-                                    <span class="text-muted">@ticket.StatusName</span>
-                                }
-                            }
-                        </td>
-                        <td>@ticket.DateAdded</td>
-                        <td class="text-center">
-                            <a asp-action="ViewTicket" asp-route-id="@ticket.TicketId"  class="edit btn btn-outline-primary btn-sm text-center"><i class="fas fa-eye"></i></a>
-                            @if (ticket.CanEdit)
-                            {
-                                <a asp-action="EditTicket" asp-route-id="@ticket.TicketId" asp- class="btn btn-outline-danger btn-sm text-center">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                            }
-                            @if (User.FindFirst("Role")?.Value == "Super Admin" || User.FindFirst("Role")?.Value == "Admin")
-                            {
-                                <button type="button" class="btn btn-outline-danger btn-sm delete-btn text-center" data-bs-toggle="modal" data-bs-target="#deleteTicketModal-@ticket.TicketId">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            }
-                        </td>
+                        <td colspan="7" class="text-center">No tickets found.</td>
                     </tr>
                 }
             </tbody>
         </table>
     </div>
+
+    <!-- Pagination Controls -->
+    <div class="pagination d-flex justify-content-center gap-2">
+        @if (Model.CurrentPage > 1)
+        {
+            <a href="@Url.Action("Index", new { page = Model.CurrentPage - 1, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-secondary">Previous</a>
+        }
+
+        @for (var i = 1; i <= Model.TotalPages; i++)
+        {
+            <a href="@Url.Action("Index", new { page = i, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-secondary @((i == Model.CurrentPage) ? "active" : "")">@i</a>
+        }
+
+        @if (Model.CurrentPage < Model.TotalPages)
+        {
+            <a href="@Url.Action("Index", new { page = Model.CurrentPage + 1, searchQuery = Model.SearchQuery })" class="btn btn-sm btn-outline-secondary">Next</a>
+        }
+    </div>
 </div>
 
-
 <!-- Delete Ticket Modal -->
-@foreach (var ticket in Model)
+@foreach (var ticket in Model.Tickets)
 {
     <div class="modal fade" id="deleteTicketModal-@ticket.TicketId" tabindex="-1" aria-labelledby="deleteTicketModalLabel-@ticket.TicketId" aria-hidden="true">
         <div class="modal-dialog">
@@ -128,16 +189,117 @@
 }
 
 @section scripts {
-    <script>
-        // Check for error message and display Toastr notification
-        var errorMessage = '@TempData["ErrorMessage"]';
-        if (errorMessage) {
-            toastr.error(errorMessage);
-        }
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript">
+        // Get the data from the server and log it to the console for verification
+        var ticketsByCategory = @Html.Raw(Json.Serialize(Model.TicketsByCategory));
+        var ticketsByStatus = @Html.Raw(Json.Serialize(Model.TicketsByStatus));
+        var ticketsByPriority = @Html.Raw(Json.Serialize(Model.TicketsByPriority));
 
-        var successMessage = '@TempData["SuccessMessage"]';
-        if (successMessage) {
-            toastr.success(successMessage);
-        }
+        console.log(ticketsByCategory);
+        console.log(ticketsByStatus);
+        console.log(ticketsByPriority);
+
+        // Map the data for Chart.js format (labels and corresponding counts)
+        var categoryLabels = ticketsByCategory.map(item => item.category);
+        var categoryCounts = ticketsByCategory.map(item => item.count);
+
+        var statusLabels = ticketsByStatus.map(item => item.status);
+        var statusCounts = ticketsByStatus.map(item => item.count);
+
+        var priorityLabels = ticketsByPriority.map(item => item.priority);
+        var priorityCounts = ticketsByPriority.map(item => item.count);
+
+        // Example of how you would use this mapped data in a Chart.js chart
+        new Chart(document.getElementById("categoryChart"), {
+            type: 'pie',  // You can choose 'bar', 'pie', 'line', etc.
+            data: {
+                labels: categoryLabels,  // Labels for each section (e.g., "Bug", "Support")
+                datasets: [{
+                    data: categoryCounts,  // Corresponding data for each label (e.g., [1, 2])
+                    backgroundColor: [ // Optional color options
+                        '#ffcfd4',   // Light red shade
+                        '#fd838e',   // Medium red shade
+                        '#dc3545',   // Standard red
+                        '#c41c25',   // Darker red
+                        '#b30000'    // Very dark red
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom', // Position legend at the bottom
+                        align: 'center', // Align legend in the center
+                        labels: {
+                            boxWidth: 20, // Adjust the width of the legend color box
+                            padding: 20,  // Adjust the spacing between legend items
+                        }
+                    }
+                }
+            }
+        });
+
+        new Chart(document.getElementById("statusChart"), {
+            type: 'pie',  // Change chart type as needed
+            data: {
+                labels: statusLabels,  // Labels for each status ("Open", "Resolved")
+                datasets: [{
+                    data: statusCounts,  // Corresponding data
+                    backgroundColor: [ // Optional color options
+                        '#ffcfd4',   // Light red shade
+                        '#fd838e',   // Medium red shade
+                        '#dc3545',   // Standard red
+                        '#c41c25',   // Darker red
+                        '#b30000'    // Very dark red
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom', // Position legend at the bottom
+                        align: 'center', // Align legend in the center
+                        labels: {
+                            boxWidth: 20, // Adjust the width of the legend color box
+                            padding: 20,  // Adjust the spacing between legend items
+                        }
+                    }
+                }
+            }
+        });
+
+        new Chart(document.getElementById("priorityChart"), {
+            type: 'pie',
+            data: {
+                labels: priorityLabels,  // Labels for each priority ("Low")
+                datasets: [{
+                    data: priorityCounts,  // Corresponding data
+                    backgroundColor: [ // Optional color options
+                        '#ffcfd4',   // Light red shade
+                        '#fd838e',   // Medium red shade
+                        '#dc3545',   // Standard red
+                        '#c41c25',   // Darker red
+                        '#b30000'    // Very dark red
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom', // Position legend at the bottom
+                        align: 'center', // Align legend in the center
+                        labels: {
+                            boxWidth: 20, // Adjust the width of the legend color box
+                            padding: 20,  // Adjust the spacing between legend items
+                        }
+                    }
+                }
+            }
+        });
     </script>
+
 }

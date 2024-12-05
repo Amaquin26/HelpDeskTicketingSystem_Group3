@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Configuration;
 using System.Linq;
 using System.Security.Claims;
@@ -42,12 +43,54 @@ namespace ASI.Basecode.WebApp.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
-        {                
-            var tickets = _ticketService.GetListOfTickets();
+        public IActionResult Index(string searchQuery, int page = 1, int pageSize = 5)
+        {
+            var tickets = _ticketService.GetListOfTickets(); // Assuming this returns a list of TicketDto objects
 
-            return View(tickets);
+            // Generate chart data for Tickets by Category, Status, and Priority
+            var ticketsByCategory = tickets
+                .GroupBy(t => t.CategoryName)
+                .Select(g => new TicketCategoryCount { Category = g.Key, Count = g.Count() })
+                .ToList();
+
+            var ticketsByStatus = tickets
+                .GroupBy(t => t.StatusName)
+                .Select(g => new TicketStatusCount { Status = g.Key, Count = g.Count() })
+                .ToList();
+
+            var ticketsByPriority = tickets
+                .GroupBy(t => t.PriorityName)
+                .Select(g => new TicketPriorityCount { Priority = g.Key, Count = g.Count() })
+                .ToList();
+
+            // If a search query is provided, filter the tickets
+            if (!string.IsNullOrEmpty(searchQuery))
+            {
+                tickets = tickets.Where(t => t.Title.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                                              t.AssigneeId.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                                              t.CategoryName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                                              t.PriorityName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            // Paginate the tickets
+            var pagedTickets = tickets.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            var totalPages = (int)Math.Ceiling(tickets.Count / (double)pageSize);
+
+            // Create a ViewModel or pass necessary data to the view
+            var viewModel = new TicketListViewModel
+            {
+                Tickets = pagedTickets,
+                CurrentPage = page,
+                TotalPages = totalPages,
+                SearchQuery = searchQuery,
+                TicketsByCategory = ticketsByCategory,
+                TicketsByStatus = ticketsByStatus,
+                TicketsByPriority = ticketsByPriority
+            };
+
+            return View(viewModel);
         }
+
 
         [HttpGet]
         public IActionResult AddTicket()
@@ -181,7 +224,7 @@ namespace ASI.Basecode.WebApp.Controllers
                     Title = "You have been assigned to a ticket",
                     Description = "New ticket was assigned to you",
                     DateCreated = System.DateTime.Now,
-                    UserId=ticket.AssigneeId
+                    UserId = ticket.AssigneeId
                 }
             );
             TempData["SuccessMessage"] = "Ticket Added";
