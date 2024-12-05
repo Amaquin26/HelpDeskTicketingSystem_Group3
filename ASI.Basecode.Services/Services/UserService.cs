@@ -279,5 +279,19 @@ namespace ASI.Basecode.Services.Services
         {
             return _repository.GetUserRole(userId);
         }
+
+        public List<Role> GetUserRoles()
+        {
+            var role = _httpContextAccessor.HttpContext?.User.FindFirst("Role")?.Value;
+            var rolesQuery = _repository.GetUserRoles();
+
+            if (role == "Admin")
+            {
+                var roleIds = new List<int> { 3, 4 }; // admins can only add users or agents
+                rolesQuery = rolesQuery.Where(x => roleIds.Contains(x.RoleId));
+            }
+
+            return rolesQuery.ToList();
+        }
     }
 }

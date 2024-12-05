@@ -2,63 +2,15 @@
 @using Microsoft.AspNetCore.Mvc.ModelBinding
 @using System.Security.Claims;
 @{
-    ViewData["Title"] = "User Details";
+    ViewData["Title"] = "Profile";
 }
 
-
 <div class="content p-4" style="margin-left: 200px;">
-    <div class="d-flex justify-content-between mb-3">
-        <!-- Back Button on the Left -->
-        <a asp-action="Index" class="btn">
-            <i class="fas fa-arrow-left"></i> Back
-        </a>
+    <h3 class="mb-4"><strong>Your Details</strong></h3>
 
-        <!-- Edit and Delete Buttons on the Right -->
-        <div>
-            @{
-                var canDelete = false;
-                var canEdit = false;
-
-                if (User.FindFirst("Role")?.Value == "Super Admin" || User.FindFirst("Role")?.Value == "Admin")
-                {
-                    canDelete = true;
-                    canEdit = true;
-                }
-
-                if (@Model.RoleName == "Super Admin")
-                {
-                    canDelete = false;
-                    canEdit = false;
-                }
-
-                if (User.FindFirst("Role")?.Value == @Model.RoleName)
-                {
-                    canDelete = false;
-                    canEdit = false;
-                }
-
-                if (@Model.UserId == User.FindFirst("UserId")?.Value)
-                {
-                    canDelete = false;
-                    canEdit = true;
-                }         
-            }
-            @if(canEdit)
-            {
-                <a asp-action="Edit" asp-route-id="@Model.UserId" class="btn btn-outline-danger me-2">
-                    <i class="fas fa-edit"></i> Edit
-                </a>
-            }       
-            @if (canDelete)
-            {
-                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal-@Model.UserId">
-                    <i class="fas fa-trash-alt"></i> Delete
-                </button>
-            }
-        </div>
-    </div>
-
-    <h3 class="mb-4"><strong>User Details</strong></h3>
+    <a asp-action="UpdateProfile" asp-controller="User" class="btn btn-danger mb-3" id="button-addon2">
+        Update Profile
+    </a>
 
     <!-- Agent Info Card -->
     <div class="card mb-4">
@@ -75,7 +27,7 @@
                     <p class="mb-0"><strong>Role:</strong> @Model.RoleName</p>
                 </div>
                 @{
-                    if(Model.RoleName != "User")
+                    if (Model.RoleName != "User")
                     {
                         <div class="col-md-4">
                             <p class="mb-0"><strong>Customer Satisfaction Rating:</strong> @Model.CustomerRating.ToString("F2") /5</p>
@@ -113,7 +65,7 @@
     </div>
 
     @{
-        if(Model.RoleName != "User")
+        if (Model.RoleName != "User")
         {
             <h3 class="mb-4"><strong>Assigned Tickets</strong></h3>
         }

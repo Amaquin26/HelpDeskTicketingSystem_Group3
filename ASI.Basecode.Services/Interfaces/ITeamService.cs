@@ -1,4 +1,5 @@
-﻿using ASI.Basecode.Services.Dto;
+﻿using ASI.Basecode.Data.Models;
+using ASI.Basecode.Services.Dto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,9 @@ namespace ASI.Basecode.Services.ServiceModels
         void EditTeam(TeamViewModel model);
         void DeleteTeam(int id);
         TeamDetailsDto? GetTeamDetails(int id);
+        void RemoveTeamMember(string userId);
+        List<User> GetAdditionalMembers(int teamId);
+        void AddAgentToTeam(string userId, int teamId);
     }
 
 }

@@ -1,5 +1,5 @@
 ﻿@model ASI.Basecode.Services.Dto.TeamDetailsDto
-
+@using System.Security.Claims;
 @{
     ViewData["Title"] = "Team Details Page";
 }
@@ -12,14 +12,17 @@
         </a>
 
         <!-- Edit and Delete Buttons on the Right -->
-        <div>
-            <a asp-action="Edit" asp-route-id="@Model.TeamId" class="edit btn btn-outline-danger me-2">
-                <i class="fas fa-edit"></i> Edit
-            </a>
-            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteTeamModal-@Model.TeamId">
-                <i class="fas fa-trash-alt"></i> Delete
-            </button>
-        </div>
+        @if (User.FindFirst("Role")?.Value == "Super Admin" || User.FindFirst("Role")?.Value == "Admin")
+        {
+            <div>
+                <a asp-action="Edit" asp-route-id="@Model.TeamId" class="btn btn-outline-danger me-2">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteTeamModal-@Model.TeamId">
+                    <i class="fas fa-trash-alt"></i> Delete
+                </button>
+            </div>
+        }
     </div>
 
     <h2 class="mb-4">Team Details</h2>
@@ -61,6 +64,54 @@
             </div>
         </div>
     </div>
+
+    <h3 class="mb-4"><strong>Team Members</strong></h3>
+
+    @if (User.FindFirst("Role")?.Value == "Super Admin" || User.FindFirst("Role")?.Value == "Admin" || User.FindFirst("UserId")?.Value == Model.TeamLeaderId)
+    {
+        <a class="btn btn-danger mb-3" asp-action="AddMember" asp-route-teamId="@Model.TeamId">
+            <i class="fas fa-plus"></i>
+            Add Team Member
+        </a>
+    }
+
+    @if(Model.TeamMebers.Count > 0)
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Role</th>
+                        <th class="action-column">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="userItems">
+                    @foreach (var member in Model.TeamMebers)
+                    {
+                        <tr>
+                            <td>@member.Name</td>
+                            <td>@member.Email</td>
+                            <td>@member.Role</td>
+                            @if (User.FindFirst("Role")?.Value == "Super Admin" || User.FindFirst("Role")?.Value == "Admin" || User.FindFirst("UserId")?.Value == Model.TeamLeaderId)
+                            {
+                                <td>
+                                    <button type="button" class="btn btn-outline-danger btn-sm delete-btn" data-bs-toggle="modal" data-bs-target="#deleteMemberModal-@member.UserId">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <h5 class="mb-4">No Members</h5>
+    }
 
     <h3 class="mb-4"><strong>Assigned Tickets</strong></h3>
     <div class="mb-4">
@@ -112,3 +163,29 @@
         </div>
     </div>
 </div>
+
+<!-- Remove TeamMember Modal -->
+@foreach (var member in Model.TeamMebers)
+{
+    <div class="modal fade" id="deleteMemberModal-@member.UserId" tabindex="-1" aria-labelledby="deleteMemberModal-@member.UserId" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteTeamModalLabel">Delete Team Member</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to remove this member from the team?</p>
+                    <p><strong>Name: </strong>@member.Name</p>
+                    <p><strong>Email: </strong>@member.Email</p>
+                    <form asp-action="RemoveTeamMember" asp-controller="Team" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="UserId" value="@member.UserId" />
+                        <input type="hidden" name="TeamId" value="@Model.TeamId" />
+                        <button type="submit" class="btn btn-danger">Remove</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}

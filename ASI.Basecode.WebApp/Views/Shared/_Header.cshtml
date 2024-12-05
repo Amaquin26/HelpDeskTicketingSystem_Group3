@@ -12,6 +12,13 @@
     </div>
     <ul>
 
+        @if (User.Identity.IsAuthenticated)
+        {
+            <li class="@(IsActive("Index", "Profile") ? "active" : "")">
+                <a asp-action="Index" asp-controller="Profile"><i class="fas fa-user"></i> <span>Profile</span></a>
+            </li>
+        }
+
         @if (User.FindFirst("Role")?.Value == "Agent")
         {
             <li class="@(IsActive("Index", "Ticket") ? "active" : "")">
@@ -34,6 +41,9 @@
 
         @if (User.Identity.IsAuthenticated)
         {
+            <li class="@(IsActive("Index", "Feedback") ? "active" : "")">
+                <a asp-action="Index" asp-controller="Feedback"><i class="fas fa-comment"></i> <span>Feedback</span></a>
+            </li>
             <li class="@(IsActive("Index", "Notification") ? "active" : "")">
                 <a asp-action="Index" asp-controller="Notification"><i class="fas fa-bell"></i> <span>Notifications</span></a>
             </li>

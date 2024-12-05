@@ -1,8 +1,10 @@
-﻿using ASI.Basecode.Services.Interfaces;
+﻿using ASI.Basecode.Data.Models;
+using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace ASI.Basecode.WebApp.Controllers
@@ -96,6 +98,62 @@ namespace ASI.Basecode.WebApp.Controllers
             }
 
             return View(team);
+        }
+
+        [HttpPost]
+        public IActionResult RemoveTeamMember(string userId, int teamId)
+        {
+            _teamService.RemoveTeamMember(userId);
+            return RedirectToAction("TeamDetails", new { Id = teamId });
+        }
+
+        [HttpGet]
+        public IActionResult AddMember(int teamId)
+        {
+            var agents = _teamService.GetAdditionalMembers(teamId);
+
+            var agentItems = new List<SelectListItem>();
+
+            foreach (User agent in agents)
+            {
+                var listItem = new SelectListItem { Text = agent.Name, Value = agent.UserId };
+                agentItems.Add(listItem);
+            }
+
+            ViewBag.Agents = agentItems;
+            ViewBag.TeamId = teamId;
+
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult AddMember(AddTeamMemberViewModel agent)
+        {
+            List<User> agents;
+            List<SelectListItem> agentItems;
+
+
+            if (!ModelState.IsValid)
+            {
+                agents = _teamService.GetAdditionalMembers(agent.TeamId);
+
+                agentItems = new List<SelectListItem>();
+
+                foreach (User a in agents)
+                {
+                    var listItem = new SelectListItem { Text = a.Name, Value = a.UserId };
+                    agentItems.Add(listItem);
+                }
+
+                ViewBag.Agents = agentItems;
+                ViewBag.TeamId = agent.TeamId;
+
+                return View();
+            }
+
+            _teamService.AddAgentToTeam(agent.UserId, agent.TeamId);
+
+            return RedirectToAction("TeamDetails", new { Id = agent.TeamId });
         }
     }
 

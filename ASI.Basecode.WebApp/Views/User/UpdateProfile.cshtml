@@ -1,14 +1,23 @@
-﻿@{
+﻿@model ASI.Basecode.Services.ServiceModels.UpdateUserViewModel
+@{
     ViewData["Title"] = "Update Profile Page";
-    Layout = "~/Views/Shared/_LayoutUser.cshtml";
+    if (User.FindFirst("Role")?.Value == "User")
+    {
+        Layout = "~/Views/Shared/_LayoutUser.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+
+    var containerStyle = User.FindFirst("Role")?.Value != "User" ? "margin-left: 200px;" : "";
+    var containerClass = User.FindFirst("Role")?.Value != "User" ? "container content  p-4" : "container content";
 }
-@model ASI.Basecode.Services.ServiceModels.UpdateUserViewModel
 
-
-<div class="container content">
+<div class="@containerClass" style="@containerStyle">
     <div class="row">
 
-        <h3 class="mb-4"><strong>Change Password</strong></h3>
+        <h3 class="mb-4"><strong>Update Profile</strong></h3>
         <form method="post" action="UpdateProfile">
             <div class="mb-3">
                 <input asp-for="@Model.UserId" hidden>

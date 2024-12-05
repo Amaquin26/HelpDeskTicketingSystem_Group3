@@ -180,9 +180,63 @@ namespace ASI.Basecode.Services.Services
                 PriorityId = t.PriorityId
             }).ToList();
 
+            var teamMembers = _userRepository.GetUsers()
+                .Where(x => x.TeamId == id && teamDetails.TeamLeaderId != x.UserId)
+                .Select(
+                    x => new TeamMember
+                    {
+                        UserId = x.UserId,
+                        Name = x.Name,
+                        Role = x.Role.RoleName,
+                        Email = x.Email
+                    }
+                )
+                .ToList();
+
             teamDetails.Tickets = ticketDtos;
+            teamDetails.TeamMebers = teamMembers;
 
             return teamDetails;
+        }
+
+        public void RemoveTeamMember(string userId)
+        {
+            var user = _userRepository.GetUsers().FirstOrDefault(x => x.UserId == userId);
+
+            if (user != null)
+            {
+                user.TeamId = null;
+                _userRepository.UpdateUser(user);   
+            }
+        }
+
+        public List<User> GetAdditionalMembers(int teamId)
+        {
+            var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var team = _teamRepository.GetTeams().FirstOrDefault(x => x.TeamId == teamId);
+
+            if(team == null)
+            {
+                return new List<User>();
+            }
+
+            var users = _userRepository.GetAgents()
+                .Where(x => x.TeamId == null && team.TeamLeaderId != userId)
+                .ToList();
+
+            return users;
+        }
+
+        public void AddAgentToTeam(string userId, int teamId)
+        {
+            var user = _userRepository.GetAgents().FirstOrDefault(x => x.UserId == userId);
+
+            if(user != null)
+            {
+                user.TeamId = teamId;
+            }
+
+            _userRepository.UpdateUser(user);
         }
     }
 

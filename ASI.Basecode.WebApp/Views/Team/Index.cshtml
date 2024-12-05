@@ -39,7 +39,7 @@
                             <a asp-action="Edit" asp-route-id="@team.TeamId" class="btn btn-outline-danger btn-sm">
                                 <i class="fas fa-edit"></i>
                             </a>
-                                    <button type="button" class="btn btn-outline-danger btn-sm delete-btn" data-bs-toggle="modal" data-bs-target="#deleteTeamModal-@team.TeamId">
+                            <button type="button" class="btn btn-outline-danger btn-sm delete-btn" data-bs-toggle="modal" data-bs-target="#deleteTeamModal-@team.TeamId">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         </td>
@@ -49,7 +49,7 @@
         </table>
     </div>
 
-    <!-- Delete User Modal -->
+    <!-- Delete Team Modal -->
     @foreach (var team in Model)
     {
         <div class="modal fade" id="deleteTeamModal-@team.TeamId" tabindex="-1" aria-labelledby="deleteTeamModal-@team.TeamId" aria-hidden="true">

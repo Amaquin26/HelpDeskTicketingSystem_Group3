@@ -71,35 +71,35 @@
                             }
                         </td>
                         <td class="text-center">
-                            <a asp-action="UserDetails" asp-route-id="@user.UserId" class="edit btn btn-outline-primary btn-sm text-center"><i class="fas fa-eye"></i></a>
-                            <a class="btn btn-outline-danger btn-sm" asp-action="Edit" asp-route-id="@user.UserId">
-                                <i class="fas fa-edit"></i>
-                            </a>
                             @{
-                                var canDelete = false;
+                                var canEditDelete = false;
 
                                 if (User.FindFirst("Role")?.Value == "Super Admin" || User.FindFirst("Role")?.Value == "Admin")
                                 {
-                                    canDelete = true;
+                                    canEditDelete = true;
                                 }
 
                                 if (user.Role.RoleName == "Super Admin")
                                 {
-                                    canDelete = false;
+                                    canEditDelete = false;
                                 }
 
                                 if (User.FindFirst("Role")?.Value == user.Role.RoleName)
                                 {
-                                    canDelete = false;
+                                    canEditDelete = false;
                                 }
 
                                 if (user.UserId == User.FindFirst("UserId")?.Value)
                                 {
-                                    canDelete = false;
+                                    canEditDelete = false;
                                 }
                             }
-                            @if (canDelete)
+                            <a asp-action="UserDetails" asp-route-id="@user.UserId" class="edit btn btn-outline-primary btn-sm text-center"><i class="fas fa-eye"></i></a>                       
+                            @if (canEditDelete)
                             {
+                                <a class="btn btn-outline-danger btn-sm" asp-action="Edit" asp-route-id="@user.UserId">
+                                    <i class="fas fa-edit"></i>
+                                </a>
                                 <button class="btn btn-outline-danger btn-sm delete-btn" data-bs-toggle="modal" data-bs-target="#deleteUserModal-@user.UserId">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>

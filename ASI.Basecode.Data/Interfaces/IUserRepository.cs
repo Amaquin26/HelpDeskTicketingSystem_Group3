@@ -69,5 +69,6 @@ namespace ASI.Basecode.Data.Interfaces
         /// </summary>
         /// <returns>The role of the user</returns>
         Role GetUserRole(string userId);
+        IQueryable<Role> GetUserRoles();
     }
 }

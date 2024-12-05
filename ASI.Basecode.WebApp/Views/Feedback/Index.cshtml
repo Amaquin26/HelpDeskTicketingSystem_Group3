@@ -1,17 +1,30 @@
-﻿
+﻿@model IEnumerable<ASI.Basecode.Services.ServiceModels.FeedbackViewModel>
+@using System.Security.Claims;
 @{
     ViewData["Title"] = "Feedbacks Model";
-    Layout = "~/Views/Shared/_LayoutUser.cshtml";
-}
-@model IEnumerable<ASI.Basecode.Services.ServiceModels.FeedbackViewModel>
+    if (User.FindFirst("Role")?.Value == "User")
+    {
+        Layout = "~/Views/Shared/_LayoutUser.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
 
-<div class="container content">
+    var containerStyle = User.FindFirst("Role")?.Value != "User" ? "margin-left: 200px;" : "";
+    var containerClass = User.FindFirst("Role")?.Value != "User" ? "container content  p-4" : "container content";
+}
+
+<div class="@containerClass" style="@containerStyle">
     <h3 class="mb-4"><strong>Feedbacks</strong></h3>
 
-    <a asp-action="Create" class="btn btn-danger mb-3" id="button-addon2">
-        <i class="fas fa-plus"></i>
-        Add Feedback
-    </a>
+    @if (User.FindFirst("Role")?.Value == "User")
+    {
+        <a asp-action="Create" class="btn btn-danger mb-3" id="button-addon2">
+            <i class="fas fa-plus"></i>
+            Add Feedback
+        </a>
+    }
 
     <div class="input-group mb-3">
         <input type="text" class="form-control" id="searchInput" placeholder="Search Feedbacks">
@@ -30,21 +43,23 @@
                             </p>
                             <p class="card-text mb-0 text-muted small">@feedback.CreatedTime</p>
                         </div>
-                        <div>
-                            <a asp-action="Edit" asp-route-id="@feedback.FeedbackId" class="btn btn-sm btn-outline-danger me-1">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal-@feedback.FeedbackId">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </div>
+                        @if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == feedback.UserId || User.FindFirst("Role")?.Value == "Super Admin" || User.FindFirst("Role")?.Value == "Admin")
+                        {
+                            <div>
+                                @if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == feedback.UserId)
+                                {
+                                    <a asp-action="Edit" asp-route-id="@feedback.FeedbackId" class="btn btn-sm btn-outline-danger me-1">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                }
+                                <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal-@feedback.FeedbackId">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        }
                     </div>
                     <hr />
-                    <div class="d-flex justify-content-between mb-2">
-                        <p class="card-text small mb-0"><strong>Feedback ID:</strong> @feedback.FeedbackId</p>
-                        <p class="card-text small mb-0"><strong>Ticket ID:</strong> @feedback.TicketId</p>
-                    </div>
-                    <p class="card-text">@feedback.Rating</p>
+                    <p class="card-text fw-bold">@feedback.Rating</p>
                     <p class="card-text flex-grow-1">@feedback.Comment</p>
                 </div>
             </div>

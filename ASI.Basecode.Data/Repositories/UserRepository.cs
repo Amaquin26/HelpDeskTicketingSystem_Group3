@@ -64,8 +64,12 @@ namespace ASI.Basecode.Data.Repositories
 
         public Role GetUserRole(string userId)
         {
-            // return the user role
             return this.GetDbSet<User>().Include(u => u.Role).Where(u => u.UserId == userId).Select(u => u.Role).FirstOrDefault();
+        }
+
+        public IQueryable<Role> GetUserRoles()
+        {
+            return this.GetDbSet<Role>();
         }
     }
 }

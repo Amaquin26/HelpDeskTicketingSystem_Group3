@@ -1,5 +1,5 @@
 ﻿@model ASI.Basecode.Services.ServiceModels.TicketViewModel
-
+@using System.Security.Claims;
 @{
     ViewData["Title"] = "Edit Ticket Page";
 }
@@ -46,21 +46,29 @@
             <span asp-validation-for="Ticket.PriorityId" class="text-danger"></span>
         </div>
 
-        <div class="mb-3">
-            <label asp-for="Ticket.AssigneeId" class="form-label">Reassign to Agent</label>
-            <select asp-for="Ticket.AssigneeId" class="form-select" id="ticketAssign" asp-items="@(new SelectList(Model.Agents, "UserId", "Name"))">
-                <option value="">Select Agent</option>
-            </select>
-            <span asp-validation-for="Ticket.AssigneeId" class="text-danger"></span>
-        </div>
+        @if (User.FindFirst("Role")?.Value == "Super Admin" || User.FindFirst("Role")?.Value == "Admin")
+        {
+            <div class="mb-3">
+                <label asp-for="Ticket.AssigneeId" class="form-label">Reassign to Agent</label>
+                <select asp-for="Ticket.AssigneeId" class="form-select" id="ticketAssign" asp-items="@(new SelectList(Model.Agents, "UserId", "Name"))">
+                    <option value="">Select Agent</option>
+                </select>
+                <span asp-validation-for="Ticket.AssigneeId" class="text-danger"></span>
+            </div>
 
-        <div class="mb-3">
-            <label asp-for="Ticket.TeamAssignedId" class="form-label">Reassign to Team</label>
-            <select asp-for="Ticket.TeamAssignedId" class="form-select" id="teamAssign" asp-items="@(new SelectList(Model.Teams, "TeamId", "TeamName"))">
-                <option value="">Select Team</option>
-            </select>
-            <span asp-validation-for="Ticket.TeamAssignedId" class="text-danger"></span>
-        </div>
+            <div class="mb-3">
+                <label asp-for="Ticket.TeamAssignedId" class="form-label">Reassign to Team</label>
+                <select asp-for="Ticket.TeamAssignedId" class="form-select" id="teamAssign" asp-items="@(new SelectList(Model.Teams, "TeamId", "TeamName"))">
+                    <option value="">Select Team</option>
+                </select>
+                <span asp-validation-for="Ticket.TeamAssignedId" class="text-danger"></span>
+            </div>
+        }
+        else
+        {
+            <input type="hidden" asp-for="Ticket.AssigneeId" />
+            <input type="hidden" asp-for="Ticket.TeamAssignedId" />
+        }     
 
         @* <div class="mb-3">
             <label for="ticketAttachment" class="form-label">Attachments</label>

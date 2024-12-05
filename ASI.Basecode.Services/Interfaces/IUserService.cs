@@ -72,5 +72,6 @@ namespace ASI.Basecode.Services.Interfaces
         void UpdateProfile(UpdateUserViewModel user);
 
         Role GetUserRole(string userId);
+        List<Role> GetUserRoles();
     }
 }

@@ -38,9 +38,23 @@ namespace ASI.Basecode.Services.Services
         /// </returns>
         public List<FeedbackViewModel> GetListOfFeedbacks()
         {
+            var id = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var role = _httpContextAccessor.HttpContext?.User.FindFirst("Role")?.Value;
+
             var feedbacks = _feedbackRepository.GetFeedbacks().ToList();
 
-            var feedViewModels = feedbacks
+            var feedbackQuery = feedbacks;
+                
+
+            if (role == "User")
+            {
+                feedbackQuery.Where(x => x.UserId == id);
+            }else if (role == "Agent")
+            {
+                feedbackQuery.Where(x => x.Ticket.AssigneeId == id);
+            }
+
+            var feedbackViewModels = feedbackQuery
                 .Select(f => new FeedbackViewModel
                 {
                     FeedbackId = f.FeedbackId,
@@ -53,7 +67,7 @@ namespace ASI.Basecode.Services.Services
                     TicketTitle = f.Ticket.Title
                 }).ToList();
 
-            return feedViewModels;
+            return feedbackViewModels;
         }
 
         /// <summary>

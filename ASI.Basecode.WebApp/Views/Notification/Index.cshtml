@@ -1,32 +1,41 @@
-﻿@{
+﻿@model IEnumerable<ASI.Basecode.Data.Models.Notification>
+@{
     ViewData["Title"] = "Notitications Page";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    if (User.FindFirst("Role")?.Value == "User")
+    {
+        Layout = "~/Views/Shared/_LayoutUser.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+
+    var containerStyle = User.FindFirst("Role")?.Value != "User" ? "margin-left: 200px;" : "";
+    var containerClass = User.FindFirst("Role")?.Value != "User" ? "container content  p-4" : "container content";
 }
-@model IEnumerable<ASI.Basecode.Data.Models.Notification>
 
-
-<div class="content p-4" style="margin-left: 200px;">
+<div class="@containerClass" style="@containerStyle">
     <div class="row">
 
-        <h2 class="mb-4">Notifications</h2>
+    <h2 class="mb-4">Notifications</h2>
 
-        <!-- Ticket Notifications Section -->
-        @foreach (var notif in Model)
-        {
-            <div id="ticketNotifications" class="notification-section mb-5">
-                <div class="card notification-card mb-3 position-relative">
-                    <div class="card-body">
-                        <h5 class="card-title">@notif.Title</h5>
-                        <p class="card-text">@notif.Description</p>
-                        <p class="notification-time">@notif.DateCreated</p>
-                        <form asp-action="Delete" method="post">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="NotificationId" value="@notif.Id" />
-                            <button type="submit" class="btn-close position-absolute top-0 end-0 m-3" aria-label="Close"></button>
-                        </form>
-                    </div>
+    <!-- Ticket Notifications Section -->
+    @foreach (var notif in Model)
+    {
+        <div id="ticketNotifications" class="notification-section mb-5">
+            <div class="card notification-card mb-3 position-relative">
+                <div class="card-body">
+                    <h5 class="card-title">@notif.Title</h5>
+                    <p class="card-text">@notif.Description</p>
+                    <p class="notification-time">@notif.DateCreated</p>
+                    <form asp-action="Delete" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="NotificationId" value="@notif.Id" />
+                        <button type="submit" class="btn-close position-absolute top-0 end-0 m-3" aria-label="Close"></button>
+                    </form>
                 </div>
             </div>
-        }
-    </div>
+        </div>
+    }
+</div>
 </div>

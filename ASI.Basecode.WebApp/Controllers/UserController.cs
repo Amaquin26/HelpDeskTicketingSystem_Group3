@@ -73,13 +73,17 @@ namespace ASI.Basecode.WebApp.Controllers
             })
             .ToList();
 
-            ViewBag.Roles = new List<SelectListItem>
+            var roles = _userService.GetUserRoles();
+
+            var roleItems = new List<SelectListItem>();
+
+            foreach(Role role in roles)
             {
-                new SelectListItem { Text = "Super Admin", Value = "1" },
-                new SelectListItem { Text = "Admin", Value = "2" },
-                new SelectListItem { Text = "Agent", Value = "3" },
-                new SelectListItem { Text = "User", Value = "4" },
-            };
+                var listItem = new SelectListItem { Text = role.RoleName, Value = role.RoleId.ToString()};
+                roleItems.Add(listItem);
+            }
+
+            ViewBag.Roles = roleItems;
 
             var user = new User();
             return View(user); 
@@ -92,6 +96,8 @@ namespace ASI.Basecode.WebApp.Controllers
             _userService.AddUser(user); 
             return RedirectToAction("Index","User");
         }
+
+        [HttpGet]
         public IActionResult Edit(string id)
         {
             var user = _userService.GetUsers().FirstOrDefault(x => x.UserId == id);
@@ -109,13 +115,18 @@ namespace ASI.Basecode.WebApp.Controllers
             })
             .ToList();
 
-            ViewBag.Roles = new List<SelectListItem>
+            var roles = _userService.GetUserRoles();
+
+            var roleItems = new List<SelectListItem>();
+
+            foreach (Role role in roles)
             {
-                new SelectListItem { Text = "Super Admin", Value = "1" },
-                new SelectListItem { Text = "Admin", Value = "2" },
-                new SelectListItem { Text = "Agent", Value = "3" },
-                new SelectListItem { Text = "User", Value = "4" },
-            };
+                var listItem = new SelectListItem { Text = role.RoleName, Value = role.RoleId.ToString() };
+                roleItems.Add(listItem);
+            }
+
+            ViewBag.Roles = roleItems;
+
             return View(user);
         }
 

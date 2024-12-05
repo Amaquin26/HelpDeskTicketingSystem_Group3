@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ASI.Basecode.Services.ServiceModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,5 +20,6 @@ namespace ASI.Basecode.Services.Dto
         public string AverageResolutionTimeString { get; set; }
         public float CustomerRating { get; set; }
         public List<TicketDto> Tickets { get; set; } = new List<TicketDto>();
+        public List<TeamMember> TeamMebers { get; set; } = new List<TeamMember>();
     }
 }
