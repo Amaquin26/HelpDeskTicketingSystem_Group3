@@ -18,13 +18,13 @@ namespace ASI.Basecode.Data.Models
         public string? UpdatedBy { get; set; }
         public DateTime? UpdatedTime { get; set; }
         public bool IsActive { get; set; } = true;
+        public bool ReceiveNotifications { get; set; } = true; //true by default
+        public bool TicketViewMode { get; set; } = false; //true for list view and false for card view
 
         // Navigation properties
         public ICollection<Ticket> Tickets { get; set; }
         public ICollection<Team> TeamsLed { get; set; } 
         public Team Team { get; set; }
         public Role Role { get; set; }
-
-
     }
 }

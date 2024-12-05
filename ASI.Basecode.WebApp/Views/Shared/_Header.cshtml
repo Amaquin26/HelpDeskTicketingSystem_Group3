@@ -47,6 +47,9 @@
             <li class="@(IsActive("Index", "Notification") ? "active" : "")">
                 <a asp-action="Index" asp-controller="Notification"><i class="fas fa-bell"></i> <span>Notifications</span></a>
             </li>
+            <li class="@(IsActive("Index", "Preference") ? "active" : "")">
+                <a asp-action="Index" asp-controller="Preference"><i class="fas fa-sliders"></i> <span>Preference</span></a>
+            </li>
             <li>
                 <a asp-action="SignOutUser" asp-controller="Account"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
             </li>

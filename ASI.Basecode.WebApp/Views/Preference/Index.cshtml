@@ -1,0 +1,48 @@
+﻿@using System.Security.Claims;
+@{
+    ViewData["Title"] = "Preference Page";
+    if (User.FindFirst("Role")?.Value == "User")
+    {
+        Layout = "~/Views/Shared/_LayoutUser.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+
+    var containerStyle = User.FindFirst("Role")?.Value != "User" ? "margin-left: 200px;" : "";
+    var containerClass = User.FindFirst("Role")?.Value != "User" ? "container content  p-4" : "container content";
+}
+
+<div class="@containerClass" style="@containerStyle">
+    <h3 class="mb-4"><strong>Preference</strong></h3>
+
+    <h4>Notifications</h4>
+    <div class="form-check mb-4">
+        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
+        <label class="form-check-label" for="flexCheckChecked">
+            Receive Notifications
+        </label>
+    </div>
+
+    <h4>Your Ticket View</h4>
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+        <label class="form-check-label" for="flexRadioDefault1">
+            Table View
+        </label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" checked>
+        <label class="form-check-label" for="flexRadioDefault2">
+            Card View
+        </label>
+    </div>
+    @if (User.FindFirst("Role")?.Value == "User")
+    {
+        <small class="text-muted">Only affects the tickets in your <strong>Profile</strong></small>
+    }else
+    {
+        <small class="text-muted">Only affects the submitted tickets view in <strong>My Tickets</strong></small>
+    }
+</div>
