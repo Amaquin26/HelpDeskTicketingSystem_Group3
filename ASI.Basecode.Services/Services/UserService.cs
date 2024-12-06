@@ -23,10 +23,11 @@ namespace ASI.Basecode.Services.Services
         private readonly ITeamRepository _teamRepository;
         private readonly ITicketRepository _ticketRepository;
         private readonly IFeedbackRepository _feedbackRepository;
+        private readonly IUserActivityRepository _userActivityRepository;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UserService(IUserRepository repository, ITeamRepository teamRepository, ITicketRepository ticketRepository, IFeedbackRepository feedbackRepository, IHttpContextAccessor httpContextAccessor,IMapper mapper)
+        public UserService(IUserRepository repository, ITeamRepository teamRepository, ITicketRepository ticketRepository, IFeedbackRepository feedbackRepository, IHttpContextAccessor httpContextAccessor,IMapper mapper, IUserActivityRepository userActivityRepository)
         {
             _mapper = mapper;
             _repository = repository;
@@ -34,6 +35,7 @@ namespace ASI.Basecode.Services.Services
             _ticketRepository = ticketRepository;
             _feedbackRepository = feedbackRepository;
             _httpContextAccessor = httpContextAccessor;
+            _userActivityRepository = userActivityRepository;
         }
 
         public LoginResult AuthenticateUser(string email, string password, ref User user)
@@ -165,7 +167,7 @@ namespace ASI.Basecode.Services.Services
             return _repository.GetTeamLeaders(); // Call the repository method to get team leaders
         }
 
-        public UserDetailsDto? GetUserDetails(string id)
+        public UserDetailsDto? GetUserDetails(string id, string? filter)
         {
             var userDetails = new UserDetailsDto();
 
@@ -195,6 +197,18 @@ namespace ASI.Basecode.Services.Services
                 .Include(t => t.Status)
                 .Include(t => t.Priority);
 
+            // Convert filter parameter to an integer if it is not null or empty
+            int? filterValue = null;
+            if (!string.IsNullOrEmpty(filter) && int.TryParse(filter, out var parsedFilter))
+            {
+                filterValue = parsedFilter;
+            }
+
+            // If filter is not 0, apply the filter by StatusId
+            if (filterValue.HasValue && filterValue.Value != 0)
+            {
+                ticketQuery = ticketQuery.Where(t => t.StatusId == filterValue.Value);
+            }
 
             if (user.RoleName == "User")
             {
@@ -262,10 +276,12 @@ namespace ASI.Basecode.Services.Services
                 PriorityName = t.Priority.PriorityName,
                 CategoryId = t.CategoryId,
                 StatusId = t.StatusId,
-                PriorityId = t.PriorityId
+                PriorityId = t.PriorityId,
+                DateAdded = t.CreatedTime
             }).ToList();
 
             userDetails.Tickets = ticketDtos;
+            userDetails.Filter = filterValue ?? 0;
 
             return userDetails;
         }
@@ -293,6 +309,60 @@ namespace ASI.Basecode.Services.Services
             }
 
             return rolesQuery.ToList();
+        }
+
+        public (bool,bool) GetUserPreference()
+        {
+            var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var user = _repository.GetUsers().FirstOrDefault(x => x.UserId == userId); 
+
+            if (user == null)
+            {
+                return (false,false);
+            }
+
+            return (user.ReceiveNotifications, user.TicketViewMode);
+        }
+
+        public void EditUserPreference(bool ReceiveNotification, bool TicketViewMode)
+        {
+            var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var user = _repository.GetUsers().FirstOrDefault(x => x.UserId == userId);
+
+            if(user != null)
+            {
+                user.ReceiveNotifications = ReceiveNotification;
+                user.TicketViewMode = TicketViewMode;
+            }
+
+            _repository.UpdateUser(user);
+        }
+
+        public List<UserActivity> GetUserActivity(string userId)
+        {
+            var userActivity = _userActivityRepository.GetUserActivities().Where(x => x.UserId == userId);
+
+            return userActivity.ToList();
+        }
+
+        public List<UserActivity> GetMyUserActivity()
+        {
+            var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userActivity = _userActivityRepository.GetUserActivities().Where(x => x.UserId == userId);
+
+            return userActivity.ToList();
+        }
+
+        public void DeleteUserActivity(int activityId)
+        {
+            var activity = _userActivityRepository.GetUserActivities().FirstOrDefault(x => x.Id == activityId);
+
+            if(activity != null)
+            {
+                _userActivityRepository.DeleteUserActivity(activity);
+            }
         }
     }
 }

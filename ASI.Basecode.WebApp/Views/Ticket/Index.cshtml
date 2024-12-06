@@ -51,7 +51,7 @@
 
     <div class="d-flex justify-content-between mb-4">
         <!-- Add Ticket Button (aligned to the left) -->
-        <a asp-action="AddTicket" asp-controller="Ticket" class="btn btn-dark" id="button-addon2">
+        <a asp-action="AddTicket" asp-controller="Ticket" class="btn btn-success" id="button-addon2">
             <i class="fas fa-plus"></i> Add Ticket
         </a>
 
@@ -95,16 +95,16 @@
                             </td>
                             <td>@ticket.DateAdded</td>
                             <td class="text-center">
-                                <a asp-action="ViewTicket" asp-route-id="@ticket.TicketId" class="edit btn btn-outline-secondary btn-sm text-center"><i class="fas fa-eye"></i></a>
+                                <a asp-action="ViewTicket" asp-route-id="@ticket.TicketId" class="edit btn btn-outline-dark btn-sm text-center"><i class="fas fa-eye"></i></a>
                                 @if (ticket.CanEdit)
                                 {
-                                    <a asp-action="EditTicket" asp-route-id="@ticket.TicketId" asp- class="btn btn-outline-dark btn-sm text-center">
+                                    <a asp-action="EditTicket" asp-route-id="@ticket.TicketId" asp- class="btn btn-dark btn-sm text-center">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                 }
                                 @if (User.FindFirst("Role")?.Value == "Super Admin" || User.FindFirst("Role")?.Value == "Admin")
                                 {
-                                    <button type="button" class="btn btn-outline-danger btn-sm delete-btn text-center" data-bs-toggle="modal" data-bs-target="#deleteTicketModal-@ticket.TicketId">
+                                    <button type="button" class="btn btn-danger btn-sm delete-btn text-center" data-bs-toggle="modal" data-bs-target="#deleteTicketModal-@ticket.TicketId">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
                                 }

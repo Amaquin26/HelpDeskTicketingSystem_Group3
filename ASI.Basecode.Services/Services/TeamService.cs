@@ -29,7 +29,7 @@ namespace ASI.Basecode.Services.Services
             _feedbackRepository = feedbackRepository;
         }
 
-        public List<TeamViewModel> GetListOfTeams()
+        public List<TeamViewModel> GetTeams()
         {
             var teams = _teamRepository.GetTeams().Join(_userRepository.GetUsers(),
                 team => team.CreatedBy,
@@ -44,9 +44,75 @@ namespace ASI.Basecode.Services.Services
                     CreatedTime = team.CreatedTime,
                     TeamLeaderName = team.TeamLeader.Name ?? "No Team Leader"
                 })
-            .ToList();
+                .ToList();
 
             return teams;
+        }
+
+        public PagedTeamViewModel GetListOfTeams(string searchQuery, int page, int pageSize)
+        {
+
+            PagedTeamViewModel pageTeamViewModel = new PagedTeamViewModel();
+
+            var role = _httpContextAccessor.HttpContext?.User.FindFirst("Role")?.Value;
+            var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var current_user = _userRepository.GetUsers().FirstOrDefault(x => x.UserId == userId);
+
+            List<TeamViewModel> teams;
+
+            if(role == "Admin" || role == "Super Admin")
+            {
+                teams = _teamRepository.GetTeams().Join(_userRepository.GetUsers(),
+                team => team.CreatedBy,
+                user => user.UserId,
+                (team, user) => new TeamViewModel
+                {
+                    TeamId = team.TeamId,
+                    TeamName = team.TeamName,
+                    TeamLeaderId = team.TeamLeaderId,
+                    TeamSpecialization = team.TeamSpecialization,
+                    CreatedBy = user.Name ?? "N/A",
+                    CreatedTime = team.CreatedTime,
+                    TeamLeaderName = team.TeamLeader.Name ?? "No Team Leader"
+                })
+                .ToList();
+            }
+            else
+            {
+                teams = _teamRepository.GetTeams().Join(_userRepository.GetUsers(),
+                team => team.CreatedBy,
+                user => user.UserId,
+                (team, user) => new TeamViewModel
+                {
+                    TeamId = team.TeamId,
+                    TeamName = team.TeamName,
+                    TeamLeaderId = team.TeamLeaderId,
+                    TeamSpecialization = team.TeamSpecialization,
+                    CreatedBy = user.Name ?? "N/A",
+                    CreatedTime = team.CreatedTime,
+                    TeamLeaderName = team.TeamLeader.Name ?? "No Team Leader"
+                })
+                .Where(x => x.TeamId == current_user.TeamId || x.TeamLeaderId == userId)
+                .ToList();
+            }
+
+
+            // Filter by search query
+            if (!string.IsNullOrEmpty(searchQuery))
+            {
+                teams = teams.Where(t => t.TeamName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                                    t.TeamLeaderName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                                    t.TeamSpecialization.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            // Paginate the teams
+            var pagedTeams = teams.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            var totalPages = (int)Math.Ceiling(teams.Count / (double)pageSize);
+
+            pageTeamViewModel.teams = pagedTeams;
+            pageTeamViewModel.totalPages = totalPages;
+
+            return pageTeamViewModel;
         }
 
         public TeamViewModel GetTeamById(int id)
@@ -101,7 +167,7 @@ namespace ASI.Basecode.Services.Services
             _teamRepository.DeleteTeam(id);
         }
 
-        public TeamDetailsDto? GetTeamDetails(int id)
+        public TeamDetailsDto? GetTeamDetails(int id, string? filter)
         {
             var teamDetails = _teamRepository.GetTeams()
                 .Include(x => x.TeamLeader)
@@ -122,12 +188,29 @@ namespace ASI.Basecode.Services.Services
                 return null;
             }
 
-            var tickets = _ticketRepository.GetTickets()
+            var ticketQuery = _ticketRepository.GetTickets()
                 .Include(t => t.Category)
                 .Include(t => t.Status)
                 .Include(t => t.Priority)
-                .Where(t => t.TeamAssignedId == teamDetails.TeamId)
-                .ToList();
+                .Where(t => t.TeamAssignedId == teamDetails.TeamId);
+                
+
+            // Convert filter parameter to an integer if it is not null or empty
+            int? filterValue = null;
+            if (!string.IsNullOrEmpty(filter) && int.TryParse(filter, out var parsedFilter))
+            {
+                filterValue = parsedFilter;
+            }
+
+            var tickets = ticketQuery.ToList();
+
+            // If filter is not 0, apply the filter by StatusId
+            if (filterValue.HasValue && filterValue.Value != 0)
+            {
+                ticketQuery = ticketQuery.Where(t => t.StatusId == filterValue.Value);
+            }
+
+            var ticketsToDisplay = ticketQuery.ToList();
 
             var ticketIds = tickets.Select(t => t.TicketId).ToList();
 
@@ -153,7 +236,7 @@ namespace ASI.Basecode.Services.Services
             teamDetails.CustomerRating = (float)customerRating;
             teamDetails.AverageResolutionTimeString = averageResolutionTime;
 
-            var ticketDtos = tickets.Select(t => new TicketDto
+            var ticketDtos = ticketsToDisplay.Select(t => new TicketDto
             {
                 TicketId = t.TicketId,
                 Title = t.Title,
@@ -177,7 +260,8 @@ namespace ASI.Basecode.Services.Services
                 PriorityName = t.Priority.PriorityName,
                 CategoryId = t.CategoryId,
                 StatusId = t.StatusId,
-                PriorityId = t.PriorityId
+                PriorityId = t.PriorityId,
+                DateAdded = t.CreatedTime
             }).ToList();
 
             var teamMembers = _userRepository.GetUsers()
@@ -195,6 +279,7 @@ namespace ASI.Basecode.Services.Services
 
             teamDetails.Tickets = ticketDtos;
             teamDetails.TeamMebers = teamMembers;
+            teamDetails.Filter = filterValue ?? 0;
 
             return teamDetails;
         }
@@ -237,7 +322,6 @@ namespace ASI.Basecode.Services.Services
             }
 
             _userRepository.UpdateUser(user);
-        }
+        }     
     }
-
 }

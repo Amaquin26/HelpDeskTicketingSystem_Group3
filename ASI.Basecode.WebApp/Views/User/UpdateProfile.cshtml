@@ -17,26 +17,10 @@
 
 <div class="@containerClass" style="@containerStyle">
     <div class="row">
+        <!-- Heading -->
+        <h3 class=""><strong>Update Profile</strong></h3>
+
         <form method="post" action="UpdateProfile">
-
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <!-- Heading -->
-                <h3 class=""><strong>Update Profile</strong></h3>
-
-                <!-- Button -->
-                <div class="d-flex justify-content-end gap-2">
-                    <button type="submit" class="btn d-block btn-dark">Update Profile</button>
-                    @if (User.FindFirst("Role")?.Value == "User")
-                    {
-                        <a asp-action="Index" asp-controller="UserTicket" class="btn btn-outline-danger">Cancel</a>
-                    }
-                    else
-                    {
-                        <a asp-action="Index" asp-controller="Profile" class="btn btn-outline-danger">Cancel</a>
-                    }
-                </div>
-            </div>
-        
             <div class="mb-3">
                 <input asp-for="@Model.UserId" hidden>
                 <label for="addUserName" class="form-label">Name</label>
@@ -56,6 +40,19 @@
                 <label for="title" class="form-label">Confirm Password</label>
                 <input asp-for="@Model.ConfirmPassword" class="form-control" id="title">
                 <span asp-validation-for="@Model.ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            <!-- Button -->
+            <div class="d-flex justify-content-end gap-2">
+                <button type="submit" class="btn d-block btn-dark">Update Profile</button>
+                @if (User.FindFirst("Role")?.Value == "User")
+                {
+                    <a asp-action="Index" asp-controller="UserTicket" class="btn btn-outline-danger">Cancel</a>
+                }
+                else
+                {
+                    <a asp-action="Index" asp-controller="Profile" class="btn btn-outline-danger">Cancel</a>
+                }
             </div>
         </form>
     </div>

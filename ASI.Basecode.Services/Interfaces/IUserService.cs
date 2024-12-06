@@ -1,9 +1,11 @@
 ﻿using ASI.Basecode.Data.Models;
 using ASI.Basecode.Services.Dto;
 using ASI.Basecode.Services.ServiceModels;
+using Microsoft.AspNetCore.Http;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using static ASI.Basecode.Resources.Constants.Enums;
 
 namespace ASI.Basecode.Services.Interfaces
@@ -60,11 +62,16 @@ namespace ASI.Basecode.Services.Interfaces
         /// </summary>
         /// <returns>A queryable list of team leader users.</returns>
         IQueryable<User> GetTeamLeaders();
-        UserDetailsDto? GetUserDetails(string id);
+        UserDetailsDto? GetUserDetails(string id, string? filter);
         User? GetMyProfile();
         void UpdateProfile(UpdateUserViewModel user);
 
         Role GetUserRole(string userId);
         List<Role> GetUserRoles();
+        (bool, bool) GetUserPreference();
+        void EditUserPreference(bool ReceiveNotification, bool TicketViewMode);
+        List<UserActivity> GetUserActivity(string userId);
+        List<UserActivity> GetMyUserActivity();
+        void DeleteUserActivity(int activityId);
     }
 }

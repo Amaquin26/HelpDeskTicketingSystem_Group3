@@ -13,7 +13,6 @@ namespace ASI.Basecode.WebApp.Controllers
             _notificationService = notificationService;
         }
 
-
         public IActionResult Index()
         {
             var notifs = _notificationService.GetUserNotifications();

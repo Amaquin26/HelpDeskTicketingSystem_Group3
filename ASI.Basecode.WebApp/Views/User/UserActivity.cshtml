@@ -1,0 +1,59 @@
+﻿@model IEnumerable<ASI.Basecode.Data.Models.UserActivity>
+@using System.Security.Claims;
+@{
+    ViewData["Title"] = "User Activity Page";
+    if (User.FindFirst("Role")?.Value == "User")
+    {
+        Layout = "~/Views/Shared/_LayoutUser.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+
+    var containerStyle = User.FindFirst("Role")?.Value != "User" ? "margin-left: 200px;" : "";
+    var containerClass = User.FindFirst("Role")?.Value != "User" ? "container content  p-4" : "container content";
+}
+
+<div class="@containerClass" style="@containerStyle">
+    <!-- Back Button on the Left -->
+    @if (!String.IsNullOrEmpty(ViewBag.UserId))
+    {
+        <a asp-action="UserDetails" asp-controller="User" asp-route-id="@ViewBag.UserId" class="btn mb-3">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    }
+    else
+    {
+        <a asp-action="Index" asp-controller="Profile" class="btn mb-3">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    }
+
+    <h3 class="mb-4"><strong>Activities</strong></h3>
+
+    <div class="row">
+        <!-- User Activity Section -->
+        @foreach (var activity in Model)
+        {
+            <div id="ticketNotifications" class="notification-section">
+                <div class="card notification-card mb-3 position-relative">
+                    <div class="card-body">
+                        <h5 class="card-title">@activity.Title</h5>
+                        <p class="card-text">@activity.Description</p>
+                        <p class="notification-time">@activity.DateCreated</p>
+                        @if (activity.UserId == User.FindFirst(ClaimTypes.NameIdentifier)?.Value)
+                        {
+                            <form asp-action="DeleteActivity" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="ActivityId" value="@activity.Id" />
+                                <input type="hidden" name="UserId" value="@ViewBag.UserId" />
+                                <button type="submit" class="btn-close position-absolute top-0 end-0 m-3" aria-label="Close"></button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

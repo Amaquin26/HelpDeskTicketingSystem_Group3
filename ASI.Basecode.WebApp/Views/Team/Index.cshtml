@@ -1,5 +1,5 @@
 ﻿@model ASI.Basecode.Services.ServiceModels.TeamListViewModel
-
+@using System.Security.Claims;
 @{
     ViewData["Title"] = "Team Management";
 }
@@ -8,10 +8,13 @@
     <h3 class="mb-4"><strong>Team Management</strong></h3>
 
     <div class="d-flex justify-content-between mb-4">
-        <a class="btn btn-dark" asp-action="Create">
-            <i class="fas fa-plus"></i>
-            Add Team
-        </a>
+        @if (User.FindFirst("Role")?.Value == "Super Admin" || User.FindFirst("Role")?.Value == "Admin")
+        {
+            <a class="btn btn-success" asp-action="Create">
+                <i class="fas fa-plus"></i>
+                Add Team
+            </a>
+        }
 
         <form method="get" asp-action="Index" id="searchForm">
             <div class="input-group">
@@ -45,17 +48,20 @@
                         <tr>
                             <td class="text-capitalize">@team.TeamName</td>
                             <td class="text-lowercase">@team.TeamLeaderName</td>
-                            <td>@team.TeamSpecialization</td>
+                            <td>@team.TeamSpecialization</td>                         
                             <td class="text-center">
-                                <a asp-action="TeamDetails" asp-route-id="@team.TeamId" class="btn btn-outline-primary btn-sm">
+                                <a asp-action="TeamDetails" asp-route-id="@team.TeamId" class="btn btn-outline-dark btn-sm">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <a asp-action="Edit" asp-route-id="@team.TeamId" class="btn btn-outline-danger btn-sm">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteTeamModal-@team.TeamId">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
+                                @if (User.FindFirst("Role")?.Value == "Super Admin" || User.FindFirst("Role")?.Value == "Admin")
+                                {
+                                    <a asp-action="Edit" asp-route-id="@team.TeamId" class="btn btn-dark btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteTeamModal-@team.TeamId">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                }        
                             </td>
                         </tr>
                     }

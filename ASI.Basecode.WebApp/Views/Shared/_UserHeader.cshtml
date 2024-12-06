@@ -2,7 +2,7 @@
 @inject IHttpContextAccessor HttpContextAccessor
 
 <!-- Sidebar -->
-<nav class="@((ViewBag.LoginView == true) ? "d-hidden" : "navbar navbar-expand-lg bg-danger px-4 mb-5")">
+<nav class="@((ViewBag.LoginView == true) ? "d-hidden" : "navbar navbar-expand-lg bg-danger px-4 mb-5 bg-dark")">
     <a class="navbar-brand d-flex align-items-center" href="#">
         <img src="~/img/icon-white.png" alt="Logo">
         <strong class="text-white">Resolve.it</strong>
@@ -30,6 +30,11 @@
             <li class="nav-item">
                 <a asp-action="Index" asp-controller="Feedback" class="@(IsActive("Index", "Feedback") ? "nav-link active text-white" : "nav-link")">
                     Feedback
+                </a>
+            </li>
+            <li class="nav-item">
+                <a asp-action="Index" asp-controller="Preference" class="@(IsActive("Index", "Preference") ? "nav-link active text-white" : "nav-link")">
+                    Preference
                 </a>
             </li>
             <li class="nav-item">

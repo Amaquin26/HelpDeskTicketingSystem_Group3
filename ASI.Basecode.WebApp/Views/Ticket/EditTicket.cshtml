@@ -2,9 +2,20 @@
 @using System.Security.Claims;
 @{
     ViewData["Title"] = "Edit Ticket Page";
+    if (User.FindFirst("Role")?.Value == "User")
+    {
+        Layout = "~/Views/Shared/_LayoutUser.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+
+    var containerStyle = User.FindFirst("Role")?.Value != "User" ? "margin-left: 200px;" : "";
+    var containerClass = User.FindFirst("Role")?.Value != "User" ? "container content  p-4" : "container content";
 }
 
-<div class="content p-4" style="margin-left: 200px;">
+<div class="@containerClass" style="@containerStyle">
     <h3 class="mb-4"><strong>Edit Ticket</strong></h3>
     <div asp-validation-summary="All" class="text-danger"></div>
     <form method="post" asp-action="EditTicket" asp-controller="Ticket">
@@ -22,13 +33,20 @@
             <span asp-validation-for="Ticket.Description" class="text-danger"></span>
         </div>
 
-        <div class="mb-3">
-            <label asp-for="Ticket.StatusId" class="form-label">Status</label>
-            <select asp-for="Ticket.StatusId" class="form-select" id="status" asp-items="@(new SelectList(Model.TicketStatuses, "StatusId", "StatusName"))">
-                <option value="">Select Status</option>
-            </select>
-            <span asp-validation-for="Ticket.StatusId" class="text-danger"></span>
-        </div>
+        @if (User.FindFirst("Role")?.Value == "Super Admin" || User.FindFirst("Role")?.Value == "Admin" || User.FindFirst("Role")?.Value == "Agent")
+        {
+            <div class="mb-3">
+                <label asp-for="Ticket.StatusId" class="form-label">Status</label>
+                <select asp-for="Ticket.StatusId" class="form-select" id="status" asp-items="@(new SelectList(Model.TicketStatuses, "StatusId", "StatusName"))">
+                    <option value="">Select Status</option>
+                </select>
+                <span asp-validation-for="Ticket.StatusId" class="text-danger"></span>
+            </div>
+        }
+        else
+        {
+            <input type="hidden" asp-for="Ticket.StatusId" />
+        }
 
         <div class="mb-3">
             <label asp-for="Ticket.CategoryId" class="form-label">Category</label>
@@ -38,13 +56,20 @@
             <span asp-validation-for="Ticket.CategoryId" class="text-danger"></span>
         </div>
 
-        <div class="mb-3">
-            <label asp-for="Ticket.PriorityId" class="form-label">Priority</label>
-            <select asp-for="Ticket.PriorityId" class="form-select" id="priority" asp-items="@(new SelectList(Model.TicketPriorities, "PriorityId", "PriorityName"))">
-                <option value="">Select Priority</option>
-            </select>
-            <span asp-validation-for="Ticket.PriorityId" class="text-danger"></span>
-        </div>
+        @if (User.FindFirst("Role")?.Value == "Super Admin" || User.FindFirst("Role")?.Value == "Admin" || User.FindFirst("Role")?.Value == "Agent")
+        {
+            <div class="mb-3">
+                <label asp-for="Ticket.PriorityId" class="form-label">Priority</label>
+                <select asp-for="Ticket.PriorityId" class="form-select" id="priority" asp-items="@(new SelectList(Model.TicketPriorities, "PriorityId", "PriorityName"))">
+                    <option value="">Select Priority</option>
+                </select>
+                <span asp-validation-for="Ticket.PriorityId" class="text-danger"></span>
+            </div>
+        }
+        else
+        {
+            <input type="hidden" asp-for="Ticket.PriorityId" />
+        }
 
         @if (User.FindFirst("Role")?.Value == "Super Admin" || User.FindFirst("Role")?.Value == "Admin")
         {
@@ -83,7 +108,7 @@
         </ul> *@
 
         <div class="d-flex justify-content-end gap-2">
-            <button type="submit" class="btn d-block btn-danger">Update Ticket</button>
+            <button type="submit" class="btn d-block btn-dark">Update Ticket</button>
             <a asp-action="Index" class="btn btn-outline-danger">Cancel</a>
         </div>
     </form>

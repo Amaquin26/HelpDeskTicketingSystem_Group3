@@ -12,7 +12,7 @@
 
     <div class="d-flex justify-content-between mb-4">
         <!-- Add Ticket Button (aligned to the left) -->
-        <a asp-action="Create" class="btn btn-dark" id="button-addon2">
+        <a asp-action="Create" class="btn btn-success" id="button-addon2">
             <i class="fas fa-plus"></i>
             Add User
         </a>
@@ -59,23 +59,23 @@
                             <td>
                                 @if (user.RoleId == 1)
                                 {
-                                    <span class="badge pill bg-danger">Super Admin</span>
+                                    <span class="badge pill border border-success text-success">Super Admin</span>
                                 }
                                 else if (user.RoleId == 2)
                                 {
-                                    <span class="badge pill border border-danger text-danger">Admin</span>
+                                    <span class="badge pill border border-primary text-primary">Admin</span>
                                 }
                                 else if (user.RoleId == 3)
                                 {
-                                    <span class="badge pill bg-dark text-white">Agent</span>
+                                    <span class="badge pill border border-dark text-dark">Agent</span>
                                 }
                                 else if (user.RoleId == 4)
                                 {
-                                    <span class="badge pill border border-dark text-dark">User</span>
+                                    <span class="badge pill border border-secondary text-secondary">User</span>
                                 }
                                 else
                                 {
-                                    <span class="badge pill border border-light">User</span>
+                                    <span class="badge pill border border-secondary text-secondary">User</span>
                                 }
                             </td>
                             <td class="text-center">
@@ -102,13 +102,13 @@
                                         canEditDelete = false;
                                     }
                                 }
-                                <a asp-action="UserDetails" asp-route-id="@user.UserId" class="edit btn btn-outline-primary btn-sm text-center"><i class="fas fa-eye"></i></a>
+                                <a asp-action="UserDetails" asp-route-id="@user.UserId" class="edit btn btn-outline-dark btn-sm text-center"><i class="fas fa-eye"></i></a>
                                 @if (canEditDelete)
                                 {
-                                    <a class="btn btn-outline-danger btn-sm" asp-action="Edit" asp-route-id="@user.UserId">
+                                    <a class="btn btn-dark btn-sm" asp-action="Edit" asp-route-id="@user.UserId">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <button class="btn btn-outline-danger btn-sm delete-btn" data-bs-toggle="modal" data-bs-target="#deleteUserModal-@user.UserId">
+                                    <button class="btn btn-danger btn-sm delete-btn" data-bs-toggle="modal" data-bs-target="#deleteUserModal-@user.UserId">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
                                 }

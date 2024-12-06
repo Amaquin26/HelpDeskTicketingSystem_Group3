@@ -61,7 +61,7 @@ namespace ASI.Basecode.WebApp.Controllers
         // Loads the Create User form
         public IActionResult Create()
         {
-            ViewBag.Teams = _teamService.GetListOfTeams()
+            ViewBag.Teams = _teamService.GetTeams()
             .Select(team => new SelectListItem
             {
                 Value = team.TeamId.ToString(),
@@ -103,13 +103,17 @@ namespace ASI.Basecode.WebApp.Controllers
                 return RedirectToAction("Index");
             }
 
-            ViewBag.Teams = _teamService.GetListOfTeams()
-            .Select(team => new SelectListItem
+            var teams = _teamService.GetTeams().ToList();
+
+            var teamItems = new List<SelectListItem>();
+
+            foreach (TeamViewModel team in teams)
             {
-                Value = team.TeamId.ToString(),
-                Text = team.TeamName
-            })
-            .ToList();
+                var listItem = new SelectListItem { Text = team.TeamName, Value = team.TeamId.ToString() };
+                teamItems.Add(listItem);
+            }
+
+            ViewBag.Teams = teamItems;
 
             var roles = _userService.GetUserRoles();
 
@@ -150,9 +154,9 @@ namespace ASI.Basecode.WebApp.Controllers
         }
 
         [HttpGet]
-        public IActionResult UserDetails(string id)
+        public IActionResult UserDetails(string id, string filter = null)
         {
-            var user = _userService.GetUserDetails(id);
+            var user = _userService.GetUserDetails(id, filter);
 
             if (user == null)
             {
@@ -210,6 +214,33 @@ namespace ASI.Basecode.WebApp.Controllers
             {
                 return RedirectToAction("Index", "Profile");
             }
+        }
+
+        [HttpGet]
+        public IActionResult UserActivity(string? userId)
+        {
+            List<UserActivity> userActivities;
+
+            if (String.IsNullOrEmpty(userId))
+            {
+                userActivities = _userService.GetMyUserActivity();
+            }
+            else
+            {
+                userActivities = _userService.GetUserActivity(userId);
+            }
+
+            ViewBag.UserId = userId;
+
+            return View(userActivities);
+        }
+
+        [HttpPost]
+        public IActionResult DeleteActivity(int activityId, string? userId)
+        {
+            _userService.DeleteUserActivity(activityId);
+
+            return RedirectToAction("UserActivity", new {UserId = userId });
         }
     }
 }

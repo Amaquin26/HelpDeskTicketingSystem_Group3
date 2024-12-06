@@ -105,7 +105,7 @@ namespace ASI.Basecode.WebApp.Controllers
             ticketModel.TicketCategories = ticketCategories;
             ticketModel.TicketStatuses = ticketStatuses;
             ticketModel.Agents = _userService.GetAgents().Where(x => x.RoleId == 3).ToList();
-            ticketModel.Teams = _teamService.GetListOfTeams().Select(t => new Team
+            ticketModel.Teams = _teamService.GetTeams().Select(t => new Team
             {
                 TeamId = t.TeamId,
                 TeamName = t.TeamName,
@@ -146,7 +146,7 @@ namespace ASI.Basecode.WebApp.Controllers
             ticketModel.TicketCategories = ticketCategories;
             ticketModel.TicketStatuses = ticketStatuses;
             ticketModel.Agents = _userService.GetAgents().Where(x => x.RoleId == 3).ToList();
-            ticketModel.Teams = _teamService.GetListOfTeams().Select(t => new Team
+            ticketModel.Teams = _teamService.GetTeams().Select(t => new Team
             {
                 TeamId = t.TeamId,
                 TeamName = t.TeamName,
@@ -193,7 +193,7 @@ namespace ASI.Basecode.WebApp.Controllers
 
                 if (ticketModel.Teams.Count == 0)
                 {
-                    ticketModel.Teams = _teamService.GetListOfTeams().Select(t => new Team
+                    ticketModel.Teams = _teamService.GetTeams().Select(t => new Team
                     {
                         TeamId = t.TeamId,
                         TeamName = t.TeamName,
@@ -213,6 +213,7 @@ namespace ASI.Basecode.WebApp.Controllers
                 CategoryId = ticketFormModel.CategoryId,
                 StatusId = 1,
                 AssigneeId = ticketFormModel.AssigneeId,
+                TeamAssignedId = ticketFormModel.TeamAssignedId,
                 Files = ticketModel.Files,
             };
 
@@ -233,8 +234,19 @@ namespace ASI.Basecode.WebApp.Controllers
         [HttpPost]
         public IActionResult EditTicket(TicketViewModel ticketModel)
         {
+            var role = _httpContextAccessor.HttpContext?.User.FindFirst("Role")?.Value;
+
+            // bypass adding team or assignee if it is the user that will edit
+            var isValid = role == "User" ? (
+                !String.IsNullOrEmpty(ticketModel.Ticket.Title) ||
+                !String.IsNullOrEmpty(ticketModel.Ticket.Description) ||
+                ticketModel.Ticket.CategoryId != 0
+            ) : (
+                ModelState.IsValid
+            );
+
             //Return the view with the model to show validation errors
-            if (!ModelState.IsValid)
+            if (!isValid)
             {
                 if (ticketModel.TicketStatuses.Count == 0)
                 {
@@ -258,7 +270,7 @@ namespace ASI.Basecode.WebApp.Controllers
 
                 if (ticketModel.Teams.Count == 0)
                 {
-                    ticketModel.Teams = _teamService.GetListOfTeams().Select(t => new Team
+                    ticketModel.Teams = _teamService.GetTeams().Select(t => new Team
                     {
                         TeamId = t.TeamId,
                         TeamName = t.TeamName,
@@ -292,7 +304,8 @@ namespace ASI.Basecode.WebApp.Controllers
             );
 
             TempData["SuccessMessage"] = "Ticket Updated";
-            return RedirectToAction("Index");
+
+            return RedirectToAction("ViewTicket", new { Id = ticket .TicketId});
         }
 
         [HttpPost]

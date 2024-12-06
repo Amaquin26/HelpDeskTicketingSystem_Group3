@@ -40,13 +40,13 @@ namespace ASI.Basecode.WebApp
             this._services.AddScoped<IFeedbackService, FeedbackService>();
             this._services.AddScoped<INotificationService, NotificationService>();
 
-
             // Repositories
             this._services.AddScoped<IUserRepository, UserRepository>();
             this._services.AddScoped<ITicketRepository, TicketRepository>();
             this._services.AddScoped<ITeamRepository, TeamRepository>();
             this._services.AddScoped<IFeedbackRepository, FeedbackRepository>();
             this._services.AddScoped<INotificationRepository, NotificationRepository>();
+            this._services.AddScoped<IUserActivityRepository, UserActivityRepository>();
 
             // Manager Class
             this._services.AddScoped<SignInManager>();

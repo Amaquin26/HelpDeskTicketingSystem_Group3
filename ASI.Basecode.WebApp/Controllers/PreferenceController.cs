@@ -17,20 +17,34 @@ namespace ASI.Basecode.WebApp.Controllers
     public class PreferenceController : Controller
     {
         private readonly IUserService _userService;
-        private readonly ITeamService _teamService;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public PreferenceController(IUserService userService, ITeamService teamService, IHttpContextAccessor httpContextAccessor)
+        public PreferenceController(IUserService userService, IHttpContextAccessor httpContextAccessor)
         {
             _userService = userService;
-            _teamService = teamService;
             _httpContextAccessor = httpContextAccessor;
         }
 
         // Displays a list of active users
         public IActionResult Index()
         {
-            return View();
+            var preference = _userService.GetUserPreference();
+
+            var preferenceViewModel = new PreferenceViewModel
+            {
+                ReceiveNotifications = preference.Item1,
+                TicketViewMode = preference.Item1,
+            };
+
+            return View(preferenceViewModel);
+        }
+
+        [HttpPost]
+        public IActionResult EditPreference(PreferenceViewModel preference)
+        {
+            _userService.EditUserPreference(preference.ReceiveNotifications,preference.TicketViewMode);
+
+            return RedirectToAction("Index");
         }
 
     }

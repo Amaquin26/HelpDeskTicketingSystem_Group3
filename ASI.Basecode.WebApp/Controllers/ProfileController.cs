@@ -27,10 +27,10 @@ namespace ASI.Basecode.WebApp.Controllers
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public IActionResult Index(bool onlyAgents = false, string searchName = null, string searchEmail = null, int? searchRoleId = null)
+        public IActionResult Index(string filter = null)
         {
             var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var user = _userService.GetUserDetails(userId);
+            var user = _userService.GetUserDetails(userId, filter);   
 
             return View(user);
         }

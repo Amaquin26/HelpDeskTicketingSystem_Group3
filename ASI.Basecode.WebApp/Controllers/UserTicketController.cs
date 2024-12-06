@@ -53,10 +53,10 @@ namespace ASI.Basecode.WebApp.Controllers
             if (!string.IsNullOrEmpty(searchQuery))
             {
                 tickets = tickets.Where(t => t.Title.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
-                                              t.CreatedBy.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
-                                              t.CategoryName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
-                                              t.StatusName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
-                                              t.PriorityName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
+                        t.CreatedBy.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                        t.CategoryName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                        t.StatusName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                        t.PriorityName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
             // Pagination logic
@@ -91,7 +91,7 @@ namespace ASI.Basecode.WebApp.Controllers
             ticketModel.TicketCategories = ticketCategories;
             ticketModel.TicketStatuses = ticketStatuses;
             ticketModel.Agents = _userService.GetAgents().Where(x => x.RoleId == 3).ToList();
-            ticketModel.Teams = _teamService.GetListOfTeams().Select(t => new Team
+            ticketModel.Teams = _teamService.GetTeams().Select(t => new Team
             {
                 TeamId = t.TeamId,
                 TeamName = t.TeamName,
@@ -133,7 +133,7 @@ namespace ASI.Basecode.WebApp.Controllers
 
                 if (ticketModel.Teams.Count == 0)
                 {
-                    ticketModel.Teams = _teamService.GetListOfTeams().Select(t => new Team
+                    ticketModel.Teams = _teamService.GetTeams().Select(t => new Team
                     {
                         TeamId = t.TeamId,
                         TeamName = t.TeamName,

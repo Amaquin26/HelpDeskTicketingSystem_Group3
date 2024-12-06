@@ -1,0 +1,16 @@
+﻿@model ASI.Basecode.Services.Dto.TeamDetailsDto
+@using System.Security.Claims;
+@{
+    ViewData["Title"] = "No Team Page";
+}
+
+<div class="content p-4" style="margin-left: 200px;">
+    <div class="mb-3">
+        <!-- Back Button on the Left -->
+        <a asp-action="Index" asp-controller="Ticket" class="btn">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </div>
+
+    <h2 class="mb-4">You are not in a team.</h2>
+</div>

@@ -22,26 +22,14 @@ namespace ASI.Basecode.WebApp.Controllers
 
         public IActionResult Index(string searchQuery, int page = 1, int pageSize = 2)
         {
-            var teams = _teamService.GetListOfTeams();
-
-            // Filter by search query
-            if (!string.IsNullOrEmpty(searchQuery))
-            {
-                teams = teams.Where(t => t.TeamName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
-                                         t.TeamLeaderName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
-                                         t.TeamSpecialization.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
-            }
-
-            // Paginate the teams
-            var pagedTeams = teams.Skip((page - 1) * pageSize).Take(pageSize).ToList();
-            var totalPages = (int)Math.Ceiling(teams.Count / (double)pageSize);
+            var pagedTeamViewModel = _teamService.GetListOfTeams(searchQuery, page, pageSize);
 
             // Build the view model
             var viewModel = new TeamListViewModel
             {
-                Teams = pagedTeams,
+                Teams = pagedTeamViewModel.teams,
                 CurrentPage = page,
-                TotalPages = totalPages,
+                TotalPages = pagedTeamViewModel.totalPages,
                 SearchQuery = searchQuery
             };
 
@@ -111,9 +99,9 @@ namespace ASI.Basecode.WebApp.Controllers
         }
 
         [HttpGet]
-        public IActionResult TeamDetails(int id)
+        public IActionResult TeamDetails(int id, string filter = null)
         {
-            var team = _teamService.GetTeamDetails(id);
+            var team = _teamService.GetTeamDetails(id, filter);
 
             if (team == null)
             {
@@ -179,5 +167,4 @@ namespace ASI.Basecode.WebApp.Controllers
             return RedirectToAction("TeamDetails", new { Id = agent.TeamId });
         }
     }
-
 }

@@ -6,16 +6,19 @@
 
 <div class="content p-4" style="margin-left: 200px;">
     <div class="d-flex justify-content-between mb-3">
-        <!-- Back Button on the Left -->
-        <a asp-action="Index" class="btn">
-            <i class="fas fa-arrow-left"></i> Back
-        </a>
+        @if (User.FindFirst("Role")?.Value == "Super Admin" || User.FindFirst("Role")?.Value == "Admin")
+        {
+            <!-- Back Button on the Left -->
+            <a asp-action="Index" class="btn">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+        }
 
         <!-- Edit and Delete Buttons on the Right -->
         @if (User.FindFirst("Role")?.Value == "Super Admin" || User.FindFirst("Role")?.Value == "Admin")
         {
             <div>
-                <a asp-action="Edit" asp-route-id="@Model.TeamId" class="btn btn-outline-danger me-2">
+                <a asp-action="Edit" asp-route-id="@Model.TeamId" class="btn btn-dark me-2">
                     <i class="fas fa-edit"></i> Edit
                 </a>
                 <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteTeamModal-@Model.TeamId">
@@ -29,9 +32,8 @@
 
     <!-- Team Info Card -->
     <div class="card mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
+        <div class="card-header">
             <p class="mb-0"><strong>Team Name:</strong> @Model.Name</p>
-            <button class="edit btn text-secondary"><small>View Team Activity</small></button>
         </div>
         <div class="card-body">
             <div class="row mb-2">
@@ -69,7 +71,7 @@
 
     @if (User.FindFirst("Role")?.Value == "Super Admin" || User.FindFirst("Role")?.Value == "Admin" || User.FindFirst("UserId")?.Value == Model.TeamLeaderId)
     {
-        <a class="btn btn-danger mb-3" asp-action="AddMember" asp-route-teamId="@Model.TeamId">
+        <a class="btn btn-success mb-3" asp-action="AddMember" asp-route-teamId="@Model.TeamId">
             <i class="fas fa-plus"></i>
             Add Team Member
         </a>
@@ -84,7 +86,10 @@
                         <th scope="col">Name</th>
                         <th scope="col">Email</th>
                         <th scope="col">Role</th>
-                        <th class="action-column">Actions</th>
+                        @if (User.FindFirst("Role")?.Value == "Super Admin" || User.FindFirst("Role")?.Value == "Admin" || User.FindFirst("UserId")?.Value == Model.TeamLeaderId)
+                        {
+                            <th class="action-column">Actions</th>
+                        }
                     </tr>
                 </thead>
                 <tbody id="userItems">
@@ -97,7 +102,7 @@
                             @if (User.FindFirst("Role")?.Value == "Super Admin" || User.FindFirst("Role")?.Value == "Admin" || User.FindFirst("UserId")?.Value == Model.TeamLeaderId)
                             {
                                 <td>
-                                    <button type="button" class="btn btn-outline-danger btn-sm delete-btn" data-bs-toggle="modal" data-bs-target="#deleteMemberModal-@member.UserId">
+                                    <button type="button" class="btn btn-danger btn-sm delete-btn" data-bs-toggle="modal" data-bs-target="#deleteMemberModal-@member.UserId">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </td>
@@ -114,30 +119,59 @@
     }
 
     <h3 class="mb-4"><strong>Assigned Tickets</strong></h3>
+
+    <!-- Filter Options -->
     <div class="mb-4">
         <div class="btn-group" role="group" aria-label="Filter Tickets">
-            <button type="button" class="btn btn-danger">All</button>
-            <button type="button" class="btn btn-outline-danger">Open</button>
-            <button type="button" class="btn btn-outline-danger">In Progress</button>
-            <button type="button" class="btn btn-outline-danger">Closed</button>
+            <button type="button" class="btn btn-outline-dark @((Model.Filter == 0) ? "active" : "")" onclick="filterTickets('0')">All</button>
+            <button type="button" class="btn btn-outline-dark @((Model.Filter == 1) ? "active" : "")" onclick="filterTickets('1')">Open</button>
+            <button type="button" class="btn btn-outline-dark @((Model.Filter == 2) ? "active" : "")" onclick="filterTickets('2')">In Progress</button>
+            <button type="button" class="btn btn-outline-dark @((Model.Filter == 3) ? "active" : "")" onclick="filterTickets('3')">Resolved</button>
+            <button type="button" class="btn btn-outline-dark @((Model.Filter == 4) ? "active" : "")" onclick="filterTickets('4')">Closed</button>
+            <button type="button" class="btn btn-outline-dark @((Model.Filter == 5) ? "active" : "")" onclick="filterTickets('5')">On Hold</button>
         </div>
     </div>
+
     <div class="row">
-        @foreach (var ticket in Model.Tickets)
+        @if (Model.Tickets != null && Model.Tickets.Any())
         {
-            <div class="col-md-4 mb-3">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Ticket</h5>
-                        <p class="card-text"><strong>Created By: </strong>@ticket.CreatedBy</p>
-                        <p class="card-text"><strong>Issue: </strong>@ticket.Title</p>
-                        <p class="card-text"><strong>Status: </strong> @ticket.StatusName</p>
-                        <p class="card-text"><strong>Priority: </strong>@ticket.PriorityName</p>
-                        <p class="card-text"><strong>Category: </strong>@ticket.CategoryName</p>
-                        <a asp-action="ViewTicket" asp-controller="Ticket" asp-route-id="@ticket.TicketId" class="btn btn-danger">View Details</a>
+            @foreach (var ticket in Model.Tickets)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card border h-100">
+                        <div class="card-body d-flex flex-column">
+                            <!-- Title -->
+                            <h5 class="card-title text-dark fw-bold">@ticket.Title</h5>
+
+                            <div class="mt-auto border-top pt-3">
+                                <!-- Date Added -->
+                                <p class="card-text small text-muted">
+                                    <strong>Date Created:</strong> @ticket.DateAdded.ToString("MMMM dd, yyyy")
+                                </p>
+
+                                <!-- Status -->
+                                <p class="card-text small text-muted">
+                                    <strong>Status:</strong> <span class="badge bg-@GetStatusBadgeClass(ticket.StatusName) text-uppercase">@ticket.StatusName</span>
+                                </p>
+
+                                <!-- Category -->
+                                <p class="card-text small text-muted">
+                                    <strong>Category:</strong> @ticket.CategoryName
+                                </p>
+
+                                <!-- View Details Button -->
+                                <a asp-action="ViewTicket" asp-controller="Ticket" asp-route-id="@ticket.TicketId" class="btn btn-outline-dark w-100">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            }
+        }
+        else
+        {
+            <h4 class="text-center">No tickets found.</h4>
         }
     </div>
 </div>
@@ -189,3 +223,36 @@
         </div>
     </div>
 }
+
+@functions {
+    public string GetStatusBadgeClass(string status)
+    {
+        return status.ToLower() switch
+        {
+            "open" => "primary",
+            "in progress" => "warning",
+            "resolved" => "success",
+            "closed" => "danger",
+            "on hold" => "secondary",
+            _ => "dark" // Fallback for unexpected values
+        };
+    }
+}
+
+<script>
+    function filterTickets(statusId) {
+        let url = new URL(window.location.href);
+        let searchParams = url.searchParams;
+
+        // If no filter is selected or 'All' is clicked, reset the filter
+        if (statusId !== undefined) {
+            searchParams.set('filter', statusId);  // 0 for "All"
+        }
+
+        // Update the URL without reloading the page (optional, for SPA behavior)
+        window.history.pushState({}, '', url.toString());
+
+        // Submit the form or trigger a page reload
+        window.location.href = url.toString();  // Or use AJAX for dynamic content loading
+    }
+</script>

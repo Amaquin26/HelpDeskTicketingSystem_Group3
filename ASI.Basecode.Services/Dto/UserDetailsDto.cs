@@ -19,6 +19,7 @@ namespace ASI.Basecode.Services.Dto
         public TimeSpan AverageResolutionTime { get; set; }
         public string AverageResolutionTimeString { get; set; }
         public float CustomerRating { get; set; }
+        public int Filter { get; set; }
         public List<TicketDto> Tickets { get; set; } = new List<TicketDto>();
 
     }

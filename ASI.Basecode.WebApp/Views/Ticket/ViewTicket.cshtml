@@ -21,13 +21,13 @@
         <!-- Back Button on the Left -->
         @if (User.FindFirst("Role")?.Value == "User")
         {
-            <a asp-action="Index" asp-controller="UserTicket" class="btn btn-dark">
+            <a asp-action="Index" asp-controller="UserTicket" class="btn">
                 <i class="fas fa-arrow-left"></i> Back
             </a>
         }
         else
         {
-            <a asp-action="Index" class="btn btn-dark">
+            <a asp-action="Index" asp-controller="Ticket" class="btn">
                 <i class="fas fa-arrow-left"></i> Back
             </a>
         }
@@ -92,10 +92,11 @@
             <h5 class="card-title">Ticket Details</h5> 
             <p class="card-text"><strong>Created By:</strong><br>@Model.CreatedBy</p>
             @{
-                if (@Model.TeamAssignedId != null)
+                if (Model.TeamAssignedId != null)
                 {
-                    <p class="card-text"><strong>Agent Assigned:</strong><br>@Model.TeamName</p>
-                }else
+                    <p class="card-text"><strong>Team Assigned:</strong><br>@Model.TeamName</p>
+                }
+                else if (Model.AssigneeId != null)
                 {
                     <p class="card-text"><strong>Agent Assigned:</strong><br>@Model.AgentName</p>
                 }

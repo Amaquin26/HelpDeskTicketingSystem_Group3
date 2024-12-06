@@ -8,54 +8,46 @@
 
 .sidebar {
     height: 100vh;
-    background-color: #dc3545;
+    background-color: #212529 !important;
     padding-top: 20px;
     position: fixed;
     transition: width 0.3s;
     width: 200px;
 }
 
-    .sidebar.shrink {
-        width: 60px;
-    }
+.sidebar.shrink {
+    width: 60px;
+}
 
-    .sidebar .logo {
-        text-align: center;
-        margin-bottom: 20px;
-    }
+.sidebar .logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
 
-        .sidebar .logo img {
-            width: 40px;
-        }
+.sidebar .logo img {
+    width: 40px;
+}
 
-        .sidebar .logo label {
-            color: white;
-            font-size: 18px;
-            display: block;
-            margin-top: 10px;
-            transition: opacity 0.3s;
-        }
+.sidebar .logo label {
+    color: white;
+    font-size: 18px;
+    display: block;
+    margin-top: 10px;
+    transition: opacity 0.3s;
+}
 
-    .sidebar.shrink .logo label {
-        opacity: 0;
-        visibility: hidden;
-    }
+.sidebar.shrink .logo label {
+    opacity: 0;
+    visibility: hidden;
+}
 
-    .sidebar ul {
-        padding: 0;
-        list-style-type: none;
-    }
+.sidebar ul {
+    padding: 0;
+    list-style-type: none;
+}
 
-        .sidebar ul li {
-            padding: 10px 20px;
-        }
-
-            .sidebar ul li:hover {
-                background-color: #b31c2b;
-            }
-
-.active {
-    background-color: #b31c2b;
+.sidebar ul li {
+    padding: 10px 20px;
 }
 
 .sidebar ul li a {
@@ -65,14 +57,14 @@
     text-decoration: none;
 }
 
-    .sidebar ul li a i {
-        margin-right: 15px;
-    }
+.sidebar ul li a i {
+    margin-right: 15px;
+}
 
-    .sidebar ul li a span {
-        transition: opacity 0.3s;
-        padding-left: 20px;
-    }
+.sidebar ul li a span {
+    transition: opacity 0.3s;
+    padding-left: 20px;
+}
 
 .sidebar.shrink ul li a span {
     opacity: 0;
@@ -88,16 +80,16 @@
     position: relative;
 }
 
-    .topbar .logo img {
-        width: 40px;
-    }
+.topbar .logo img {
+    width: 40px;
+}
 
-    .topbar .toggle-button {
-        color: white;
-        background: none;
-        border: none;
-        font-size: 24px;
-    }
+.topbar .toggle-button {
+    color: white;
+    background: none;
+    border: none;
+    font-size: 24px;
+}
 
 .dropdown-menu {
     background-color: #dc3545;
@@ -109,46 +101,46 @@
     display: none;
 }
 
-    .dropdown-menu.show {
-        display: block;
-    }
+.dropdown-menu.show {
+    display: block;
+}
 
-    .dropdown-menu a {
-        color: white;
-        padding: 10px 20px;
-        display: block;
-        text-decoration: none;
-    }
+.dropdown-menu a {
+    color: white;
+    padding: 10px 20px;
+    display: block;
+    text-decoration: none;
+}
 
 /* Modal adjustments */
 @media (max-width: 768px) {
-    .modal-side {
-        width: 100%;
-        height: auto;
-        top: 0;
-        right: -100%;
-        transition: right 0.3s ease-in-out;
-    }
+.modal-side {
+    width: 100%;
+    height: auto;
+    top: 0;
+    right: -100%;
+    transition: right 0.3s ease-in-out;
+}
 
-        .modal-side.show {
-            right: 0;
-        }
+.modal-side.show {
+    right: 0;
+}
 
-    .modal-header {
-        padding: 10px 15px;
-    }
+.modal-header {
+    padding: 10px 15px;
+}
 
-    .modal-body {
-        padding: 15px;
-    }
+.modal-body {
+    padding: 15px;
+}
 
-    .floating-btn {
-        bottom: 10px;
-        right: 10px;
-        width: 50px;
-        height: 50px;
-        font-size: 20px;
-    }
+.floating-btn {
+    bottom: 10px;
+    right: 10px;
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+}
 }
 /* Floating round button */
 .floating-btn {
@@ -179,9 +171,9 @@
     z-index: 1055;
 }
 
-    .modal-side.show {
-        right: 0;
-    }
+.modal-side.show {
+    right: 0;
+}
 
 .modal-backdrop {
     position: fixed;
@@ -196,10 +188,10 @@
     transition: opacity 0.3s ease;
 }
 
-    .modal-backdrop.show {
-        display: block;
-        opacity: 1;
-    }
+.modal-backdrop.show {
+    display: block;
+    opacity: 1;
+}
 
 /* Media Query for Mobile Screens */
 @media (max-width: 768px) {
@@ -226,10 +218,10 @@
         margin-bottom: 10px; /* Add some space between rows */
     }
 
-        .dataTables_wrapper .dataTables_length select,
-        .dataTables_wrapper .dataTables_filter input {
-            width: 100%; /* Make inputs/selects full width on mobile */
-        }
+    .dataTables_wrapper .dataTables_length select,
+    .dataTables_wrapper .dataTables_filter input {
+        width: 100%; /* Make inputs/selects full width on mobile */
+    }
 }
 
 /* Ensure table is responsive and allows horizontal scrolling */
@@ -275,11 +267,11 @@
     -webkit-appearance: none;
 }
 
-    .dataTables_wrapper .dataTables_length select:focus {
-        border-color: #80bdff; /* Bootstrap focus border color */
-        outline: 0;
-        box-shadow: 0 0 0 0.2rem rgba(223, 54, 54, 0.25); /* Bootstrap focus shadow */
-    }
+.dataTables_wrapper .dataTables_length select:focus {
+    border-color: #80bdff; /* Bootstrap focus border color */
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(223, 54, 54, 0.25); /* Bootstrap focus shadow */
+}
 
 .dataTables_wrapper .dataTables_filter {
     float: right;
@@ -302,11 +294,11 @@
     border: 1px solid #dee2e6; /* Matches Bootstrap's border color */
 }
 
-    #ticketTable.dataTable th,
-    #ticketTable.dataTable td {
-        border: 1px solid #dee2e6; /* Retain cell borders */
-        padding: 0.75rem; /* Bootstrap's default padding */
-    }
+#ticketTable.dataTable th,
+#ticketTable.dataTable td {
+    border: 1px solid #dee2e6; /* Retain cell borders */
+    padding: 0.75rem; /* Bootstrap's default padding */
+}
 
 .dataTables_wrapper .dataTables_paginate .paginate_button {
     padding: 0.375rem 0.75rem; /* Bootstrap button padding */
@@ -318,19 +310,19 @@
     margin-bottom: 80px;
 }
 
-    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-        color: transparent; /* White text on hover */
-    }
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    color: transparent; /* White text on hover */
+}
 
-    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-        background-color: none; /* Active page background */
-        color: transparent; /* Active page text color */
-    }
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background-color: none; /* Active page background */
+    color: transparent; /* Active page text color */
+}
 
-    .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
-        color: #6c757d; /* Disabled button text color */
-        cursor: not-allowed;
-    }
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+    color: #6c757d; /* Disabled button text color */
+    cursor: not-allowed;
+}
 
 .chart-container {
     position: relative;
